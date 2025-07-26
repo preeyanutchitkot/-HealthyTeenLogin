@@ -13,7 +13,7 @@ const Login = () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       alert('เข้าสู่ระบบสำเร็จ!');
-      router.push('/dashboard');
+      router.push('/line/home');
     } catch (error) {
       alert('เกิดข้อผิดพลาด: ' + error.message);
     }

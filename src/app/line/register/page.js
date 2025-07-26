@@ -2,10 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
 import { db, auth } from '../lib/firebase';
 import { doc, setDoc } from 'firebase/firestore';
 
 const Register = () => {
+  const router = useRouter();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -15,7 +18,6 @@ const Register = () => {
   const [weight, setWeight] = useState('');
   const [bmi, setBmi] = useState('');
 
-  // คำนวณ BMI ทุกครั้งที่ height หรือ weight เปลี่ยน
   useEffect(() => {
     const h = parseFloat(height);
     const w = parseFloat(weight);
@@ -49,6 +51,7 @@ const Register = () => {
       });
 
       alert('สมัครสมาชิกสำเร็จ!');
+      router.push('/line/agreement');
     } catch (error) {
       alert('เกิดข้อผิดพลาด: ' + error.message);
     }
@@ -158,6 +161,53 @@ const Register = () => {
           color: #84AA81;
           text-decoration: underline;
         }
+          .input-group {
+          display: flex;
+          flex-direction: column;
+          flex: 1;
+        }
+
+        .input-group label {
+          font-size: 14px;
+          font-weight: bold;
+          color: #3ABB47;
+          margin-bottom: 4px;
+        }
+        .input-group select,
+        .input-group input {
+          width: 100%;
+          padding: 10px;
+          border-radius: 10px;
+          border: 1px solid #ccc;
+          font-size: 16px;
+          box-sizing: border-box;
+        }
+          .input-wrapper {
+          display: flex;
+          align-items: center;
+          border: 1px solid #ccc;
+          border-radius: 10px;
+          padding: 5px 10px;
+          background-color: white;
+        }
+
+        .input-wrapper img {
+          width: 20px;
+          height: 20px;
+          margin-right: 8px;
+          opacity: 0.7;
+        }
+
+        .input-wrapper input,
+        .input-wrapper select {
+          border: none;
+          outline: none;
+          font-size: 16px;
+          flex: 1;
+          padding: 6px 0;
+        }
+
+
       `}</style>
 
       <div className="content">
@@ -191,34 +241,60 @@ const Register = () => {
           />
 
           <div className="row">
-            <select value={gender} onChange={(e) => setGender(e.target.value)}>
-              <option value="">เพศ</option>
-              <option value="male">ชาย</option>
-              <option value="female">หญิง</option>
-              <option value="other">อื่น ๆ</option>
-            </select>
-            <input
-              type="number"
-              placeholder="อายุ"
-              value={age}
-              onChange={(e) => setAge(e.target.value)}
-            />
+            <div className="input-group">
+              <label>ระบุเพศ</label>
+              <div className="input-wrapper">
+                <img src="/gender.png" alt="gender" />
+                <select value={gender} onChange={(e) => setGender(e.target.value)}>
+                  <option value="">เพศ</option>
+                  <option value="male">ชาย</option>
+                  <option value="female">หญิง</option>
+                  {/* <option value="other">อื่น ๆ</option> */}
+                </select>
+              </div>
+            </div>
+            <div className="input-group">
+              <label>อายุ</label>
+              <div className="input-wrapper">
+                <img src="/age.png" alt="age" />
+                <input
+                  type="number"
+                  placeholder="อายุ"
+                  value={age}
+                  onChange={(e) => setAge(e.target.value)}
+                />
+              </div>
+            </div>
           </div>
 
+          {/* ส่วนสูง + น้ำหนัก */}
           <div className="row">
-            <input
-              type="number"
-              placeholder="ส่วนสูง (cm)"
-              value={height}
-              onChange={(e) => setHeight(e.target.value)}
-            />
-            <input
-              type="number"
-              placeholder="น้ำหนัก (kg)"
-              value={weight}
-              onChange={(e) => setWeight(e.target.value)}
-            />
+            <div className="input-group">
+              <label>ส่วนสูง</label>
+              <div className="input-wrapper">
+                <img src="/height.png" alt="height" />
+                <input
+                  type="number"
+                  placeholder="ส่วนสูง"
+                  value={height}
+                  onChange={(e) => setHeight(e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="input-group">
+              <label>น้ำหนัก</label>
+              <div className="input-wrapper">
+                <img src="/weight.png" alt="weight" />
+                <input
+                  type="number"
+                  placeholder="น้ำหนัก"
+                  value={weight}
+                  onChange={(e) => setWeight(e.target.value)}
+                />
+              </div>
+            </div>
           </div>
+
 
           <div className="bmi-text">
             BMI ของคุณ: {bmi || 'ยังไม่คำนวณ'}

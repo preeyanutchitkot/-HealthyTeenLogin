@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { db, auth } from '../lib/firebase';
 import { doc, setDoc } from 'firebase/firestore';
@@ -15,16 +15,18 @@ const Register = () => {
   const [weight, setWeight] = useState('');
   const [bmi, setBmi] = useState('');
 
-const calculateBMI = () => {
-  const h = parseFloat(String(height).trim()); // height in cm
-  const w = parseFloat(String(weight).trim()); // weight in kg
-  if (!isNaN(h) && !isNaN(w) && h > 0) {
-    const heightInMeters = h / 100;
-    const bmiResult = w / (heightInMeters * heightInMeters);
-    setBmi(bmiResult.toFixed(2));
-  }
-};
-
+  // คำนวณ BMI ทุกครั้งที่ height หรือ weight เปลี่ยน
+  useEffect(() => {
+    const h = parseFloat(height);
+    const w = parseFloat(weight);
+    if (!isNaN(h) && !isNaN(w) && h > 0) {
+      const heightInMeters = h / 100;
+      const bmiResult = w / (heightInMeters * heightInMeters);
+      setBmi(bmiResult.toFixed(2));
+    } else {
+      setBmi('');
+    }
+  }, [height, weight]);
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -75,7 +77,7 @@ const calculateBMI = () => {
           margin-bottom: 20px;
         }
 
-            h2 {
+        h2 {
           color: #84AA81;
           margin-bottom: 4px;
         }
@@ -119,7 +121,7 @@ const calculateBMI = () => {
           margin-top: 6px;
         }
 
-          .note {
+        .note {
           font-size: 12px;
           color: #999;
           display: flex;
@@ -133,7 +135,6 @@ const calculateBMI = () => {
           font-weight: bold;
           text-decoration: underline;
         }
-
 
         .btn {
           background-color: #3ABB47;
@@ -177,17 +178,18 @@ const calculateBMI = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-         <div className="note">
-              <span>รหัสผ่านควรมีความยาวอย่างน้อย 8 ตัวอักษร</span>
-              <a href="/line/liff">เข้าสู่ระบบ</a>
-            </div> 
-                      
+          <div className="note">
+            <span>รหัสผ่านควรมีความยาวอย่างน้อย 8 ตัวอักษร</span>
+            <a href="/line/liff">เข้าสู่ระบบ</a>
+          </div>
+
           <input
             type="password"
             placeholder="ยืนยันรหัสผ่าน"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
+
           <div className="row">
             <select value={gender} onChange={(e) => setGender(e.target.value)}>
               <option value="">เพศ</option>
@@ -202,32 +204,26 @@ const calculateBMI = () => {
               onChange={(e) => setAge(e.target.value)}
             />
           </div>
+
           <div className="row">
             <input
               type="number"
               placeholder="ส่วนสูง (cm)"
               value={height}
-              onChange={(e) => {
-                setHeight(e.target.value);
-                setTimeout(calculateBMI, 100);
-              }}
+              onChange={(e) => setHeight(e.target.value)}
             />
             <input
               type="number"
               placeholder="น้ำหนัก (kg)"
               value={weight}
-              onChange={(e) => {
-                setWeight(e.target.value);
-                setTimeout(calculateBMI, 100);
-              }}
+              onChange={(e) => setWeight(e.target.value)}
             />
           </div>
+
           <div className="bmi-text">
-          BMI ของคุณ: {bmi || 'ยังไม่คำนวณ'}
-          <br />
-          <span style={{fontSize: '12px', color: '#aaa'}}>
-          </span>
-        </div>
+            BMI ของคุณ: {bmi || 'ยังไม่คำนวณ'}
+          </div>
+
           <button type="submit" className="btn">ยืนยัน</button>
         </form>
       </div>

@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import BottomMenu from '@/app/line/components/menu'; // ปรับ path ตามโปรเจกต์คุณ
+import Link from 'next/link'; 
 
 export default function HomePage() {
   return (
@@ -32,17 +33,21 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Circle Menu */}
-        <div className="circle-menu">
-          {['บันทึกอาหาร', 'แนะนำอาหาร', 'พูดคุย', 'วิดีโอสุขภาพ'].map((label) => (
-            <div className="circle-menu-item" key={label}>
-              <div className="circle-icon">
-                <Image src="/test.png" alt={label} width={36} height={36} />
-              </div>
-              <div className="circle-label">{label}</div>
+       <div className="circle-menu">
+            {[
+                { label: 'บันทึกอาหาร', href: '/line/food' },
+                { label: 'แนะนำอาหาร', href: '/line/recommend' },
+                { label: 'พูดคุย', href: '/line/chat' },
+                { label: 'วิดีโอสุขภาพ', href: '/line/video' },
+            ].map((item) => (
+                <Link href={item.href} key={item.label} className="circle-menu-item">
+                <div className="circle-icon">
+                    <Image src="/test.png" alt={item.label} width={36} height={36} />
+                </div>
+                <div className="circle-label">{item.label}</div>
+                </Link>
+            ))}
             </div>
-          ))}
-        </div>
 
         {/* เมนูวันนี้ */}
         <div className="menu-today">

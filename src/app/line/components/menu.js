@@ -8,8 +8,8 @@ const BottomMenu = () => {
   const pathname = usePathname();
 
   const menuItems = [
-    { label: 'หน้าหลัก', href: '/', icon: '/home.png' },
-    { label: 'บันทึกอาหาร', href: '/log', icon: '/foodlog.png' },
+    { label: 'หน้าหลัก', href: '/line/home', icon: '/home.png' },
+    { label: 'บันทึกอาหาร', href: '/line/food', icon: '/foodlog.png' },
     { label: 'แชทบอท', href: '/chatbot', icon: '/chatbot.jpg', center: true },
     { label: 'พูดคุย', href: '/chat', icon: '/talk.png' },
     { label: 'ฉัน', href: '/me', icon: '/profile.png' },

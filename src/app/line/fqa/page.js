@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import BottomMenu from '@/app/line/components/menu';
 
 export default function AgreementPage() {
   const [tab, setTab] = useState("privacy");
@@ -39,24 +40,10 @@ return (
 
       .wrapper {
         min-height: 100vh;
-        background-color: white;
+        background-color: #e9f8ea;
         font-family: 'Noto Sans Thai', sans-serif;
         display: flex;
         flex-direction: column;
-      }
-
-      .back-button {
-        background-color: white;
-        color: #3ABB47;
-        font-weight: 600;
-        font-size: 14px;
-        padding: 16px;
-        border-bottom: 1px solid #ddd;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        width: 100%;
       }
 
       .header {
@@ -81,7 +68,7 @@ return (
         font-weight: 600;
         font-size: 14px;
         cursor: pointer;
-        border: 1px solid #3ABB47;
+        border: 1px solid #EAF0EB;
         border-top: none;
       }
 
@@ -130,34 +117,12 @@ return (
         color: #3ABB47;
       }
 
-      .checkbox {
-        width: 16px;
-        height: 16px;
-        margin-top: 3px;
-      }
-
-      .next-btn {
-        width: 100%;
-        padding: 14px;
-        background-color: #3ABB47;
-        color: white;
-        font-weight: bold;
-        font-size: 14px;
-        border: none;
-        cursor: pointer;
-        border-radius: 100px;
-      }
-
-      .next-btn:disabled {
-        background-color: #ccc;
-        cursor: not-allowed;
-      }
     `}</style>
 
     <div className="header"> คำถามที่พบบ่อย (FAQ) </div>
 
     <div className="content">{tab === "privacy" ? privacyText : termsText}</div>
-
+<BottomMenu />
   </div>
 );
 

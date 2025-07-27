@@ -88,7 +88,7 @@ return (
 
       .wrapper {
         min-height: 100vh;
-        background-color: white;
+        background-color: f3faee;
         font-family: 'Noto Sans Thai', sans-serif;
         display: flex;
         flex-direction: column;

@@ -13,6 +13,14 @@ export default function HomePage() {
           <div className="profile">
             <Image src="/test.png" alt="profile" width={72} height={72} />
           </div>
+          <div className="header-icons">
+            <Link href="/notification">
+            <Image src="/Doorbell.png" alt="doorbell" width={28} height={40} />
+            </Link>
+            <Link href="/editmenu">
+            <Image src="/Menu.png" alt="menu" width={28} height={40} />
+            </Link>
+          </div>
 
           {/* Summary Box */}
           <div className="summary-container">
@@ -90,7 +98,14 @@ export default function HomePage() {
           position: relative;
           height: 200px;
         }
-
+          .header-icons {
+          position: absolute;
+          top: 10px;
+          right: 20px;
+          display: flex;
+          gap: 16px;
+          z-index: 20;
+        }
         .profile {
           position: absolute;
           top: 16px;

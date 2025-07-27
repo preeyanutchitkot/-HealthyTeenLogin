@@ -11,9 +11,12 @@
   "dependencies": {
     "@line/liff": "^2.27.1",
     "@tailwindcss/vite": "^4.1.11",
+    "body-parser": "^2.2.0",
+    "express": "^5.1.0",
     "firebase": "^12.0.0",
     "lucide-react": "^0.525.0",
     "next": "15.4.4",
+    "node-fetch": "^3.3.2",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },
@@ -22,5 +25,18 @@
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.11"
-  }
+  },
+  "description": "This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aphichet-autsa/-HealthyTeenLogin.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aphichet-autsa/-HealthyTeenLogin/issues"
+  },
+  "homepage": "https://github.com/aphichet-autsa/-HealthyTeenLogin#readme"
 }

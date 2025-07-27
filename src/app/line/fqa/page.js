@@ -122,7 +122,7 @@ return (
     <div className="header"> คำถามที่พบบ่อย (FAQ) </div>
 
     <div className="content">{tab === "privacy" ? privacyText : termsText}</div>
-<BottomMenu />
+        <BottomMenu />
   </div>
 );
 

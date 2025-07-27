@@ -135,13 +135,13 @@ return (
       }
 
       .tab.active {
-        background-color: #3ABB47;
-        color: white;
+        background-color: white;
+        color: #3ABB47;
       }
 
       .tab.inactive {
-        background-color: white;
-        color: #3ABB47;
+        background-color: #3ABB47;
+        color: white;
       }
 
       .content {

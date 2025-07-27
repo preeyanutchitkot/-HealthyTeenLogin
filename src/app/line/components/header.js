@@ -8,7 +8,7 @@ const Header = ({ title, cartoonImage }) => {
         <Image src="/backbotton.png" alt="back" width={24} height={24} />
       </button>
       <div className="header-center">
-        <span className="header-title">{title}</span>
+        <span className="header-title">{title}</span> 
         <Image className="header-cartoon" src={cartoonImage} alt="cartoon" width={55} height={70} />
       </div>
       <style>{`

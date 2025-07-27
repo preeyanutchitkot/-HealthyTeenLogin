@@ -8,4 +8,4 @@ export default function LookvideoPage() {
       {/* เนื้อหาหน้าแรก */}
     </div>
   );
-}
+} 

@@ -4,12 +4,31 @@ function MenuPopup({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   // ไอคอนที่ใช้ในแต่ละเมนู (ใช้ public/xxx.png)
+  // SVG ไอคอนสีดำ
+  const icons = {
+    edit: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 20h4.586a1 1 0 0 0 .707-.293l10.5-10.5a2 2 0 0 0 0-2.828l-2.172-2.172a2 2 0 0 0-2.828 0l-10.5 10.5A1 1 0 0 0 4 15.414V20z" stroke="#222" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M14.5 6.5l3 3" stroke="#222" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+    ),
+    book: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="4" width="18" height="16" rx="2" stroke="#222" strokeWidth="2"/><path d="M7 4v16" stroke="#222" strokeWidth="2"/></svg>
+    ),
+    question: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" stroke="#222" strokeWidth="2"/><path d="M12 16h.01" stroke="#222" strokeWidth="2" strokeLinecap="round"/><path d="M12 8a2 2 0 0 1 2 2c0 1-2 2-2 4" stroke="#222" strokeWidth="2" strokeLinecap="round"/></svg>
+    ),
+    doc: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="2" width="16" height="20" rx="2" stroke="#222" strokeWidth="2"/><path d="M8 6h8M8 10h8M8 14h6" stroke="#222" strokeWidth="2"/></svg>
+    ),
+    phone: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.72 19.72 0 0 1 2 4.18 2 2 0 0 1 4 2h3a2 2 0 0 1 2 1.72c.13 1.05.37 2.07.72 3.06a2 2 0 0 1-.45 2.11l-1.27 1.27a16 16 0 0 0 6.29 6.29l1.27-1.27a2 2 0 0 1 2.11-.45c.99.35 2.01.59 3.06.72A2 2 0 0 1 22 16.92z" stroke="#222" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+    ),
+  };
+
   const menuItems = [
     {
       section: 'การตั้งค่า',
       items: [
         {
-          icon: '🔧', // ดำ
+          icon: icons.edit,
           label: 'แก้ไขข้อมูล',
           onClick: () => {},
         },
@@ -19,22 +38,22 @@ function MenuPopup({ isOpen, onClose }) {
       section: 'ข้อมูลเพิ่มเติม',
       items: [
         {
-          icon: '📖',
+          icon: icons.book,
           label: 'วิธีการใช้งาน',
           onClick: () => {},
         },
         {
-          icon: '❓',
+          icon: icons.question,
           label: 'คำถามที่พบบ่อย',
           onClick: () => {},
         },
         {
-          icon: '📄',
+          icon: icons.doc,
           label: 'ข้อกำหนดและเงื่อนไขการใช้งาน',
           onClick: () => {},
         },
         {
-          icon: '📞',
+          icon: icons.phone,
           label: 'ติดต่อเรา',
           onClick: () => {},
         },
@@ -119,7 +138,7 @@ function MenuPopup({ isOpen, onClose }) {
                   fontSize: 16,
                   background: 'none',
                 }} onClick={item.onClick}>
-                  <span style={{ width: 28, height: 28, marginRight: 16, fontSize: 24, color: '#222', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{item.icon}</span>
+                  <span style={{ width: 28, height: 28, marginRight: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{item.icon}</span>
                   <span style={{ flex: 1, color: '#222', fontWeight: 500 }}>{item.label}</span>
                   <span style={{ color: '#3ABB47', fontSize: 22, fontWeight: 700 }}>{'>'}</span>
                 </div>

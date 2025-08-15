@@ -12,6 +12,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 */
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
 export const metadata = {
   title: "Create Next App",

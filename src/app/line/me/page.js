@@ -139,7 +139,7 @@ export default function MePage() {
         })}
       </div>
 
-  <MenuPopup open={menuOpen} onClose={() => setMenuOpen(false)} />
+  <MenuPopup isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
   <BottomMenu />
 
       <style>{`

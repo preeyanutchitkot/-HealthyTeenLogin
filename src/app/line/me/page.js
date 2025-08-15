@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import BottomMenu from "@/app/line/components/menu";
 import CalorieSummary from "@/app/line/components/CalorieSummary";
+import MenuPopup from "@/app/line/components/MenuPopup";
 import { Noto_Sans_Thai } from "next/font/google";
 
 const notoSansThai = Noto_Sans_Thai({
@@ -34,6 +35,7 @@ export default function MePage() {
 
   // state JS ล้วน (ไม่มีไทป์)
   const [openDates, setOpenDates] = useState({ "20/07/68": true });
+  const [menuOpen, setMenuOpen] = useState(false);
   const toggleDate = (date) =>
     setOpenDates((prev) => ({ ...prev, [date]: !prev[date] }));
 
@@ -59,9 +61,13 @@ export default function MePage() {
           <Link href="/line/notification">
             <Image src="/Doorbell.png" alt="doorbell" width={28} height={40} />
           </Link>
-          <Link href="/line/editmenu">
+          <button
+            style={{ background: 'none', border: 'none', padding: 0, margin: 0, cursor: 'pointer' }}
+            onClick={() => setMenuOpen(true)}
+            aria-label="เมนู"
+          >
             <Image src="/Menu.png" alt="menu" width={28} height={40} />
-          </Link>
+          </button>
         </div>
 
         <div className="metrics">
@@ -133,7 +139,8 @@ export default function MePage() {
         })}
       </div>
 
-      <BottomMenu />
+  <MenuPopup open={menuOpen} onClose={() => setMenuOpen(false)} />
+  <BottomMenu />
 
       <style>{`
         .page {

@@ -22,51 +22,72 @@ const Login = () => {
   return (
     <div className="login-container">
       <style jsx>{`
+        html, body, #__next, .login-container {
+          height: 100%;
+          margin: 0;
+          padding: 0;
+          background: #e9f8ea;
+        }
         .login-container {
+          min-height: 100vh;
+          width: 100vw;
           display: flex;
+          flex-direction: column;
           justify-content: center;
           align-items: center;
-          height: 100vh;
-          background-color: #e9f8ea; /* พื้นหลังสีเขียวอ่อน */
+          background-color: #e9f8ea;
           font-family: 'Noto Sans Thai', sans-serif;
+          overflow: hidden;
         }
-
         .content {
           display: flex;
           flex-direction: column;
           align-items: center;
+          width: 100%;
+          max-width: 360px;
+          margin: 0 auto;
+          padding: 0 12px;
+          box-sizing: border-box;
+          flex: 1 0 auto;
+          justify-content: center;
         }
-
         .logo {
-          width: 200px;
-          margin-bottom: 20px;
+          width: 170px;
+          max-width: 90vw;
+          margin-bottom: 18px;
         }
-
         h2 {
-          color: #84AA81; /* หัวข้อสีเขียวเข้ม */
+          color: #3ABB47;
           margin-bottom: 20px;
+          font-size: 28px;
+          font-weight: 700;
         }
-
         h5 {
-          color: #84AA81; /* หัวข้อสีเขียวเข้ม */
+          color: #3ABB47;
           margin-bottom: 20px;
+          font-size: 18px;
+          font-weight: 500;
+          cursor: pointer;
         }
-
         form {
           display: flex;
           flex-direction: column;
           align-items: center;
           gap: 12px;
+          width: 100%;
         }
-
         input {
-          width: 280px;
-          padding: 10px;
+          width: 100%;
+          max-width: 320px;
+          padding: 10px 16px;
           border-radius: 10px;
-          border: 1px solid #ccc;
-          font-size: 16px;
+          border: 1.5px solid #BDBDBD;
+          font-size: 18px;
+          background: #fff;
+          color: #3ABB47;
+          font-family: inherit;
+          box-sizing: border-box;
         }
-
         .divider {
           display: flex;
           align-items: center;
@@ -75,39 +96,44 @@ const Login = () => {
           margin-top: 20px;
           margin-bottom: 8px;
         }
-
         .divider hr {
           flex: 1;
           border: none;
-          border-top: 1px solid #93BC99;
+          border-top: 1px solid #3ABB47;
         }
-
         .divider span {
-          color: #84AA81;
+          color: #3ABB47;
           font-weight: bold;
         }
-
         .btn {
           background-color: #3ABB47;
           color: white;
-          padding: 10px;
+          padding: 14px 0;
           border: none;
           border-radius: 12px;
           margin-top: 8px;
-          width: 280px;
+          width: 100%;
+          max-width: 320px;
           cursor: pointer;
-          font-weight: bold;
-          font-size: 16px;
+          font-weight: 700;
+          font-size: 20px;
         }
-
         .link {
           margin-top: 16px;
           font-size: 14px;
+          color: #3ABB47;
         }
-
         .link a {
-          color: #93BC99;
+          color: #3ABB47;
           text-decoration: underline;
+        }
+        @media (max-width: 480px) {
+          .content {
+            padding: 24px 8px 0 8px;
+          }
+          .logo {
+            width: 120px;
+          }
         }
       `}</style>
 
@@ -128,7 +154,7 @@ const Login = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
           
-          <h5>ลืมรหัสผ่าน</h5>
+          <h5>ลืมรหัสผ่าน</h5> 
           <button type="submit" className="btn">เข้าสู่ระบบ</button>
         </form>
 

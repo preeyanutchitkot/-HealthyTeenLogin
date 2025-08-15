@@ -1,4 +1,5 @@
 
+import Link from "next/link";
 
 function MenuPopup({ isOpen, onClose }) {
   if (!isOpen) return null;
@@ -30,7 +31,7 @@ function MenuPopup({ isOpen, onClose }) {
         {
           icon: icons.edit,
           label: 'แก้ไขข้อมูล',
-          onClick: () => {},
+          href: '/line/editmenu',
         },
       ],
     },
@@ -40,22 +41,22 @@ function MenuPopup({ isOpen, onClose }) {
         {
           icon: icons.book,
           label: 'วิธีการใช้งาน',
-          onClick: () => {},
+          href: '/line/manual',
         },
         {
           icon: icons.question,
           label: 'คำถามที่พบบ่อย',
-          onClick: () => {},
+          href: '/line/fqa',
         },
         {
           icon: icons.doc,
           label: 'ข้อกำหนดและเงื่อนไขการใช้งาน',
-          onClick: () => {},
+          href: '/line/terms',
         },
         {
           icon: icons.phone,
           label: 'ติดต่อเรา',
-          onClick: () => {},
+          href: '/line/contact',
         },
       ],
     },
@@ -112,7 +113,7 @@ function MenuPopup({ isOpen, onClose }) {
             }}
             aria-label="close menu"
           >
-            <span style={{ fontSize: 32, color: '#fff' }}>{'←'}</span>
+            <img src="/back2.png" alt="ย้อนกลับ" style={{ width: 40, height: 40, borderRadius: '50%' }} />
           </button>
           เมนู
         </div>
@@ -127,21 +128,27 @@ function MenuPopup({ isOpen, onClose }) {
                 padding: '0 32px 8px 32px',
               }}>{section.section}</div>
               {section.items.map((item, i) => (
-                <div key={item.label} style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: '10px 32px',
-                  borderBottom: i === section.items.length - 1 ? 'none' : '1px solid #E0E0E0',
-                  cursor: 'pointer',
-                  color: '#3ABB47',
-                  fontWeight: 500,
-                  fontSize: 16,
-                  background: 'none',
-                }} onClick={item.onClick}>
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '10px 32px',
+                    borderBottom: i === section.items.length - 1 ? 'none' : '1px solid #E0E0E0',
+                    cursor: 'pointer',
+                    color: '#3ABB47',
+                    fontWeight: 500,
+                    fontSize: 16,
+                    background: 'none',
+                    textDecoration: 'none',
+                  }}
+                  onClick={onClose}
+                >
                   <span style={{ width: 28, height: 28, marginRight: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{item.icon}</span>
                   <span style={{ flex: 1, color: '#222', fontWeight: 500 }}>{item.label}</span>
                   <span style={{ color: '#3ABB47', fontSize: 22, fontWeight: 700 }}>{'>'}</span>
-                </div>
+                </Link>
               ))}
             </div>
           ))}

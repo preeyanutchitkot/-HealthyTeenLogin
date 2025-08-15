@@ -1,14 +1,3 @@
-'use client';
-
-import Image from 'next/image';
-import BottomMenu from '@/app/line/components/menu';
-import Link from 'next/link';
-import CalorieSummary from '@/app/line/components/CalorieSummary';
-export default function HomePage() {
-  return (
-    <div className="page">
-      {/* Header */}
-      <div className="header">
 "use client";
 
 import Image from "next/image";

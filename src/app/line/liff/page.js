@@ -52,9 +52,10 @@ const Login = () => {
           justify-content: center;
         }
         .logo {
-          width: 170px;
-          max-width: 90vw;
-          margin-bottom: 18px;
+          width: 220px;
+          max-width: 98vw;
+          margin-bottom: 24px;
+          display: block;
         }
         h2 {
           color: #3ABB47;
@@ -62,12 +63,19 @@ const Login = () => {
           font-size: 28px;
           font-weight: 700;
         }
-        h5 {
+        .forgot-link {
           color: #3ABB47;
-          margin-bottom: 20px;
+          margin-bottom: 8px;
           font-size: 18px;
           font-weight: 500;
           cursor: pointer;
+          background: none;
+          border: none;
+          padding: 0;
+          text-align: center;
+          width: 100%;
+          max-width: 320px;
+          display: block;
         }
         form {
           display: flex;
@@ -78,11 +86,11 @@ const Login = () => {
         }
         input {
           width: 100%;
-          max-width: 320px;
-          padding: 10px 16px;
+          max-width: 260px;
+          padding: 8px 12px;
           border-radius: 10px;
           border: 1.5px solid #BDBDBD;
-          font-size: 18px;
+          font-size: 16px;
           background: #fff;
           color: #3ABB47;
           font-family: inherit;
@@ -108,31 +116,34 @@ const Login = () => {
         .btn {
           background-color: #3ABB47;
           color: white;
-          padding: 14px 0;
+          padding: 10px 0;
           border: none;
           border-radius: 12px;
-          margin-top: 8px;
+          margin-top: 0px;
           width: 100%;
-          max-width: 320px;
+          max-width: 260px;
           cursor: pointer;
           font-weight: 700;
-          font-size: 20px;
+          font-size: 16px;
+          display: block;
         }
         .link {
           margin-top: 16px;
-          font-size: 14px;
+          font-size: 18px;
           color: #3ABB47;
         }
         .link a {
           color: #3ABB47;
           text-decoration: underline;
+          font-size: 18px;
         }
         @media (max-width: 480px) {
           .content {
             padding: 24px 8px 0 8px;
           }
           .logo {
-            width: 120px;
+            width: 240px;
+            max-width: 98vw;
           }
         }
       `}</style>
@@ -153,8 +164,13 @@ const Login = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          
-          <h5>ลืมรหัสผ่าน</h5> 
+          <button
+            type="button"
+            className="forgot-link"
+            onClick={() => window.location.href = '/line/forgotpassword'}
+          >
+            ลืมรหัสผ่าน
+          </button>
           <button type="submit" className="btn">เข้าสู่ระบบ</button>
         </form>
 

@@ -1,13 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import BottomMenu from '@/app/line/components/menu';
 
-export default function AgreementPage() {
+export default function TermsPage() {
   const [tab, setTab] = useState("privacy");
-  const [isChecked, setIsChecked] = useState(false);
-  const router = useRouter();
 
   const privacyText = `
 1. ข้อมูลที่เก็บรวบรวม
@@ -203,10 +200,7 @@ return (
 
     {/* 📜 เนื้อหา */}
     <div className="content">{tab === "privacy" ? privacyText : termsText}</div>
-    
-<BottomMenu />
-
+    <BottomMenu />
   </div>
 );
-
 }

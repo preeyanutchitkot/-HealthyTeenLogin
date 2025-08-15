@@ -50,8 +50,8 @@ const Register = () => {
         bmi,
       });
 
-      alert('สมัครสมาชิกสำเร็จ!');
-      router.push('/line/agreement');
+  alert('สมัครสมาชิกสำเร็จ!');
+  router.push('/line/agreement');
     } catch (error) {
       alert('เกิดข้อผิดพลาด: ' + error.message);
     }
@@ -81,7 +81,7 @@ const Register = () => {
         }
 
         h2 {
-          color: #84AA81;
+          color: #3ABB47;
           margin-bottom: 4px;
         }
 
@@ -120,7 +120,7 @@ const Register = () => {
 
         .bmi-text {
           font-size: 14px;
-          color: #777;
+          color: red;
           margin-top: 6px;
         }
 
@@ -134,7 +134,7 @@ const Register = () => {
         }
 
         .note a {
-          color: #84AA81;
+          color: #3ABB47;
           font-weight: bold;
           text-decoration: underline;
         }

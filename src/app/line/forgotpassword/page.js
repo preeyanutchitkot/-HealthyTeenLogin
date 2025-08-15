@@ -3,7 +3,6 @@
 import { Noto_Sans_Thai } from "next/font/google";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Menu from "../../line/components/menu";
 
 const notoSansThai = Noto_Sans_Thai({
   weight: ["300", "400", "500", "700"],
@@ -114,7 +113,7 @@ export default function ForgotPasswordPage() {
       </div>
       {/* Bottom nav */}
       <div style={{ height: 80 }} />
-      <Menu />
+  {/* <Menu /> */}
     </div>
   );
 }

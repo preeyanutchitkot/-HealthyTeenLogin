@@ -9,7 +9,6 @@ export default function AgreementPage() {
   const router = useRouter();
 
   const privacyText = `
-// ...existing code...
 1. ข้อมูลที่เก็บรวบรวม
 เราเก็บรวบรวมข้อมูลบางประเภทจากผู้ใช้เพื่อการใช้งานระบบของเรา ซึ่งอาจรวมถึง:
 - ข้อมูลส่วนบุคคล เช่น ชื่อ, อีเมล, เบอร์โทรศัพท์ (กรณีที่ผู้ใช้สมัครสมาชิกหรือกรอกข้อมูล)
@@ -86,86 +85,68 @@ return (
         padding: 0;
         box-sizing: border-box;
       }
-
       .wrapper {
-        min-height: 100vh;
-        background-color: f3faee;
-        font-family: 'Noto Sans Thai', sans-serif;
-        display: flex;
-        flex-direction: column;
+  min-height: 100vh;
+  background-color: #f3faee;
+  font-family: 'Noto Sans Thai', sans-serif;
+  display: flex;
+  flex-direction: column;
+  max-width: 100vw;
+  min-width: 0;
+  margin: 0;
+  box-shadow: none;
       }
-
-      .back-button {
-        background-color: white;
-        color: #3ABB47;
-        font-weight: 600;
-        font-size: 14px;
-        padding: 16px;
-        border-bottom: 1px solid #ddd;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        width: 100%;
-      }
-
       .header {
         background-color: #3ABB47;
         color: white;
         text-align: center;
-        padding: 16px;
+        padding: 16px 8px;
         font-size: 18px;
         font-weight: bold;
         width: 100%;
       }
-
       .tabs {
         display: flex;
         width: 100%;
       }
-
       .tab {
         flex: 1;
-        padding: 12px;
+        padding: 12px 4px;
         text-align: center;
         font-weight: 600;
         font-size: 14px;
         cursor: pointer;
         border: 1px solid #3ABB47;
         border-top: none;
+        transition: background 0.2s, color 0.2s;
       }
-
       .tab.active {
         background-color: white;
         color: #3ABB47;
       }
-
       .tab.inactive {
         background-color: #3ABB47;
         color: white;
       }
-
       .content {
         flex: 1;
         overflow-y: auto;
-        padding: 20px;
+        padding: 20px 12px;
         font-size: 14px;
         line-height: 1.7;
         color: #333;
         white-space: pre-wrap;
       }
-
       .footer {
         position: sticky;
         bottom: 0;
         width: 100%;
         background: white;
-        padding: 16px;
+        padding: 16px 8px;
         border-top: 1px solid #ddd;
         box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
         z-index: 999;
       }
-
       .agreement {
         display: flex;
         align-items: flex-start;
@@ -174,18 +155,15 @@ return (
         color: #666;
         margin-bottom: 8px;
       }
-
       .agreement-text span {
         text-decoration: underline;
         color: #3ABB47;
       }
-
       .checkbox {
         width: 16px;
         height: 16px;
         margin-top: 3px;
       }
-
       .next-btn {
         width: 100%;
         padding: 14px;
@@ -197,10 +175,38 @@ return (
         cursor: pointer;
         border-radius: 100px;
       }
-
       .next-btn:disabled {
         background-color: #ccc;
         cursor: not-allowed;
+      }
+      @media (max-width: 480px) {
+        .wrapper {
+          max-width: 100vw;
+          min-height: 100vh;
+          box-shadow: none;
+        }
+        .header {
+          font-size: 16px;
+          padding: 12px 4px;
+        }
+        .tabs {
+          font-size: 13px;
+        }
+        .tab {
+          font-size: 13px;
+          padding: 10px 2px;
+        }
+        .content {
+          padding: 14px 4px;
+          font-size: 13px;
+        }
+        .footer {
+          padding: 12px 4px;
+        }
+        .next-btn {
+          font-size: 13px;
+          padding: 12px;
+        }
       }
     `}</style>
 

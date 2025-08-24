@@ -7,84 +7,103 @@ import { usePathname } from 'next/navigation';
 const BottomMenu = () => {
   const pathname = usePathname();
 
+  // ทำให้ path รูปปลอดภัย (รองรับ space/วงเล็บ)
+  const safeSrc = (p) => encodeURI(p);
+
   const menuItems = [
-    { label: 'หน้าหลัก', href: '/line/home', icon: '/home.png' },
-    { label: 'บันทึกอาหาร', href: '/line/food', icon: '/foodlog.png' },
-    { label: 'แชทบอท', href: '/chatbot', icon: '/chatbot.jpg', center: true },
-    { label: 'พูดคุย', href: '/chat', icon: '/talk.png' },
-    { label: 'ฉัน', href: '/me', icon: '/profile.png' },
+    { label: 'หน้าหลัก',   href: '/line/home', icon: '/home 3.png' },
+    { label: 'บันทึกอาหาร', href: '/line/food', icon: '/savefood.png' },
+    { label: 'แชทบอท',     href: '/line/chatbot',    icon: '/55.png', center: true },
+    { label: 'พูดคุย',      href: '/line/chat',       icon: '/Group 230 (1).png' },
+    { label: 'ฉัน',         href: '/line/me',         icon: '/Group 230 (2).png' },
   ];
 
   return (
     <>
-      <div className="bottom-menu">
-        {menuItems.map((item) => (
-          <Link
-            href={item.href}
-            key={item.href}
-            className={`menu-item ${item.center ? 'centered' : ''} ${pathname === item.href ? 'active' : ''}`}
-          >
-            <div className={item.center ? 'center-icon' : ''}>
-              <Image src={item.icon} alt={item.label} width={28} height={28} />
-            </div>
-            <span>{item.label}</span>
-          </Link>
-        ))}
-      </div>
+      <nav className="bottom-menu">
+        {menuItems.map((item) => {
+          const isActive =
+            pathname === item.href || pathname?.startsWith(item.href + '/');
+
+          return (
+            <Link
+              href={item.href}
+              key={item.href}
+              className={`menu-item ${item.center ? 'centered' : ''} ${isActive ? 'active' : ''}`}
+              aria-label={item.label}
+            >
+              {item.center ? (
+                <div className={`center-wrap ${isActive ? 'active' : ''}`}>
+                  <Image
+                    src={safeSrc(item.icon)}
+                    alt={item.label}
+                    width={40}
+                    height={50}
+                    className="center-img"
+                    priority
+                  />
+                </div>
+              ) : (
+                <Image
+                  src={safeSrc(item.icon)}
+                  alt={item.label}
+                  width={32}
+                  height={32}
+                  className={`icon ${isActive ? 'icon-active' : 'icon-inactive'}`}
+                />
+              )}
+              <span className={`label ${isActive ? 'label-active' : 'label-inactive'}`}>
+                {item.label}
+              </span>
+            </Link>
+          );
+        })}
+      </nav>
 
       <style>{`
         .bottom-menu {
           position: fixed;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          height: 80px;
-          background-color: #ffffff;
-          display: flex;
-          justify-content: space-around;
-          align-items: flex-start;
-          border-top: 1px solid #ddd;
+          left: 0; right: 0; bottom: 0;
+          height: 84px;
+          background: #fff;
+          display: grid;
+          grid-template-columns: repeat(5, 1fr);
+          align-items: start;
+          border-top: 1px solid #E7E7E7;
+          box-shadow: 0 -2px 6px rgba(0,0,0,0.05);
           z-index: 999;
-          box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
-          padding-top: 6px;
+          padding-top: 8px;
         }
-
         .menu-item {
-          display: flex;
+          display: inline-flex;
           flex-direction: column;
           align-items: center;
-          font-size: 12px;
-          color: #777;
+          justify-content: flex-start;
+          gap: 6px;
           text-decoration: none;
-          position: relative;
+          color: inherit;
+          height: 100%;
         }
-
-        .menu-item.active {
-          color: #4caf50;
-          font-weight: bold;
+        .icon { display: block; }
+        .icon-inactive { filter: grayscale(100%) opacity(0.55); }
+        .icon-active { filter: none; }
+        .centered { transform: translateY(-12px); }
+        .center-wrap {
+          width: 64px; height: 64px; border-radius: 9999px;
+          background: #fff; border: 2px solid #4CAF50;
+          display: flex; align-items: center; justify-content: center;
+          box-shadow: 0 6px 12px rgba(0,0,0,0.12);
         }
-
-        .menu-item img {
-          width: 28px;
-          height: 28px;
-          margin-bottom: 4px;
-        }
-
-        .center-icon {
-          background-color: #ffffff;
-          border: 2px solid #4caf50;
-          border-radius: 50%;
-          padding: 10px;
-          transform: translateY(-16px);
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-        }
-
-        .menu-item span {
-          margin-top: 6px;
-        }
-
-        .menu-item.centered span {
-          margin-top: -6px; /* ปรับขึ้นให้ตรง */
+        .center-wrap.active { border-color: #3ABB47; }
+        .center-img { display: block; }
+        .label { font-size: 12px; line-height: 1; margin-top: 2px; }
+        .label-inactive { color: #9AA0A6; font-weight: 400; }
+        .label-active { color: #4CAF50; font-weight: 700; }
+        .menu-item.centered .label { margin-top: 0; }
+        @media (min-width: 480px) {
+          .bottom-menu { height: 88px; }
+          .centered { transform: translateY(-16px); }
+          .center-wrap { width: 68px; height: 68px; }
         }
       `}</style>
     </>

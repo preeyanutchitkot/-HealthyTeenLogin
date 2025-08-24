@@ -23,20 +23,6 @@ export default function Login() {
   };
 
   return (
-<<<<<<< Updated upstream
-    <div className="login-container">
-      <style jsx>{`
-        .login-container {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          height: 100vh;
-          background-color: #e9f8ea; /* พื้นหลังสีเขียวอ่อน */
-          font-family: 'Noto Sans Thai', sans-serif;
-        }
-
-        .content {
-=======
     <div className="page">
       <style>{`
         html, body, #__next {
@@ -58,62 +44,11 @@ export default function Login() {
           width: 100%;
           max-width: 420px;
           padding: 0;               
->>>>>>> Stashed changes
           display: flex;
           flex-direction: column;
           align-items: center;
         }
 
-<<<<<<< Updated upstream
-        .logo {
-          width: 200px;
-          margin-bottom: 20px;
-        }
-
-        h2 {
-          color: #84AA81; /* หัวข้อสีเขียวเข้ม */
-          margin-bottom: 20px;
-        }
-
-        h5 {
-          color: #84AA81; /* หัวข้อสีเขียวเข้ม */
-          margin-bottom: 20px;
-        }
-
-        form {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 12px;
-        }
-
-        input {
-          width: 280px;
-          padding: 10px;
-          border-radius: 10px;
-          border: 1px solid #ccc;
-          font-size: 16px;
-        }
-
-        .divider {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          width: 100%;
-          margin-top: 20px;
-          margin-bottom: 8px;
-        }
-
-        .divider hr {
-          flex: 1;
-          border: none;
-          border-top: 1px solid #93BC99;
-        }
-
-        .divider span {
-          color: #84AA81;
-          font-weight: bold;
-=======
         .hero {
           width: 220px;
           height: auto;
@@ -174,40 +109,18 @@ export default function Login() {
           font-size: 13px;
           color: #24a43e;
           text-decoration: none;
->>>>>>> Stashed changes
         }
 
         .btn {
           background-color: #3ABB47;
-<<<<<<< Updated upstream
-          color: white;
-          padding: 10px;
-          border: none;
-          border-radius: 12px;
-          margin-top: 8px;
-          width: 280px;
-=======
           color: #fff;
           height: 46px;
           border: none;
           border-radius: 12px;
           width: 100%;
->>>>>>> Stashed changes
           cursor: pointer;
           font-weight: bold;
           font-size: 16px;
-<<<<<<< Updated upstream
-        }
-
-        .link {
-          margin-top: 16px;
-          font-size: 14px;
-        }
-
-        .link a {
-          color: #93BC99;
-          text-decoration: underline;
-=======
         }
 
         .divider {
@@ -231,7 +144,6 @@ export default function Login() {
           font-size: 14px;
           color: #6b7280;
           text-align: center;
->>>>>>> Stashed changes
         }
         .footer-link a { color: #24a43e; text-decoration: underline; }
       `}</style>
@@ -239,26 +151,6 @@ export default function Login() {
       <div className="container">
         <img src="/Logo.png" alt="Login Logo" className="logo" />
         <h2>เข้าสู่ระบบ</h2>
-<<<<<<< Updated upstream
-        <form onSubmit={handleLogin}>
-          <input
-            type="email"
-            placeholder="อีเมล"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="กรอกรหัสผ่าน"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          
-          <h5>ลืมรหัสผ่าน</h5>
-          <button type="submit" className="btn">เข้าสู่ระบบ</button>
-        </form>
-=======
->>>>>>> Stashed changes
 
         <form onSubmit={handleLogin}>
           <div className="field">

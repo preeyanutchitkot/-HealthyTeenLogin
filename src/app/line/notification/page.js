@@ -1,6 +1,6 @@
 import React from 'react';
-import Header from '@/app/line/components/header';
-import CalorieAlertCard from '@/app/line/components/CalorieAlertCard';
+import Header from '../components/header';
+import CalorieAlertCard from '../components/CalorieAlertCard';
 
 export default function NotificationPage() {
   return (

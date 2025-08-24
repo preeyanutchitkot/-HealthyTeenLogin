@@ -1,12 +1,15 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 
-const Login = () => {
+export default function Login() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPw, setShowPw] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -20,171 +23,180 @@ const Login = () => {
   };
 
   return (
-    <div className="login-container">
-      <style jsx>{`
-        html, body, #__next, .login-container {
+    <div className="page">
+      <style>{`
+        html, body, #__next {
           height: 100%;
           margin: 0;
           padding: 0;
           background: #e9f8ea;
-        }
-        .login-container {
-          min-height: 100vh;
-          width: 100vw;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          background-color: #e9f8ea;
           font-family: 'Noto Sans Thai', sans-serif;
-          overflow: hidden;
         }
-        .content {
+        .page {
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center; 
+        }
+
+        /* โปร่งใส: ไม่มีกรอบ/พื้น/เงา */
+        .container {
+          width: 100%;
+          max-width: 420px;
+          padding: 0;               
           display: flex;
           flex-direction: column;
           align-items: center;
+        }
+
+        .hero {
+          width: 220px;
+          height: auto;
+          margin: 0 auto 8px;
+          display: block;
+        }
+
+        h2 {
+          color: #24a43e;
+          font-size: 24px;
+          font-weight: 700;
+          margin: 10px 0 18px;
+          text-align: center;
+        }
+
+        form {
           width: 100%;
           max-width: 360px;
-          margin: 0 auto;
-          padding: 0 12px;
-          box-sizing: border-box;
-          flex: 1 0 auto;
-          justify-content: center;
-        }
-        .logo {
-          width: 220px;
-          max-width: 98vw;
-          margin-bottom: 24px;
-          display: block;
-        }
-        h2 {
-          color: #3ABB47;
-          margin-bottom: 20px;
-          font-size: 28px;
-          font-weight: 700;
-        }
-        .forgot-link {
-          color: #3ABB47;
-          margin-bottom: 8px;
-          font-size: 18px;
-          font-weight: 500;
-          cursor: pointer;
-          background: none;
-          border: none;
-          padding: 0;
-          text-align: center;
-          width: 100%;
-          max-width: 320px;
-          display: block;
-        }
-        form {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
+          display: grid;
           gap: 12px;
-          width: 100%;
         }
-        input {
+
+        .field { position: relative; }
+
+        .input {
           width: 100%;
-          max-width: 260px;
-          padding: 8px 12px;
-          border-radius: 10px;
-          border: 1.5px solid #BDBDBD;
-          font-size: 16px;
+          height: 44px;
+          padding: 0 14px;
+          padding-right: 44px;      /* เผื่อที่ให้ปุ่มตา */
+          border-radius: 12px;
+          border: 1.5px solid #cfd8dc;
           background: #fff;
-          color: #3ABB47;
-          font-family: inherit;
+          font-size: 15px;
+          color: #111827;
+          outline: none;
           box-sizing: border-box;
         }
-        .divider {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          width: 100%;
-          margin-top: 20px;
-          margin-bottom: 8px;
-        }
-        .divider hr {
-          flex: 1;
+        .input::placeholder { color: #9ca3af; }
+
+        .pw-toggle {
+          position: absolute;
+          right: 6px;
+          top: 50%;
+          transform: translateY(-50%);
           border: none;
-          border-top: 1px solid #3ABB47;
+          background: transparent;
+          cursor: pointer;
+          width: 28px;
+          height: 28px;
+          display: grid;
+          place-items: center;
+          padding: 0;
         }
-        .divider span {
-          color: #3ABB47;
-          font-weight: bold;
+        .pw-toggle img { width: 20px; height: 20px; }
+
+        .link-small {
+          text-align: center;
+          font-size: 13px;
+          color: #24a43e;
+          text-decoration: none;
         }
+
         .btn {
           background-color: #3ABB47;
-          color: white;
-          padding: 10px 0;
+          color: #fff;
+          height: 46px;
           border: none;
           border-radius: 12px;
-          margin-top: 0px;
           width: 100%;
-          max-width: 260px;
           cursor: pointer;
-          font-weight: 700;
+          font-weight: bold;
           font-size: 16px;
+        }
+
+        .divider {
+          display: grid;
+          grid-template-columns: 1fr auto 1fr;
+          align-items: center;
+          gap: 12px;
+          margin: 10px 0 2px;
+          color: #9ca3af;
+          font-size: 13px;
+        }
+        .divider::before, .divider::after {
+          content: "";
+          height: 1px;
+          background: #e5e7eb;
           display: block;
         }
-        .link {
-          margin-top: 16px;
-          font-size: 18px;
-          color: #3ABB47;
+
+        .footer-link {
+          margin-top: 10px;
+          font-size: 14px;
+          color: #6b7280;
+          text-align: center;
         }
-        .link a {
-          color: #3ABB47;
-          text-decoration: underline;
-          font-size: 18px;
-        }
-        @media (max-width: 480px) {
-          .content {
-            padding: 24px 8px 0 8px;
-          }
-          .logo {
-            width: 240px;
-            max-width: 98vw;
-          }
-        }
+        .footer-link a { color: #24a43e; text-decoration: underline; }
       `}</style>
 
-      <div className="content">
+      <div className="container">
         <img src="/Logo.png" alt="Login Logo" className="logo" />
         <h2>เข้าสู่ระบบ</h2>
-        <form onSubmit={handleLogin}>
-          <input
-            type="email"
-            placeholder="อีเมล"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="กรอกรหัสผ่าน"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <button
-            type="button"
-            className="forgot-link"
-            onClick={() => window.location.href = '/line/forgotpassword'}
-          >
-            ลืมรหัสผ่าน
-          </button>
-          <button type="submit" className="btn">เข้าสู่ระบบ</button>
-        </form>
 
-        <div className="divider">
-          <hr />
-          <span>หรือ</span>
-          <hr />
-        </div>
-        <div className="link">
-          ไม่มีบัญชี <a href="/line/register">สมัคร</a>
-        </div>
+        <form onSubmit={handleLogin}>
+          <div className="field">
+            <input
+              className="input"
+              type="email"
+              placeholder="อีเมล"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              required
+            />
+          </div>
+
+          <div className="field">
+            <input
+              className="input"
+              type={showPw ? 'text' : 'password'}
+              placeholder="กรอกรหัสผ่าน"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+              required
+            />
+            <button
+              type="button"
+              className="pw-toggle"
+              onClick={() => setShowPw(!showPw)}
+              aria-label={showPw ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน'}
+            >
+
+              <img src="/eye2.png" alt="toggle password" />
+            </button>
+          </div>
+
+          <a className="link-small" href="/line/forgot">ลืมรหัสผ่าน</a>
+
+          <button type="submit" className="btn">เข้าสู่ระบบ</button>
+
+          <div className="divider">หรือ</div>
+
+          <div className="footer-link">
+            ไม่มีบัญชี? <a href="/line/register">สมัคร</a>
+          </div>
+        </form>
       </div>
     </div>
   );
-};
-
-export default Login;
+}

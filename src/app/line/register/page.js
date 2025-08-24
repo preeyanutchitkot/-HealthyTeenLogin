@@ -1,17 +1,27 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import {
+  createUserWithEmailAndPassword,
+  fetchSignInMethodsForEmail,
+  sendPasswordResetEmail,
+} from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { db, auth } from '../lib/firebase';
-import { doc, setDoc } from 'firebase/firestore';
+import {
+  doc,
+  setDoc,
+  runTransaction,
+  serverTimestamp,
+} from 'firebase/firestore';
 
-const Register = () => {
+export default function Register() {
   const router = useRouter();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPw, setShowPw] = useState(false);
   const [gender, setGender] = useState('');
   const [age, setAge] = useState('');
   const [height, setHeight] = useState('');
@@ -30,271 +40,352 @@ const Register = () => {
     }
   }, [height, weight]);
 
+  // ===== ขอเลขรันนิ่ง "user1", "user2", ... แบบอะตอมมิก =====
+  const getNextUserSeqId = async () => {
+    const counterRef = doc(db, 'metadata', 'counters');
+    const nextNum = await runTransaction(db, async (tx) => {
+      const snap = await tx.get(counterRef);
+      if (!snap.exists()) {
+        // create ครั้งแรก userCounter = 1  (ตรงกับ Firestore Rules)
+        tx.set(counterRef, { userCounter: 1 });
+        return 1;
+      } else {
+        const current = snap.data().userCounter || 0;
+        const next = current + 1;
+        tx.update(counterRef, { userCounter: next });
+        return next;
+      }
+    });
+    return `user${nextNum}`;
+  };
+
   const handleRegister = async (e) => {
     e.preventDefault();
+
+    const emailNorm = email.trim().toLowerCase();
+
     if (password !== confirmPassword) {
       alert('รหัสผ่านไม่ตรงกัน');
       return;
     }
+    if (password.length < 8) {
+      alert('รหัสผ่านควรยาวอย่างน้อย 8 ตัวอักษร');
+      return;
+    }
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      // เช็กว่ามีอีเมลอยู่แล้วไหม
+      const methods = await fetchSignInMethodsForEmail(auth, emailNorm);
+      if (methods.length > 0) {
+        const doReset = confirm('อีเมลนี้มีบัญชีอยู่แล้ว ต้องการรีเซ็ตรหัสผ่านไหม?');
+        if (doReset) {
+          await sendPasswordResetEmail(auth, emailNorm);
+          alert('ส่งลิงก์รีเซ็ตรหัสผ่านไปที่อีเมลแล้ว');
+        }
+        router.push('/line/liff'); // ไปหน้าเข้าสู่ระบบ
+        return;
+      }
+
+      // สมัคร Auth
+      const userCredential = await createUserWithEmailAndPassword(auth, emailNorm, password);
       const user = userCredential.user;
 
+      // ขอ seqId เช่น "user1"
+      const seqId = await getNextUserSeqId();
+
+      // แปลงชนิดข้อมูล
+      const ageNum = age ? parseInt(age, 10) : null;
+      const heightNum = height ? parseFloat(height) : null;
+      const weightNum = weight ? parseFloat(weight) : null;
+      const bmiNum = bmi ? parseFloat(bmi) : null;
+
+      // บันทึกลง users/<uid> (doc id = uid)
       await setDoc(doc(db, 'users', user.uid), {
-        email,
+        uid: user.uid,
+        seqId,                  // ← เก็บเลขรันนิ่งไว้ในฟิลด์
+        email: emailNorm,
         gender,
-        age,
-        height,
-        weight,
-        bmi,
+        age: ageNum,
+        height: heightNum,
+        weight: weightNum,
+        bmi: bmiNum,
+        createdAt: serverTimestamp(),
       });
 
-  alert('สมัครสมาชิกสำเร็จ!');
-  router.push('/line/agreement');
+      alert('สมัครสมาชิกสำเร็จ!');
+      router.push('/line/agreement');
     } catch (error) {
+      console.error(error);
+      // ดักกรณีพิเศษอีกชั้น (กัน race condition ระหว่างเช็ก-สมัคร)
+      if (error.code === 'auth/email-already-in-use') {
+        const doReset = confirm('อีเมลนี้มีบัญชีแล้ว ต้องการรีเซ็ตรหัสผ่านไหม?');
+        if (doReset) {
+          await sendPasswordResetEmail(auth, emailNorm);
+          alert('ส่งลิงก์รีเซ็ตรหัสผ่านไปที่อีเมลแล้ว');
+        }
+        router.push('/line/liff');
+        return;
+      }
       alert('เกิดข้อผิดพลาด: ' + error.message);
     }
   };
 
+  
   return (
-    <div className="register-container">
-      <style jsx>{`
-        .register-container {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          height: 100vh;
-          background-color: #e9f8ea;
+    <div className="page">
+
+  <style>{`
+        html, body, #__next {
+          height: 100%;
+          margin: 0;
+          padding: 0;
+          background: #e9f8ea;
           font-family: 'Noto Sans Thai', sans-serif;
         }
-
-        .content {
+        .page {
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .container {
+          width: 100%;
+          max-width: 420px;
+          padding: 0;
           display: flex;
           flex-direction: column;
           align-items: center;
         }
-
         .logo {
           width: 180px;
-          margin-bottom: 20px;
+          margin-bottom: 16px;
         }
-
         h2 {
+<<<<<<< Updated upstream
+          color: #84AA81;
+=======
           color: #3ABB47;
+          font-size: 24px;
+          font-weight: 700;
+>>>>>>> Stashed changes
           margin-bottom: 4px;
+          text-align: center;
         }
-
         h4 {
-          margin-top: 0;
-          margin-bottom: 20px;
           color: #555;
+          font-size: 16px;
+          margin-bottom: 20px;
+          text-align: center;
         }
-
         form {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
+          width: 100%;
+          max-width: 360px;
+          display: grid;
           gap: 12px;
         }
-
-        input, select {
-          width: 280px;
-          padding: 10px;
-          border-radius: 10px;
-          border: 1px solid #ccc;
-          font-size: 16px;
+        .field {
+          position: relative;
         }
+        .input {
+          width: 100%;
+          height: 44px;
+          padding: 0 14px;
+          padding-right: 44px;
+          border-radius: 12px;
+          border: 1.5px solid #cfd8dc;
+          background: #fff;
+          font-size: 15px;
+          color: #111827;
+          outline: none;
+          box-sizing: border-box;
+        }
+        .input::placeholder { color: #9ca3af; }
+
+        .pw-toggle {
+          position: absolute;
+          right: 6px;
+          top: 50%;
+          transform: translateY(-50%);
+          border: none;
+          background: transparent;
+          cursor: pointer;
+          width: 28px;
+          height: 28px;
+          display: grid;
+          place-items: center;
+          padding: 0;
+        }
+        .pw-toggle img { width: 20px; height: 20px; }
 
         .row {
           display: flex;
           gap: 10px;
-          width: 300px;
         }
-
-        .row input,
-        .row select {
+        .row > div {
           flex: 1;
-          min-width: 0;
         }
-
-        .bmi-text {
+        .label {
           font-size: 14px;
-          color: red;
+<<<<<<< Updated upstream
+          color: #777;
           margin-top: 6px;
+=======
+          font-weight: bold;
+          color: #3ABB47;
+          margin-bottom: 4px;
         }
-
+        select, input[type="number"] {
+          width: 100%;
+          height: 44px;
+          padding: 0 12px;
+          border-radius: 10px;
+          border: 1px solid #ccc;
+          font-size: 15px;
+          box-sizing: border-box;
+>>>>>>> Stashed changes
+        }
         .note {
           font-size: 12px;
           color: #999;
           display: flex;
           justify-content: space-between;
-          width: 280px;
-          margin-top: -8px;
         }
-
         .note a {
-          color: #3ABB47;
+          color: #84AA81;
           font-weight: bold;
           text-decoration: underline;
         }
-
+        .bmi-text {
+          font-size: 14px;
+          color: red;
+          text-align: center;
+        }
         .btn {
           background-color: #3ABB47;
           color: white;
-          padding: 10px;
+          height: 46px;
           border: none;
           border-radius: 12px;
-          margin-top: 12px;
-          width: 280px;
+          width: 100%;
           cursor: pointer;
-          font-weight: bold;
+          font-weight: 700;
           font-size: 16px;
         }
-
-        .link {
-          margin-top: 16px;
+        .footer-link {
+          margin-top: 10px;
           font-size: 14px;
+          color: #6b7280;
+          text-align: center;
         }
-
-        .link a {
-          color: #84AA81;
+        .footer-link a {
+          color: #24a43e;
           text-decoration: underline;
         }
-          .input-group {
-          display: flex;
-          flex-direction: column;
-          flex: 1;
-        }
-
-        .input-group label {
-          font-size: 14px;
-          font-weight: bold;
-          color: #3ABB47;
-          margin-bottom: 4px;
-        }
-        .input-group select,
-        .input-group input {
-          width: 100%;
-          padding: 10px;
-          border-radius: 10px;
-          border: 1px solid #ccc;
-          font-size: 16px;
-          box-sizing: border-box;
-        }
-          .input-wrapper {
-          display: flex;
-          align-items: center;
-          border: 1px solid #ccc;
-          border-radius: 10px;
-          padding: 5px 10px;
-          background-color: white;
-        }
-
-        .input-wrapper img {
-          width: 20px;
-          height: 20px;
-          margin-right: 8px;
-          opacity: 0.7;
-        }
-
-        .input-wrapper input,
-        .input-wrapper select {
-          border: none;
-          outline: none;
-          font-size: 16px;
-          flex: 1;
-          padding: 6px 0;
-        }
-
-
       `}</style>
 
-      <div className="content">
+      <div className="container">
+        <img src="/Logo.png" alt="Register Logo" className="logo" />
         <h2>สมัครสมาชิก</h2>
         <h4>สำหรับผู้สมัครสมาชิกใหม่</h4>
-        <img src="/Logo.png" alt="Register Logo" className="logo" />
 
         <form onSubmit={handleRegister}>
-          <input
-            type="email"
-            placeholder="อีเมล"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="รหัสผ่าน"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          <div className="field">
+            <input
+              className="input"
+              type="email"
+              placeholder="อีเมล"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="field">
+            <input
+              className="input"
+              type={showPw ? 'text' : 'password'}
+              placeholder="รหัสผ่าน"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <button
+              type="button"
+              className="pw-toggle"
+              onClick={() => setShowPw(!showPw)}
+              aria-label={showPw ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน'}
+            >
+              <img src="/eye2.png" alt="toggle password" />
+            </button>
+          </div>
+
           <div className="note">
-            <span>รหัสผ่านควรมีความยาวอย่างน้อย 8 ตัวอักษร</span>
+            <span>รหัสผ่านควรมีอย่างน้อย 8 ตัวอักษร</span>
             <a href="/line/liff">เข้าสู่ระบบ</a>
           </div>
 
-          <input
-            type="password"
-            placeholder="ยืนยันรหัสผ่าน"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-          />
+          <div className="field">
+            <input
+              className="input"
+              type={showPw ? 'text' : 'password'}
+              placeholder="ยืนยันรหัสผ่าน"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+            <button
+              type="button"
+              className="pw-toggle"
+              onClick={() => setShowPw(!showPw)}
+              aria-label={showPw ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน'}
+            >
+              <img src="/eye2.png" alt="toggle password" />
+            </button>
+          </div>
 
           <div className="row">
-            <div className="input-group">
-              <label>ระบุเพศ</label>
-              <div className="input-wrapper">
-                <img src="/gender.png" alt="gender" />
-                <select value={gender} onChange={(e) => setGender(e.target.value)}>
-                  <option value="">เพศ</option>
-                  <option value="male">ชาย</option>
-                  <option value="female">หญิง</option>
-                  {/* <option value="other">อื่น ๆ</option> */}
-                </select>
-              </div>
+            <div>
+              <div className="label">เพศ</div>
+              <select value={gender} onChange={(e) => setGender(e.target.value)} required>
+                <option value="">เลือกเพศ</option>
+                <option value="male">ชาย</option>
+                <option value="female">หญิง</option>
+              </select>
             </div>
-            <div className="input-group">
-              <label>อายุ</label>
-              <div className="input-wrapper">
-                <img src="/age.png" alt="age" />
-                <input
-                  type="number"
-                  placeholder="อายุ"
-                  value={age}
-                  onChange={(e) => setAge(e.target.value)}
-                />
-              </div>
+            <div>
+              <div className="label">อายุ</div>
+              <input
+                type="number"
+                placeholder="อายุ"
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+                required
+              />
             </div>
           </div>
 
-          {/* ส่วนสูง + น้ำหนัก */}
           <div className="row">
-            <div className="input-group">
-              <label>ส่วนสูง</label>
-              <div className="input-wrapper">
-                <img src="/height.png" alt="height" />
-                <input
-                  type="number"
-                  placeholder="ส่วนสูง"
-                  value={height}
-                  onChange={(e) => setHeight(e.target.value)}
-                />
-              </div>
+            <div>
+              <div className="label">ส่วนสูง (ซม.)</div>
+              <input
+                type="number"
+                placeholder="ส่วนสูง"
+                value={height}
+                onChange={(e) => setHeight(e.target.value)}
+                required
+              />
             </div>
-            <div className="input-group">
-              <label>น้ำหนัก</label>
-              <div className="input-wrapper">
-                <img src="/weight.png" alt="weight" />
-                <input
-                  type="number"
-                  placeholder="น้ำหนัก"
-                  value={weight}
-                  onChange={(e) => setWeight(e.target.value)}
-                />
-              </div>
+            <div>
+              <div className="label">น้ำหนัก (กก.)</div>
+              <input
+                type="number"
+                placeholder="น้ำหนัก"
+                value={weight}
+                onChange={(e) => setWeight(e.target.value)}
+                required
+              />
             </div>
           </div>
-
 
           <div className="bmi-text">
             BMI ของคุณ: {bmi || 'ยังไม่คำนวณ'}
@@ -302,9 +393,11 @@ const Register = () => {
 
           <button type="submit" className="btn">ยืนยัน</button>
         </form>
+
+        <div className="footer-link">
+          มีบัญชีอยู่แล้ว? <a href="/line/liff">เข้าสู่ระบบ</a>
+        </div>
       </div>
     </div>
   );
-};
-
-export default Register;
+}

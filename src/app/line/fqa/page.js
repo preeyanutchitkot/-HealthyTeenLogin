@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import BottomMenu from '@/app/line/components/menu';
+import BottomMenu from '../components/menu';
 
 export default function AgreementPage() {
   const [tab, setTab] = useState("privacy");
@@ -122,7 +122,7 @@ return (
     <div className="header"> คำถามที่พบบ่อย (FAQ) </div>
 
     <div className="content">{tab === "privacy" ? privacyText : termsText}</div>
-        <BottomMenu />
+<BottomMenu />
   </div>
 );
 

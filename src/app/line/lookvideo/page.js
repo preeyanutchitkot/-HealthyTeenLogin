@@ -1,6 +1,6 @@
 import React from 'react';
-import Header from '@/app/line/components/header';
-import VideoList from '@/app/line/components/VideoList';
+import Header from '../components/header';
+import VideoList from '../components/VideoList';
 
 export default function LookvideoPage() {
   return (

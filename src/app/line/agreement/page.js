@@ -1,7 +1,8 @@
-"use client";
+'use client';
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Head from "next/head";
 
 export default function AgreementPage() {
   const [tab, setTab] = useState("privacy");
@@ -76,6 +77,7 @@ export default function AgreementPage() {
 ข้อกำหนดนี้จะอยู่ภายใต้การบังคับใช้ของกฎหมายในประเทศไทย และหากมีข้อพิพาทเกิดขึ้นจะต้องถูกดำเนินการภายในเขตอำนาจศาลของประเทศไทย
 `;
 
+<<<<<<< Updated upstream
    
 return (
   <div className="wrapper">
@@ -202,53 +204,164 @@ return (
         cursor: not-allowed;
       }
     `}</style>
+=======
 
-    {/* 🟩 หัวข้อ */}
-    <div className="header">ข้อกำหนดเงื่อนไขในการใช้งาน</div>
-
-    {/* 📑 Tabs */}
-    <div className="tabs">
-      <div
-        className={`tab ${tab === "privacy" ? "active" : "inactive"}`}
-        onClick={() => setTab("privacy")}
-      >
-        นโยบายความเป็นส่วนตัว
-      </div>
-      <div
-        className={`tab ${tab === "terms" ? "active" : "inactive"}`}
-        onClick={() => setTab("terms")}
-      >
-        ข้อกำหนดและเงื่อนไขการใช้งาน
-      </div>
-    </div>
-
-    {/* 📜 เนื้อหา */}
-    <div className="content">{tab === "privacy" ? privacyText : termsText}</div>
-
-    {/* ✅ Checkbox + ปุ่ม */}
-    <div className="footer">
-      <div className="agreement">
-        <input
-          type="checkbox"
-          id="accept"
-          checked={isChecked}
-          onChange={(e) => setIsChecked(e.target.checked)}
-          className="checkbox"
+  return (
+    <>
+      <Head>
+        <meta name="theme-color" content="#f3faee" />
+        <link
+          rel="preload"
+          href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;700&display=swap"
+          as="style"
         />
-        <label htmlFor="accept" className="agreement-text">
-          You agree to our <span>Terms & Conditions</span> and acknowledge that
-          you have read our <span>Privacy Policy</span>.
-        </label>
-      </div>
-      <button
-        className="next-btn"
-        disabled={!isChecked}
-        onClick={() => router.push("/line/liff")}
-      >
-        ต่อไป
-      </button>
-    </div>
-  </div>
-);
+        <link
+          href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;700&display=swap"
+          rel="stylesheet"
+        />
+      </Head>
 
+      <style jsx global>{`
+        html, body, #__next {
+          height: 100%;
+          margin: 0;
+          padding: 0;
+          background-color: #f3faee;
+          font-family: 'Noto Sans Thai', sans-serif;
+        }
+      `}</style>
+
+      <style>{`
+        .wrapper {
+          min-height: 100vh;
+          display: flex;
+          flex-direction: column;
+        }
+        .header {
+          background-color: #3ABB47;
+          color: white;
+          text-align: center;
+          padding: 16px 8px;
+          font-size: 18px;
+          font-weight: bold;
+        }
+        .tabs {
+          display: flex;
+        }
+        .tab {
+          flex: 1;
+          padding: 12px 4px;
+          text-align: center;
+          font-weight: 600;
+          font-size: 14px;
+          cursor: pointer;
+          border: 1px solid #3ABB47;
+          border-top: none;
+        }
+        .tab.active {
+          background-color: white;
+          color: #3ABB47;
+        }
+        .tab.inactive {
+          background-color: #3ABB47;
+          color: white;
+        }
+        .content {
+          flex: 1;
+          overflow-y: auto;
+          padding: 20px 12px;
+          font-size: 14px;
+          line-height: 1.7;
+          color: #333;
+          white-space: pre-wrap;
+        }
+        .footer {
+          position: sticky;
+          bottom: 0;
+          background: white;
+          padding: 16px 8px;
+          border-top: 1px solid #ddd;
+          box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+        }
+        .agreement {
+          display: flex;
+          align-items: flex-start;
+          gap: 8px;
+          font-size: 13px;
+          color: #666;
+          margin-bottom: 8px;
+        }
+        .agreement-text span {
+          text-decoration: underline;
+          color: #3ABB47;
+        }
+        .checkbox {
+          width: 16px;
+          height: 16px;
+          margin-top: 3px;
+        }
+        .next-btn {
+          width: 100%;
+          padding: 14px;
+          background-color: #3ABB47;
+          color: white;
+          font-weight: bold;
+          font-size: 14px;
+          border: none;
+          cursor: pointer;
+          border-radius: 100px;
+        }
+        .next-btn:disabled {
+          background-color: #ccc;
+          cursor: not-allowed;
+        }
+      `}</style>
+>>>>>>> Stashed changes
+
+      <div className="wrapper">
+        <div className="header">ข้อกำหนดเงื่อนไขในการใช้งาน</div>
+
+        <div className="tabs">
+          <div
+            className={`tab ${tab === "privacy" ? "active" : "inactive"}`}
+            onClick={() => setTab("privacy")}
+          >
+            นโยบายความเป็นส่วนตัว
+          </div>
+          <div
+            className={`tab ${tab === "terms" ? "active" : "inactive"}`}
+            onClick={() => setTab("terms")}
+          >
+            ข้อกำหนดและเงื่อนไขการใช้งาน
+          </div>
+        </div>
+
+        <div className="content">
+          {tab === "privacy" ? privacyText : termsText}
+        </div>
+
+        <div className="footer">
+          <div className="agreement">
+            <input
+              type="checkbox"
+              id="accept"
+              checked={isChecked}
+              onChange={(e) => setIsChecked(e.target.checked)}
+              className="checkbox"
+            />
+            <label htmlFor="accept" className="agreement-text">
+              คุณยอมรับ <span>ข้อกำหนดการใช้งาน</span> และรับทราบ <span>นโยบายความเป็นส่วนตัว</span>
+            </label>
+          </div>
+          <button
+            className="next-btn"
+            disabled={!isChecked}
+            onClick={() => router.push("/line/liff")}
+          >
+            ต่อไป
+          </button>
+        </div>
+      </div>
+    </>
+  );
 }

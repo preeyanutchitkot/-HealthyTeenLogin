@@ -3,6 +3,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
+import BottomMenu from '../../components/menu';
+
 
 const sauce = [
   { name: 'ซอสมะเขือเทศ (1 ช้อนโต๊ะ)', calories: 20, image: '/foods/ketchup.png' },
@@ -137,6 +139,7 @@ export default function SavoryPage() {
           </div>
         </div>
       )}
+        <BottomMenu />
 
       <style jsx>{`
         .page {

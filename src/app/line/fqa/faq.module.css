@@ -1,0 +1,56 @@
+/* --- Global resets ภายใน CSS Modules: แยกกฎละ 1 global selector --- */
+:global(:root) { color-scheme: light; }
+
+:global(html) { height: 100%; }
+:global(body) { height: 100%; }
+:global(#__next) { height: 100%; }
+
+:global(html) { margin: 0; padding: 0; }
+:global(body) { margin: 0; padding: 0; }
+
+/* box-sizing ให้ครบทั้ง before/after */
+:global(*) { box-sizing: border-box; }
+:global(*::before) { box-sizing: border-box; }
+:global(*::after) { box-sizing: border-box; }
+
+/* --- Local (pure) selectors ด้านล่าง — ปลอดภัยกับ CSS Modules --- */
+
+.wrapper {
+  /* ใช้ 100svh แทน 100vh เพื่อมือถือ */
+  min-height: 100svh;
+  background: #e9f8ea;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Noto Sans Thai', system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  /* เผื่อพื้นที่เมนูล่าง + safe area */
+  padding: env(safe-area-inset-top) 0 calc(76px + 16px + env(safe-area-inset-bottom)) 0;
+}
+
+.header {
+  background-color: #3ABB47;
+  color: #fff;
+  text-align: center;
+  padding: 16px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 20px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #333;
+  white-space: pre-wrap; /* แสดง \n จากสตริง */
+}
+
+/* ถ้า BottomMenu ไม่ได้ fixed เอง ให้ dock ตรงนี้ */
+.menuDock {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  background: #fff;
+  z-index: 10;
+}

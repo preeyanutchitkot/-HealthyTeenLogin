@@ -3,6 +3,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
+import BottomMenu from '../../components/menu';
+
+
 
 const JFoods = [
  { name: 'เต้าหู้ทอด', calories: 100, image: '/foods/fried-tofu.png' },
@@ -137,6 +140,7 @@ export default function SavoryPage() {
           </div>
         </div>
       )}
+      <BottomMenu />
 
       <style jsx>{`
         .page {

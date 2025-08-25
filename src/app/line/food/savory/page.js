@@ -3,8 +3,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
+import BottomMenu from '../../components/menu';
 
-const fruitMenus = [
+const savoryFoods = [
   { name: 'ขนมครก', calories: 180, image: '/foods/khanom-khrok.png' },
   { name: 'หมูปิ้ง (3 ไม้)', calories: 250, image: '/foods/moo-ping-3.png' },
   { name: 'ลูกชิ้นปิ้ง (5 ลูก)', calories: 120, image: '/foods/look-chin-ping-5.png' },
@@ -30,7 +31,7 @@ const fruitMenus = [
 
 export default function SavoryPage() {
   const [cartCount, setCartCount] = useState(0);
-  const [foods, setFoods] = useState(fruitMenus);
+  const [foods, setFoods] = useState(savoryFoods);
   const [showModal, setShowModal] = useState(false);
   const [newFoodName, setNewFoodName] = useState('');
   const [loading, setLoading] = useState(false);
@@ -106,7 +107,7 @@ export default function SavoryPage() {
           <button className="add-new" onClick={() => setShowModal(true)}>+ เพิ่มเมนูใหม่</button>
         </div>
         <div className="cart">
-          <Image src="/icons/cart.png" alt="cart" width={16} height={16} /> {cartCount}
+          <Image src="/Shopping.png" alt="cart" width={16} height={16} /> {cartCount}
         </div>
       </div>
 
@@ -137,6 +138,8 @@ export default function SavoryPage() {
           </div>
         </div>
       )}
+
+      <BottomMenu />
 
       <style jsx>{`
         .page {

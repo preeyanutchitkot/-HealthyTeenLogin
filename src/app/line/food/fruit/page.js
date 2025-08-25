@@ -3,6 +3,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
+import BottomMenu from '../../components/menu';
+
+
 
 const fruitMenus = [
   { name: 'แอปเปิ้ล (1 ลูก)', calories: 95, image: '/foods/apple.png' },
@@ -157,6 +160,8 @@ export default function SavoryPage() {
           </div>
         </div>
       )}
+
+      <BottomMenu />
 
       <style jsx>{`
         .page {

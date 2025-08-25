@@ -15,6 +15,7 @@ export default function CheckEmailPage() {
   return (
     <div className={notoSansThai.className} style={{ background: "#fff", minHeight: "100vh", padding: 0 }}>
       <div
+      
         style={{
           maxWidth: 400,
           width: "100%",

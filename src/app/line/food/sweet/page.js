@@ -6,8 +6,7 @@ import { useState } from 'react';
 
 
 const sweetFoods = [
-  { name: 'ทับทิมกรอบ', calories: 200, image: '/foods/tub-tim-krob.png' },
-  { name: 'ขนมชั้น', calories: 220, image: '/foods/khanom-chan.png' },
+  { name: 'ขนมชั้น', calories: 220, image: '/foods/khanom-chan.png'},
   { name: 'บัวลอย', calories: 240, image: '/foods/bua-loi.png' },
   { name: 'ข้าวเหนียวมะม่วง', calories: 330, image: '/foods/khao-niew-mamuang.png' },
   { name: 'ลูกชุบ', calories: 150, image: '/foods/look-chup.png' },
@@ -25,7 +24,8 @@ const sweetFoods = [
   { name: 'เค้กกล้วยหอม', calories: 280, image: '/foods/banana-cake.png' },
   { name: 'ขนมต้ม', calories: 200, image: '/foods/khanom-tom.png' },
   { name: 'ขนมกล้วย', calories: 220, image: '/foods/khanom-kluai.png' },
-  { name: 'ขนมถ้วย', calories: 150, image: '/foods/khanom-tuay.png' }
+  { name: 'ขนมถ้วย', calories: 150, image: '/foods/khanom-tuay.png' },
+  { name: 'ทับทิมกรอบ', calories: 200, image: '/foods/tub-tim-krob.png' },
 ];
 
 export default function SweetPage() {

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 
 const alcohols= [
-{ name: 'เบียร์ (1 กระป๋อง)', calories: 150, image: '/foods/beer.png' },
+  { name: 'เบียร์ (1 กระป๋อง)', calories: 150, image: '/foods/beer.png' },
   { name: 'ไวน์แดง (1 แก้ว)', calories: 125, image: '/foods/red-wine.png' },
   { name: 'ไวน์ขาว (1 แก้ว)', calories: 120, image: '/foods/white-wine.png' },
   { name: 'วิสกี้ (1 ช็อต)', calories: 70, image: '/foods/whiskey.png' },

@@ -27,18 +27,47 @@ export default function Register() {
   const [height, setHeight] = useState('');
   const [weight, setWeight] = useState('');
   const [bmi, setBmi] = useState('');
+  const [activityFactor, setActivityFactor] = useState('');
 
+  const [bmr, setBmr] = useState('');
+  const [tdee, setTdee] = useState('');
   useEffect(() => {
     const h = parseFloat(height);
     const w = parseFloat(weight);
+    const a = parseInt(age, 10);
+    const af = parseFloat(activityFactor);
+    let bmiResult = '';
+    let bmrResult = '';
+    let tdeeResult = '';
     if (!isNaN(h) && !isNaN(w) && h > 0) {
       const heightInMeters = h / 100;
-      const bmiResult = w / (heightInMeters * heightInMeters);
+      bmiResult = w / (heightInMeters * heightInMeters);
       setBmi(bmiResult.toFixed(2));
+      // BMR
+      if (gender && !isNaN(a)) {
+        if (gender === 'male') {
+          bmrResult = 66.47 + (13.75 * w) + (5.003 * h) - (6.755 * a);
+        } else if (gender === 'female') {
+          bmrResult = 655.1 + (9.563 * w) + (1.850 * h) - (4.676 * a);
+        }
+        setBmr(bmrResult ? bmrResult.toFixed(0) : '');
+        // TDEE
+        if (bmrResult && !isNaN(af)) {
+          tdeeResult = bmrResult * af;
+          setTdee(tdeeResult ? Math.round(tdeeResult) : '');
+        } else {
+          setTdee('');
+        }
+      } else {
+        setBmr('');
+        setTdee('');
+      }
     } else {
       setBmi('');
+      setBmr('');
+      setTdee('');
     }
-  }, [height, weight]);
+  }, [height, weight, age, gender, activityFactor]);
 
   // ===== ขอเลขรันนิ่ง "user1", "user2", ... แบบอะตอมมิก =====
   const getNextUserSeqId = async () => {
@@ -93,11 +122,28 @@ export default function Register() {
       // ขอ seqId เช่น "user1"
       const seqId = await getNextUserSeqId();
 
+
       // แปลงชนิดข้อมูล
       const ageNum = age ? parseInt(age, 10) : null;
       const heightNum = height ? parseFloat(height) : null;
       const weightNum = weight ? parseFloat(weight) : null;
       const bmiNum = bmi ? parseFloat(bmi) : null;
+      const activityNum = activityFactor ? parseFloat(activityFactor) : null;
+
+      // คำนวณ BMR (สูตร Harris-Benedict)
+      let bmr = null;
+      if (gender && ageNum && heightNum && weightNum) {
+        if (gender === 'male') {
+          bmr = 66.47 + (13.75 * weightNum) + (5.003 * heightNum) - (6.755 * ageNum);
+        } else if (gender === 'female') {
+          bmr = 655.1 + (9.563 * weightNum) + (1.850 * heightNum) - (4.676 * ageNum);
+        }
+      }
+      // คำนวณ TDEE
+      let tdee = null;
+      if (bmr && activityNum) {
+        tdee = Math.round(bmr * activityNum);
+      }
 
       // บันทึกลง users/<uid> (doc id = uid)
       await setDoc(doc(db, 'users', user.uid), {
@@ -109,6 +155,9 @@ export default function Register() {
         height: heightNum,
         weight: weightNum,
         bmi: bmiNum,
+        bmr: bmr != null ? Math.round(bmr) : null,
+        activityFactor: activityNum,
+        tdee,
         createdAt: serverTimestamp(),
       });
 
@@ -161,13 +210,10 @@ export default function Register() {
           margin-bottom: 16px;
         }
         h2 {
-<<<<<<< Updated upstream
           color: #84AA81;
-=======
           color: #3ABB47;
           font-size: 24px;
           font-weight: 700;
->>>>>>> Stashed changes
           margin-bottom: 4px;
           text-align: center;
         }
@@ -226,10 +272,9 @@ export default function Register() {
         }
         .label {
           font-size: 14px;
-<<<<<<< Updated upstream
+
           color: #777;
           margin-top: 6px;
-=======
           font-weight: bold;
           color: #3ABB47;
           margin-bottom: 4px;
@@ -242,7 +287,6 @@ export default function Register() {
           border: 1px solid #ccc;
           font-size: 15px;
           box-sizing: border-box;
->>>>>>> Stashed changes
         }
         .note {
           font-size: 12px;
@@ -388,7 +432,8 @@ export default function Register() {
           </div>
 
           <div className="bmi-text">
-            BMI ของคุณ: {bmi || 'ยังไม่คำนวณ'}
+            BMI ของคุณ: {bmi || 'ยังไม่คำนวณ'}<br/>
+            BMR ของคุณ: {bmr || 'ยังไม่คำนวณ'}
           </div>
 
           <button type="submit" className="btn">ยืนยัน</button>

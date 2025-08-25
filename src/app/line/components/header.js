@@ -1,12 +1,15 @@
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const Header = ({ title, cartoonImage }) => {
   return (
     <header className="header-bar">
-      <button className="back-button" aria-label="back">
-        <Image src="/backbotton.png" alt="back" width={24} height={24} />
-      </button>
+      <Link href="/line/home" passHref legacyBehavior>
+        <button className="back-button" aria-label="back">
+          <Image src="/backbotton.png" alt="back" width={24} height={24} />
+        </button>
+      </Link>
       <div className="header-center">
         <span className="header-title">{title}</span> 
         <Image className="header-cartoon" src={cartoonImage} alt="cartoon" width={55} height={70} />
@@ -64,11 +67,11 @@ const Header = ({ title, cartoonImage }) => {
             font-size: 20px;
           }
           .header-cartoon {
-            width: 32px !important;
-            height: 32px !important;
+            width: 70px !important;
+            height: 90px !important;
           }
           .header-bar {
-            padding: 16px 8px 20px 8px;
+             padding: 24px 16px 24px 16px; 
           }
         }
       `}</style>

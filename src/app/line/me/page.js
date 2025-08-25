@@ -39,6 +39,7 @@ export default function MePage() {
 
   /* ---------- state ---------- */
   const [bmi, setBmi] = useState(null);
+  const [bmr, setBmr] = useState(null);
   const [dailyLogs, setDailyLogs] = useState([]);
   const [openDates, setOpenDates] = useState({});
   const [menuOpen, setMenuOpen] = useState(false);
@@ -51,13 +52,14 @@ export default function MePage() {
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (!user) return;
 
-      // 1) BMI จาก users/<uid>
+      // 1) BMI/BMR จาก users/<uid>
       try {
         const uSnap = await getDoc(doc(db, "users", user.uid));
         const uData = uSnap.exists() ? uSnap.data() : null;
-        setBmi(uData?.bmi ?? null);
+  setBmi(uData?.bmi != null ? Number(uData.bmi) : null);
+  setBmr(uData?.bmr != null ? Number(uData.bmr) : null);
       } catch (e) {
-        console.error("load BMI error:", e);
+        console.error("load BMI/BMR error:", e);
       }
 
       // 2) อาหารจากคอลเลกชันที่ rules อนุญาต: food/*
@@ -147,7 +149,8 @@ export default function MePage() {
 
         <div className="metrics">
           <div>
-            BMI{typeof bmi === "number" ? `: ${bmi.toFixed(1)}` : "..........................................."}
+            BMI{bmi != null && !isNaN(bmi) ? `: ${Number(bmi).toFixed(1)}` : "..........................................."}
+            {bmr != null && !isNaN(bmr) ? ` | BMR: ${Number(bmr)}` : ""}
           </div>
         </div>
       </div>
@@ -208,8 +211,18 @@ export default function MePage() {
       <MenuPopup isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
       <BottomMenu />
 
-      {/* ❗ไม่แตะต้อง CSS เดิมของคุณ (คงที่) */}
       <style>{`
+        html,
+        body,
+        #__next {
+          height: 100%;
+          margin: 0;
+          padding: 0;
+          background-color: #f3faee;
+        }
+        * {
+          box-sizing: border-box;
+        }
         .bunny-img {
           position: absolute;
           top: -24px;

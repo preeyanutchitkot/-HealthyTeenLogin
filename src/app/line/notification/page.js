@@ -1,34 +1,106 @@
-import React from 'react';
-import Header from '../components/header';
-import CalorieAlertCard from '../components/CalorieAlertCard';
+"use client";
+
+import React, { useEffect, useState } from "react";
+import Header from "../components/header";
+import CalorieAlertCard from "../components/CalorieAlertCard";
+import BottomMenu from "../components/menu";
+import { auth, db } from "../lib/firebase";
+import { doc, getDoc, collection, getDocs, query, where } from "firebase/firestore";
 
 export default function NotificationPage() {
+  const [bmr, setBmr] = useState(null);
+  const [calorie, setCalorie] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [level, setLevel] = useState("normal");
+  const [icon, setIcon] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const user = auth.currentUser;
+        if (!user) return;
+        // 1. ดึง BMR
+        const uSnap = await getDoc(doc(db, "users", user.uid));
+        const uData = uSnap.exists() ? uSnap.data() : null;
+        const bmrVal = uData?.bmr ? Number(uData.bmr) : null;
+        setBmr(bmrVal);
+        // 2. ดึงแคลอรี่ที่กินวันนี้
+        const today = new Date();
+        const ymd = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}-${String(today.getDate()).padStart(2,"0")}`;
+        const q = query(collection(db, "food"), where("uid", "==", user.uid), where("ymd", "==", ymd));
+        const snap = await getDocs(q);
+        const sum = snap.docs.reduce((s,doc)=>{
+          const d=doc.data(); return s + Number(d.calories||0)*Number(d.qty||1);
+        },0);
+        setCalorie(sum);
+        // 3. คำนวณ level
+        let lv = "normal";
+        let ic = <img src="/enough.png" alt="enough" style={{ width: 80 }} />;
+        if (bmrVal && sum > bmrVal) {
+          lv = "over";
+          ic = <img src="/full.png" alt="full" style={{ width: 80 }} />;
+        } else if (bmrVal && sum >= bmrVal/2) {
+          lv = "near";
+          ic = <img src="/nearfull.png" alt="nearfull" style={{ width: 80 }} />;
+        }
+        setLevel(lv);
+        setIcon(ic);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
-    <div>
+    <div className="wrapper">
+      <style jsx global>{`
+        html, body, #__next {
+          height: 100%;
+          margin: 0;
+          padding: 0;
+          background-color: #f3faee;
+        }
+        * { box-sizing: border-box; }
+        .wrapper {
+          min-height: 100vh;
+          background-color: #f3faee;
+          display: flex;
+          flex-direction: column;
+        }
+        .content {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 24px;
+          align-items: center;
+          margin-top: 32px;
+          padding: 0 16px;
+          padding-bottom: 120px;
+        }
+      `}</style>
+
       <Header title="ปริมาณแคลลอรี่วันนี้" cartoonImage="/8.png" />
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', alignItems: 'center', marginTop: '32px' }}>
-        <CalorieAlertCard
-          level="over"
-          title="ปริมาณแคลอรี่ของคุณเกินกำหนด"
-          calorie={2500}
-          maxCalorie={2400}
-          icon={<img src="/full.png" alt="full" style={{ width: 80 }} />}
-        />
-        <CalorieAlertCard
-          level="normal"
-          title="ปริมาณแคลอรี่ของคุณพอดี"
-          calorie={800}
-          maxCalorie={2400}
-          icon={<img src="/enough.png" alt="enough" style={{ width: 80 }} />}
-        />
-        <CalorieAlertCard
-          level="near"
-          title="วันนี้ปริมาณแคลอรี่ของคุณใกล้เต็ม"
-          calorie={1200}
-          maxCalorie={2400}
-          icon={<img src="/nearfull.png" alt="nearfull" style={{ width: 80 }} />}
-        />
+
+      <div className="content">
+        {loading ? <div>กำลังโหลด...</div> : (
+          <CalorieAlertCard
+            level={level}
+            title={
+              level === "over"
+                ? "ปริมาณแคลอรี่ของคุณเกินกำหนด"
+                : level === "near"
+                ? "วันนี้ปริมาณแคลอรี่ของคุณใกล้เต็ม"
+                : "ปริมาณแคลอรี่ของคุณพอดี"
+            }
+            calorie={calorie}
+            maxCalorie={bmr}
+            icon={icon}
+          />
+        )}
       </div>
+      <BottomMenu />
     </div>
   );
 }

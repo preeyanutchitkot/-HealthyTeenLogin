@@ -1,10 +1,11 @@
 'use client';
 
 import Image from 'next/image';
+import CartIcon from '../../components/CartIcon';
 import Link from 'next/link';
 import { useState } from 'react';
 import BottomMenu from '../../components/menu';
-
+import CategoryBar from '../../components/CategoryBar';
 
 const meatFoods = [
   { name: 'อกไก่ (100 กรัม)', calories: 165, image: '/foods/chicken-breast.png' },
@@ -91,25 +92,39 @@ export default function SavoryPage() {
         </div>
       </div>
 
-      <div className="categories">
-        <div className="category-scroll">
-          {['อาหารคาว', 'อาหารหวาน', 'เครื่องดื่ม', 'ผลไม้', 'ของว่าง', 'อาหารคลีน'].map((cat, idx) => (
-            <div className="category-item" key={idx}>
-              <Image src={`/icons/${['savory','sweet','drink','fruit','snack','clean'][idx]}.png`} width={40} height={40} alt={cat} />
-              <div>{cat}</div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <CategoryBar
+           categories={[
+             { name: "อาหารคาว", icon: "/food1.png" },
+             { name: "อาหารหวาน", icon: "/food2.png" },
+             { name: "ของว่าง", icon: "/food4.png" },
+             { name: "อาหารเจ", icon: "/jfood7.png" },
+             { name: "อาหารต่างประเทศ", icon: "/food5.png" },
+             { name: "เครื่องดื่ม", icon: "/food3.png" },
+             { name: "เครื่องดื่มแอลกอฮอล์", icon: "/food8.png" },
+             { name: "ผักและผลไม้", icon: "/food6.png" },
+             { name: "เนื้อสัตว์", icon: "/food9.png" },
+             { name: "ซอสและเครื่องปรุง", icon: "/food10.png" },
+           ]}
+           categoryPathMap={{
+             อาหารคาว: "/line/food/savory",
+             อาหารหวาน: "/line/food/sweet",
+             ของว่าง: "/line/food/snack",
+             อาหารเจ: "/line/food/J",
+             อาหารต่างประเทศ: "/line/food/Foreign",
+             เครื่องดื่ม: "/line/food/drink",
+             เครื่องดื่มแอลกอฮอล์: "/line/food/alcohol",
+             ผักและผลไม้: "/line/food/fruit",
+             เนื้อสัตว์: "/line/food/meat",
+             ซอสและเครื่องปรุง: "/line/food/sauce",
+           }}
+         />
 
       <div className="tabs">
         <div className="tab-left">
           <button className="active">ของว่าง</button>
           <button className="add-new" onClick={() => setShowModal(true)}>+ เพิ่มเมนูใหม่</button>
         </div>
-        <div className="cart">
-          <Image src="/icons/cart.png" alt="cart" width={16} height={16} /> {cartCount}
-        </div>
+  <CartIcon count={cartCount} />
       </div>
 
       <div className="food-grid">

@@ -4,7 +4,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import BottomMenu from '../../components/menu';
-
+import CartIcon from '../../components/CartIcon';
+import CategoryBar from '../../components/CategoryBar';
 
 const snackFoods = [
   { name: 'ขนมครก', calories: 180, image: '/foods/khanom-khrok.png' },
@@ -111,28 +112,32 @@ export default function SavoryPage() {
         </div>
       </div>
 
-      <div className="categories">
-  <div className="category-scroll">
-    {[
-      { name: 'อาหารคาว', icon: 'savory', path: '/foods/savory' },
-      { name: 'อาหารหวาน', icon: 'sweet', path: '/foods/sweet' },
-      { name: 'เครื่องดื่ม', icon: 'drink', path: '/foods/drink' },
-      { name: 'ผลไม้', icon: 'fruit', path: '/foods/fruit' },
-      { name: 'ของว่าง', icon: 'snack', path: '/foods/snack' },
-      { name: 'อาหารคลีน', icon: 'clean', path: '/foods/clean' },
-    ].map((cat, idx) => (
-      <Link href={cat.path} key={idx} className="category-item">
-        <Image
-          src={`/icons/${cat.icon}.png`}
-          width={40}
-          height={40}
-          alt={cat.name}
-        />
-        <div>{cat.name}</div>
-      </Link>
-    ))}
-  </div>
-</div>
+       <CategoryBar
+            categories={[
+              { name: "อาหารคาว", icon: "/food1.png" },
+              { name: "อาหารหวาน", icon: "/food2.png" },
+              { name: "ของว่าง", icon: "/food4.png" },
+              { name: "อาหารเจ", icon: "/jfood7.png" },
+              { name: "อาหารต่างประเทศ", icon: "/food5.png" },
+              { name: "เครื่องดื่ม", icon: "/food3.png" },
+              { name: "เครื่องดื่มแอลกอฮอล์", icon: "/food8.png" },
+              { name: "ผักและผลไม้", icon: "/food6.png" },
+              { name: "เนื้อสัตว์", icon: "/food9.png" },
+              { name: "ซอสและเครื่องปรุง", icon: "/food10.png" },
+            ]}
+            categoryPathMap={{
+              อาหารคาว: "/line/food/savory",
+              อาหารหวาน: "/line/food/sweet",
+              ของว่าง: "/line/food/snack",
+              อาหารเจ: "/line/food/J",
+              อาหารต่างประเทศ: "/line/food/Foreign",
+              เครื่องดื่ม: "/line/food/drink",
+              เครื่องดื่มแอลกอฮอล์: "/line/food/alcohol",
+              ผักและผลไม้: "/line/food/fruit",
+              เนื้อสัตว์: "/line/food/meat",
+              ซอสและเครื่องปรุง: "/line/food/sauce",
+            }}
+          />
 
 
       <div className="tabs">
@@ -140,9 +145,7 @@ export default function SavoryPage() {
           <button className="active">อาหารคลีน</button>
           <button className="add-new" onClick={() => setShowModal(true)}>+ เพิ่มเมนูใหม่</button>
         </div>
-        <div className="cart">
-          <Image src="/icons/cart.png" alt="cart" width={16} height={16} /> {cartCount}
-        </div>
+  <CartIcon count={cartCount} />
       </div>
 
       <div className="food-grid">

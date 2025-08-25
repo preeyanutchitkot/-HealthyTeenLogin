@@ -1,10 +1,15 @@
-/* ✅ ต้องอยู่บนสุด */
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai&display=swap');
+/* ✅ ต้องอยู่บนสุด */
 
 /* ✅ Tailwind ต้องมาก่อนโค้ดปกติทั้งหมด */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Remove underline from all links globally */
+a, a:visited, a:active, a:focus, a:hover {
+  text-decoration: none !important;
+}
 
 /* ✅ font-family รวมไว้ที่ body เดียวพอ */
 body {

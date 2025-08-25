@@ -1,21 +1,23 @@
 "use client";
 
 import Image from "next/image";
+import CartIcon from "../components/CartIcon";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import BottomMenu from "../components/menu";
+import CategoryBar from "../components/CategoryBar";
 
 const categories = [
-  { name: "อาหารคาว", icon: "/icons/savory.png" },
-  { name: "อาหารหวาน", icon: "/icons/sweet.png" },
-  { name: "ของว่าง", icon: "/icons/snack.png" },
-  { name: "อาหารเจ", icon: "/icons/Jfood.png" },
-  { name: "อาหารต่างประเทศ", icon: "/icons/Foreign.png" },
-  { name: "เครื่องดื่ม", icon: "/icons/drink.png" },
-  { name: "เครื่องดื่มแอลกอฮอล์", icon: "/icons/alcohol.png" },
-  { name: "ผักและผลไม้", icon: "/icons/fruit.png" },
-  { name: "เนื้อสัตว์", icon: "/icons/meat.png" },
-  { name: "ซอสและเครื่องปรุง", icon: "/icons/sauce.png" },
+  { name: "อาหารคาว", icon: "/food1.png" },
+  { name: "อาหารหวาน", icon: "/food2.png" },
+  { name: "ของว่าง", icon: "/food4.png" },
+  { name: "อาหารเจ", icon: "/jfood7.png" },
+  { name: "อาหารต่างประเทศ", icon: "/food5.png" },
+  { name: "เครื่องดื่ม", icon: "/food3.png" },
+  { name: "เครื่องดื่มแอลกอฮอล์", icon: "/food8.png" },
+  { name: "ผักและผลไม้", icon: "/food6.png" },
+  { name: "เนื้อสัตว์", icon: "/food9.png" },
+  { name: "ซอสและเครื่องปรุง", icon: "/food10.png" },
 ];
 
 const categoryPathMap = {
@@ -64,8 +66,7 @@ const sauce = [];
 export default function FoodLogPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [cartCount, setCartCount] = useState(0);
-
-  const handleAdd = () => setCartCount((prev) => prev + 1);
+  const addToCart = () => setCartCount((prev) => prev + 1);
 
   const filterFoods = (foods) =>
     foods.filter((f) =>
@@ -87,16 +88,13 @@ export default function FoodLogPage() {
     ],
     []
   );
+
   return (
     <div className="page">
       {/* Topbar */}
       <div className="topbar">
         <Link href="/line/home" className="back-btn" aria-label="ย้อนกลับ" />
         <h1>บันทึกอาหาร</h1>
-        <Link href="/cart" className="cart" aria-label="ตะกร้าอาหาร">
-          <Image src="/icons/cart.png" alt="cart" width={18} height={18} />
-          <span aria-live="polite">{cartCount}</span>
-        </Link>
       </div>
 
       {/* Search */}
@@ -113,94 +111,48 @@ export default function FoodLogPage() {
       </div>
 
       {/* Categories */}
-      <div className="categories" aria-label="หมวดหมู่อาหาร">
-        <div className="category-scroll">
-          {categories.map((c) => {
-            const href = categoryPathMap[c.name] ?? "#";
-            return (
-              <Link key={c.name} href={href} className="category-item">
-                <Image src={c.icon} alt={c.name} width={40} height={40} />
-                <div>{c.name}</div>
-              </Link>
-            );
-          })}
-        </div>
-      </div>
+      <CategoryBar categories={categories} categoryPathMap={categoryPathMap} />
 
-      {/* Banner */}
-      <div className="banner-scroll" aria-label="โปรโมชัน">
-        <div className="banner">
-          <Image
-            src="/braner1.webp"
-            alt="braner1"
-            fill
-            sizes="(max-width: 768px) 90vw, 320px"
-            priority
-            style={{ objectFit: 'cover' }}
-          />
-        </div>
-        <div className="banner">
-          <Image
-            src="/braner2.jpg"
-            alt="braner2"
-            fill
-            sizes="(max-width: 768px) 90vw, 320px"
-            style={{ objectFit: 'cover' }}
-          />
-        </div>
-        <div className="banner">
-          <Image
-            src="/braner3.jpeg"
-            alt="braner3"
-            fill
-            sizes="(max-width: 768px) 90vw, 320px"
-            style={{ objectFit: 'cover' }}
-          />
-        </div>
-      </div>
-
-      {[
-        { title: "อาหารคาว", data: savoryFoods },
-        { title: "อาหารหวาน", data: sweetFoods },
-        { title: "ของว่าง", data: snackFoods },
-        { title: "อาหารเจ", data: JFoods },
-        { title: "อาหารต่างประเทศ", data: foreignFoods },
-        { title: "เครื่องดื่ม", data: drinkMenus },
-        { title: "เครื่องดื่มแอลกอฮอล์", data: alcohols },
-        { title: "ผักและผลไม้", data: fruitMenus },
-        { title: "เนื้อสัตว์", data: meatFoods },
-        { title: "ซอสและเครื่องปรุง", data: sauce },
-      ].map(({ title, data }) => (
-        <div className="section" key={title}>
-          <h2>{title}</h2>
-
-          <div className="food-grid">
-            {filterFoods(data).map((f) => (
-              <div key={`${title}-${f.name}`} className="food-item">
-                <Link
-                  href={`/food/${encodeURIComponent(f.name)}`}
-                  className="food-link"
-                  aria-label={`ดูรายละเอียด ${f.name}`}
-                >
-                  <div className="thumb">
-                    <Image src={f.image} alt={f.name} fill sizes="120px" />
-                  </div>
-                  <div className="name">{f.name}</div>
-                  <div className="calories">{f.calories} แคลอรี่</div>
-                </Link>
-
-                <button
-                  className="add"
-                  onClick={handleAdd}
-                  aria-label={`เพิ่ม ${f.name} ลงตะกร้า`}
-                >
-                  +
-                </button>
-              </div>
-            ))}
+      {/* Banner + Cart in relative wrapper */}
+      <div className="banner-cart-wrapper">
+        <div className="banner-scroll" aria-label="โปรโมชัน">
+          <div className="banner">
+            <Image
+              src="/braner1.webp"
+              alt="braner1"
+              fill
+              sizes="(max-width: 768px) 90vw, 320px"
+              priority
+              style={{ objectFit: 'cover' }}
+            />
+          </div>
+          <div className="banner">
+            <Image
+              src="/braner2.jpg"
+              alt="braner2"
+              fill
+              sizes="(max-width: 768px) 90vw, 320px"
+              style={{ objectFit: 'cover' }}
+            />
+          </div>
+          <div className="banner">
+            <Image
+              src="/braner3.jpeg"
+              alt="braner3"
+              fill
+              sizes="(max-width: 768px) 90vw, 320px"
+              style={{ objectFit: 'cover' }}
+            />
           </div>
         </div>
-      ))}
+        <div className="cart-float">
+          <Link href="/cart" aria-label="ตะกร้าอาหาร">
+            <CartIcon count={cartCount} />
+          </Link>
+        </div>
+      </div>
+
+      {/* Food section rendering moved to a new component. */}
 
       <BottomMenu />
 
@@ -217,11 +169,20 @@ export default function FoodLogPage() {
           top: 0;
           z-index: 20;
           display: flex;
-          justify-content: space-between;
+          justify-content: center;
           align-items: center;
           background: #3abb47;
           color: #fff;
           padding: 12px 16px;
+        }
+        .banner-cart-wrapper {
+          position: relative;
+        }
+        .cart-float {
+          position: absolute;
+          right: 16px;
+          bottom: -12px;
+          z-index: 30;
         }
         .topbar h1 {
           font-size: 18px;
@@ -316,6 +277,11 @@ export default function FoodLogPage() {
           gap: 16px;
           padding: 16px 8px 20px 8px;
           overflow-x: auto;
+          scrollbar-width: none; /* Firefox */
+          -ms-overflow-style: none; /* IE and Edge */
+        }
+        .banner-scroll::-webkit-scrollbar {
+          display: none; /* Chrome, Safari, Opera */
         }
         .banner {
           position: relative;

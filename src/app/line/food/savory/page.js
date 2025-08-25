@@ -107,7 +107,7 @@ export default function SavoryPage() {
           <button className="add-new" onClick={() => setShowModal(true)}>+ เพิ่มเมนูใหม่</button>
         </div>
         <div className="cart">
-          <Image src="/icons/cart.png" alt="cart" width={16} height={16} /> {cartCount}
+          <Image src="/Shopping.png" alt="cart" width={16} height={16} /> {cartCount}
         </div>
       </div>
 

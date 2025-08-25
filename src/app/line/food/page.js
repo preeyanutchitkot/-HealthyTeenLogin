@@ -131,27 +131,30 @@ export default function FoodLogPage() {
       <div className="banner-scroll" aria-label="โปรโมชัน">
         <div className="banner">
           <Image
-            src="/banners/100kcal.png"
-            alt="100 kcal"
+            src="/braner1.webp"
+            alt="braner1"
             fill
-            sizes="(max-width: 768px) 80vw, 250px"
+            sizes="(max-width: 768px) 90vw, 320px"
             priority
+            style={{ objectFit: 'cover' }}
           />
         </div>
         <div className="banner">
           <Image
-            src="/banners/banner2.png"
-            alt="banner2"
+            src="/braner2.jpg"
+            alt="braner2"
             fill
-            sizes="(max-width: 768px) 80vw, 250px"
+            sizes="(max-width: 768px) 90vw, 320px"
+            style={{ objectFit: 'cover' }}
           />
         </div>
         <div className="banner">
           <Image
-            src="/banners/banner3.png"
-            alt="banner3"
+            src="/braner3.jpeg"
+            alt="braner3"
             fill
-            sizes="(max-width: 768px) 80vw, 250px"
+            sizes="(max-width: 768px) 90vw, 320px"
+            style={{ objectFit: 'cover' }}
           />
         </div>
       </div>
@@ -310,18 +313,25 @@ export default function FoodLogPage() {
 
         .banner-scroll {
           display: flex;
-          gap: 12px;
-          padding: 12px 16px;
+          gap: 16px;
+          padding: 16px 8px 20px 8px;
           overflow-x: auto;
         }
         .banner {
           position: relative;
-          width: 250px;
-          height: 100px;
-          border-radius: 12px;
+          width: 320px;
+          height: 220px;
+          border-radius: 16px;
           overflow: hidden;
           flex: 0 0 auto;
-          box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+          background: #e8f5e9;
+        }
+        @media (max-width: 600px) {
+          .banner {
+            width: 90vw;
+            height: 180px;
+          }
         }
 
         .section {

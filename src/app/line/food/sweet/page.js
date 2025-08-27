@@ -5,9 +5,14 @@ import Link from 'next/link';
 import { useState } from 'react';
 import BottomMenu from '../../components/menu';
 import CartIcon from '../../components/CartIcon';
+import { useRouter } from 'next/navigation';
 import CategoryBar from '../../components/CategoryBar';
+import PreviewModal from '../../../components/cart/PreviewModal';
+import FoodCard from '../../../components/food/FoodCard';
+import { useCart } from '../../../components/cart/CartContext';
 
 export default function SweetPage() {
+  const router = useRouter();
   const sweetFoods = [
     { name: 'ทับทิมกรอบ', calories: 200, image: '/foods/tub-tim-krob.png' },
     { name: 'ขนมชั้น', calories: 220, image: '/foods/khanom-chan.png' },
@@ -31,14 +36,30 @@ export default function SweetPage() {
     { name: 'ขนมถ้วย', calories: 150, image: '/foods/khanom-tuay.png' }
   ];
 
-  const [cartCount, setCartCount] = useState(0);
+
   const [foods, setFoods] = useState(sweetFoods);
-  const [showModal, setShowModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showModal, setShowModal] = useState(false); // สำหรับ modal เพิ่มเมนูใหม่
+  const [previewFood, setPreviewFood] = useState(null); // สำหรับ preview modal
+  const [showPreview, setShowPreview] = useState(false); // สำหรับ preview modal
   const [newFoodName, setNewFoodName] = useState('');
   const [loading, setLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
 
-  const handleAdd = () => setCartCount((prev) => prev + 1);
+  const { addItem } = useCart();
+
+  // กด + ที่การ์ดอาหาร
+  const handleRequestAdd = (food) => {
+    setPreviewFood(food);
+    setShowPreview(true);
+  };
+
+  // ยืนยันใน preview modal
+  const handleConfirmAdd = (item) => {
+    console.log('SweetPage: handleConfirmAdd', item);
+    addItem(item);
+    setShowPreview(false);
+    setPreviewFood(null);
+  };
 
   const handleAddNewFood = async () => {
     if (!newFoodName.trim()) return;
@@ -124,19 +145,23 @@ export default function SweetPage() {
             <button className="active">อาหารหวาน</button>
             <button className="add-new" onClick={() => setShowModal(true)}>+ เพิ่มเมนูใหม่</button>
           </div>
-    <CartIcon count={cartCount} />
+  <CartIcon onClick={() => router.push('/line/food/cart')} />
         </div>
+
 
         <div className="food-grid">
           {filteredFoods.map((f, i) => (
-            <div key={i} className="food-item">
-              <Image src={f.image} alt={f.name} width={80} height={80} />
-              <div className="name">{f.name}</div>
-              <div className="calories">{f.calories} แคลอรี่</div>
-              <button className="add" onClick={handleAdd}>+</button>
-            </div>
+            <FoodCard key={i} food={f} onAdd={handleRequestAdd} />
           ))}
         </div>
+
+        {/* Preview Modal (ตอนเพิ่มจากรายการ) */}
+        <PreviewModal
+          open={showPreview}
+          food={previewFood}
+          onClose={() => { setShowPreview(false); setPreviewFood(null); }}
+          onConfirm={handleConfirmAdd}
+        />
 
         {showModal && (
           <div className="modal">

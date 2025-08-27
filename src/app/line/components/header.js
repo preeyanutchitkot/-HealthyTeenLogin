@@ -12,7 +12,7 @@ const Header = ({ title, cartoonImage }) => {
       </Link>
       <div className="header-center">
         <span className="header-title">{title}</span> 
-        <Image className="header-cartoon" src={cartoonImage} alt="cartoon" width={55} height={70} />
+        <Image className="header-cartoon" src={cartoonImage} alt="cartoon" width={45} height={60} />
       </div>
       <style>{`
         .header-bar {

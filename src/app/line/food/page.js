@@ -146,8 +146,8 @@ export default function FoodLogPage() {
           </div>
         </div>
         <div className="cart-float">
-          <Link href="/cart" aria-label="ตะกร้าอาหาร">
-            <CartIcon count={cartCount} />
+          <Link href="/line/food/cart" aria-label="ตะกร้าอาหาร">
+              <CartIcon onClick={() => router.push('/line/food/cart')} />
           </Link>
         </div>
       </div>

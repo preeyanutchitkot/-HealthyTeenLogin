@@ -4,8 +4,6 @@ import Link from "next/link";
 function MenuPopup({ isOpen, onClose }) {
   if (!isOpen) return null;
 
-  // ไอคอนที่ใช้ในแต่ละเมนู (ใช้ public/xxx.png)
-  // SVG ไอคอนสีดำ
   const icons = {
     edit: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 20h4.586a1 1 0 0 0 .707-.293l10.5-10.5a2 2 0 0 0 0-2.828l-2.172-2.172a2 2 0 0 0-2.828 0l-10.5 10.5A1 1 0 0 0 4 15.414V20z" stroke="#222" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M14.5 6.5l3 3" stroke="#222" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>

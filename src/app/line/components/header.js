@@ -5,7 +5,7 @@ import Link from 'next/link';
 const Header = ({ title, cartoonImage }) => {
   return (
     <header className="header-bar">
-      <Link href="/line/home" passHref legacyBehavior>
+      <Link href="/line/home">
         <button className="back-button" aria-label="back">
           <Image src="/backbotton.png" alt="back" width={24} height={24} />
         </button>

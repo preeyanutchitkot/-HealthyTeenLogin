@@ -77,7 +77,7 @@
   position: fixed;
   left: 0;
   right: 0;
-bottom: calc(var(--menu-h, 76px) + 12px + env(safe-area-inset-bottom)); /* เพิ่ม 12px */
+  bottom: calc(var(--menu-h, 76px) + 3px + env(safe-area-inset-bottom)); /* เพิ่ม 12px */
   background: #fff;
   border-top: 1px solid #e5e7eb;
   box-shadow: 0 -2px 8px rgba(0,0,0,0.05);

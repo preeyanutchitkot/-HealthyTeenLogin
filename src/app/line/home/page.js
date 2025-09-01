@@ -10,6 +10,7 @@ import { auth, db } from "../lib/firebase";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 
+
 const toYMD = (d) => {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");
@@ -24,10 +25,20 @@ export default function HomePage() {
   const [menuOpen, setMenuOpen] = useState(false); // ✅ state สำหรับป๊อปอัป
 
   // รอสถานะล็อกอิน
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => setUid(u?.uid ?? null));
-    return () => unsub();
-  }, []);
+useEffect(() => {
+  const unsubscribe = onAuthStateChanged(auth, (user) => {
+    if (user) {
+      console.log("User UID:", user.uid);
+      setUid(user.uid);  // Set the UID for the user
+    } else {
+      console.log("No user is logged in");
+    }
+  });
+
+  // Clean up the subscription when the component is unmounted
+  return () => unsubscribe();
+}, []);  // This ensures the effect runs once when the component mounts
+
 
   // ดึงเมนูของ "วันนี้" ตาม uid + ymd
   useEffect(() => {

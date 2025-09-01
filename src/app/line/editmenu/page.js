@@ -7,7 +7,7 @@ import { auth, db } from "../lib/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
-import BottomMenu from "@/app/line/components/menu";
+import BottomMenu from "../components/menu";
 
 const notoSansThai = Noto_Sans_Thai({
   weight: ["300", "400", "500", "700"],

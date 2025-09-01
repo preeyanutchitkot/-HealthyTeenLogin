@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import BottomMenu from "../components/menu";
 import styles from "./contact.module.css";
 
 export default function ContactPage() {
@@ -65,11 +64,6 @@ export default function ContactPage() {
           </span>
           Facebook Nursing SUT
         </a>
-      </div>
-
-      {/* Bottom Menu */}
-      <div className={styles.bottom}>
-        <BottomMenu />
       </div>
     </div>
   );

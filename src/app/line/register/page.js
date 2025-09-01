@@ -111,7 +111,7 @@ export default function Register() {
           await sendPasswordResetEmail(auth, emailNorm);
           alert('ส่งลิงก์รีเซ็ตรหัสผ่านไปที่อีเมลแล้ว');
         }
-        router.push('/line/liff'); // ไปหน้าเข้าสู่ระบบ
+        router.push('/line/home'); // ไปหน้าเข้าสู่ระบบ
         return;
       }
 
@@ -172,7 +172,7 @@ export default function Register() {
           await sendPasswordResetEmail(auth, emailNorm);
           alert('ส่งลิงก์รีเซ็ตรหัสผ่านไปที่อีเมลแล้ว');
         }
-        router.push('/line/liff');
+        router.push('/app/line/login');
         return;
       }
       alert('เกิดข้อผิดพลาด: ' + error.message);
@@ -365,7 +365,7 @@ export default function Register() {
 
           <div className="note">
             <span>รหัสผ่านควรมีอย่างน้อย 8 ตัวอักษร</span>
-            <a href="/line/liff">เข้าสู่ระบบ</a>
+            <a href="/">เข้าสู่ระบบ</a>
           </div>
 
           <div className="field">
@@ -440,7 +440,7 @@ export default function Register() {
         </form>
 
         <div className="footer-link">
-          มีบัญชีอยู่แล้ว? <a href="/line/liff">เข้าสู่ระบบ</a>
+          มีบัญชีอยู่แล้ว? <a href="/">เข้าสู่ระบบ</a>
         </div>
       </div>
     </div>

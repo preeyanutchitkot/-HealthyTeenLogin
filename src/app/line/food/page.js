@@ -1,368 +1,411 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
-import CartIcon from "../components/CartIcon";
-import Link from "next/link";
-import { useMemo, useState } from "react";
 import BottomMenu from "../components/menu";
+import CartIcon from "../components/CartIcon";
 import CategoryBar from "../components/CategoryBar";
+import Header from "../components/header";
+import FoodGrid from "../components/FoodGrid";
+import CartSheet from "../components/CartSheet";
 
-const categories = [
-  { name: "อาหารคาว", icon: "/food1.png" },
-  { name: "อาหารหวาน", icon: "/food2.png" },
-  { name: "ของว่าง", icon: "/food4.png" },
-  { name: "อาหารเจ", icon: "/jfood7.png" },
-  { name: "อาหารต่างประเทศ", icon: "/food5.png" },
-  { name: "เครื่องดื่ม", icon: "/food3.png" },
-  { name: "เครื่องดื่มแอลกอฮอล์", icon: "/food8.png" },
-  { name: "ผักและผลไม้", icon: "/food6.png" },
-  { name: "เนื้อสัตว์", icon: "/food9.png" },
-  { name: "ซอสและเครื่องปรุง", icon: "/food10.png" },
+const savoryFoods = [
+  { name: "ข้าวกะเพราไก่ไข่ดาว", calories: 630, image: "/foods/khao-krapao-kai-kai-dao.png" },
+  { name: "ข้าวผัดหมู", calories: 590, image: "/foods/khao-pad-moo.png" },
+  { name: "ข้าวมันไก่", calories: 700, image: "/foods/khao-man-kai.png" },
+  { name: "ข้าวราดแกงเขียวหวานไก่", calories: 600, image: "/foods/khao-rad-kaeng-kiew-wan-kai.png" },
+  { name: "ผัดไทยกุ้งสด", calories: 550, image: "/foods/pad-thai-kung-sod.png" },
+  { name: "ข้าวคลุกกะปิ", calories: 450, image: "/foods/khao-kluk-kapi.png" },
+  { name: "ข้าวหน้าเป็ด", calories: 520, image: "/foods/khao-na-ped.png" },
+  { name: "ข้าวแกงกะหรี่ไก่", calories: 610, image: "/foods/khao-kaeng-karee-kai.png" },
+  { name: "ข้าวผัดหมู", calories: 520, image: "/foods/khao-pad-moo-2.png" },
+  { name: "โรตีหมูสับไข่", calories: 540, image: "/foods/roti-moo-sap-kai.png" },
+];
+// ข้อมูลอาหารหวาน
+const sweetFoods = [
+  { name: 'ทับทิมกรอบ', calories: 200, image: '/foods/tub-tim-krob.png' },
+  { name: 'ขนมชั้น', calories: 220, image: '/foods/khanom-chan.png' },
+  { name: 'บัวลอย', calories: 240, image: '/foods/bua-loi.png' },
+  { name: 'ข้าวเหนียวมะม่วง', calories: 330, image: '/foods/khao-niew-mamuang.png' },
+  { name: 'ลูกชุบ', calories: 150, image: '/foods/look-chup.png' },
+  { name: 'เครปเค้ก', calories: 350, image: '/foods/crepe-cake.png' },
+  { name: 'พายสัปปะรด', calories: 270, image: '/foods/pineapple-pie.png' },
+  { name: 'ชีสเค้ก', calories: 400, image: '/foods/cheesecake.png' },
+  { name: 'ทองหยิบ', calories: 210, image: '/foods/thong-yip.png' },
+  { name: 'ฝอยทอง', calories: 180, image: '/foods/foi-thong.png' },
 ];
 
-const categoryPathMap = {
-  อาหารคาว: "food/savory",
-  อาหารหวาน: "food/sweet",
-  ของว่าง: "food/snack",
-  อาหารเจ: "food/J",
-  อาหารต่างประเทศ: "food/foreign",
-  เครื่องดื่ม: "food/drink",
-  เครื่องดื่มแอลกอฮอล์: "food/alcohol",
-  ผักและผลไม้: "foods/fruit",
-  เนื้อสัตว์: "food/meat",
-  ซอสและเครื่องปรุง: "food/sauce",
-};
+// ข้อมูลอาหารว่าง
+const snackFoods = [
+  { name: 'ขนมครก', calories: 180, image: '/foods/khanom-khrok.png' },
+  { name: 'หมูปิ้ง (3 ไม้)', calories: 250, image: '/foods/moo-ping-3.png' },
+  { name: 'ลูกชิ้นปิ้ง (5 ลูก)', calories: 120, image: '/foods/look-chin-ping-5.png' },
+  { name: 'เฉาก๊วย', calories: 120, image: '/foods/chao-kuai.png' },
+  { name: 'ไข่ตุ๋น', calories: 120, image: '/foods/kai-tun.png' },
+  { name: 'ข้าวโพดปิ้ง', calories: 100, image: '/foods/khao-phot-ping.png' },
+  { name: 'กล้วยทอด', calories: 250, image: '/foods/kluai-thot.png' },
+  { name: 'มันทอด', calories: 150, image: '/foods/man-thot.png' },
+  { name: 'ถั่วทอด', calories: 200, image: '/foods/thua-thot.png' },
+  { name: 'เกี๊ยวทอด', calories: 190, image: '/foods/kiao-thot.png' },
+];
+const drinkMenus = [
+  { name: 'น้ำส้มคั้น', calories: 100, image: '/foods/orange-juice.png' },
+  { name: 'โค้ก', calories: 150, image: '/foods/coke.png' },
+  { name: 'น้ำเปล่า', calories: 0, image: '/foods/water.png' },
+  { name: 'อเมริกาโน่', calories: 10, image: '/foods/americano.png' },
+  { name: 'ลาเต้ร้อน', calories: 150, image: '/foods/hot-latte.png' },
+  { name: 'น้ำมะนาว', calories: 90, image: '/foods/lemonade.png' },
+  { name: 'น้ำแตงโมปั่น', calories: 250, image: '/foods/watermelon-smoothie.png' },
+  { name: 'นมสดเย็น', calories: 370, image: '/foods/cold-milk.png' },
+  { name: 'ชานมไข่มุก', calories: 450, image: '/foods/bubble-tea.png' },
+  { name: 'ชาเขียวเย็น', calories: 200, image: '/foods/iced-green-tea.png' },
+  ];
 
-// อาหารคาว
-const savoryFoods = [];
-
-// อาหารหวาน
-const sweetFoods = [];
-
-// ของว่าง
-const snackFoods = [];
-
-// อาหารเจ
-const JFoods = [];
-
-// อาหารต่างประเทศ
-const foreignFoods = [];
-
-// เครื่องดื่ม
-const drinkMenus = [];
-
-// เครื่องดื่มแอลกอฮอล์
-const alcohols = [];
-
-// ผักและผลไม้
-const fruitMenus = [];
-
-// เนื้อสัตว์
-const meatFoods = [];
-
-// ซอสและเครื่องปรุง
-const sauce = [];
-
-export default function FoodLogPage() {
-  const [searchTerm, setSearchTerm] = useState("");
+export default function FoodsPage() {
+  const [foods, setFoods] = useState(sweetFoods);
+  const [snacks, setSnacks] = useState(snackFoods);
+  const [savoryFoodsState, setSavoryFoods] = useState(savoryFoods);
+  const [drinks, setDrinks] = useState(drinkMenus);
+  const [searchQuery, setSearchQuery] = useState("");
   const [cartCount, setCartCount] = useState(0);
-  const addToCart = () => setCartCount((prev) => prev + 1);
+  const [cartItems, setCartItems] = useState([]);
+  const [showSheet, setShowSheet] = useState(false);
+  const router = useRouter();
 
-  const filterFoods = (foods) =>
-    foods.filter((f) =>
-      f.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+  // Load cart items from localStorage on initial render
+  useEffect(() => {
+    try {
+      const storedCart = localStorage.getItem("cartItems");
+      if (storedCart) {
+        setCartItems(JSON.parse(storedCart));
+      }
+    } catch (e) {
+      console.error("Failed to load cart from localStorage", e);
+    }
+  }, []); // Run only once on component mount
 
-  const allFoods = useMemo(
-    () => [
-      ...savoryFoods,
-      ...sweetFoods,
-      ...snackFoods,
-      ...JFoods,
-      ...foreignFoods,
-      ...drinkMenus,
-      ...alcohols,
-      ...fruitMenus,
-      ...meatFoods,
-      ...sauce,
-    ],
-    []
+  // Sync cartCount whenever cartItems change
+  useEffect(() => {
+    const total = cartItems.reduce((sum, it) => sum + it.qty, 0);
+    setCartCount(total);
+    // Persist cartItems to localStorage whenever they change
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
+  }, [cartItems]);
+  
+  // Filter foods based on search query
+  const filteredFoods = useMemo(
+    () => foods.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())),
+    [foods, searchQuery]
   );
+
+  const filteredSnacks = useMemo(
+    () => snacks.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())),
+    [snacks, searchQuery]
+  );
+
+  const filteredSavoryFoods = useMemo(
+    () => savoryFoods.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())),
+    [savoryFoods, searchQuery]
+  );
+
+  const filteredDrinks = useMemo(
+    () => drinks.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())),
+    [drinks, searchQuery]
+  );
+
+  // Add a food item to the cart
+  const addToCart = (food) => {
+    setCartItems((prev) => {
+      const idx = prev.findIndex((item) => item.name === food.name);
+      if (idx === -1) {
+        return [...prev, { ...food, qty: 1 }];
+      }
+      const updated = [...prev];
+      updated[idx].qty += 1;
+      return updated;
+    });
+  };
+
+  // Increase quantity of a food item in the cart
+  const increaseQty = (name) =>
+    setCartItems((prev) => prev.map((it) => (it.name === name ? { ...it, qty: it.qty + 1 } : it)));
+
+  // Decrease quantity of a food item in the cart
+  const decreaseQty = (name) =>
+    setCartItems((prev) => prev.map((it) => (it.name === name ? { ...it, qty: it.qty - 1 } : it)).filter((it) => it.qty > 0));
+
+  // Remove a food item from the cart
+  const removeFromCart = (name) => setCartItems((prev) => prev.filter((it) => it.name !== name));
+
+  // Navigate to the cart page
+  const saveToCart = () => {
+    setShowSheet(false);
+    router.push("/line/food/cart");
+  };
 
   return (
     <div className="page">
-      {/* Topbar */}
-      <div className="topbar">
-        <Link href="/line/home" className="back-btn" aria-label="ย้อนกลับ" />
-        <h1>บันทึกอาหาร</h1>
-      </div>
+      <Header title="บันทึกอาหาร" cartoonImage="/8.png" />
 
-      {/* Search */}
-      <div className="search-wrapper">
-        <div className="search-box" role="search">
-          <input
-            type="text"
-            placeholder="ค้นหาเมนู…"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            aria-label="ค้นหาเมนูอาหาร"
-          />
+      {/* ค้นหา */}
+      <div className="search-wrap">
+        <div className="search-pill" role="search">
+          <Image src="/search.png" alt="ค้นหา" width={26} height={26} />
+          <input type="text" placeholder="ค้นหา" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+          <Image src="/character.png" alt="ตัวการ์ตูน" width={26} height={26} />
         </div>
       </div>
 
-      {/* Categories */}
-      <CategoryBar categories={categories} categoryPathMap={categoryPathMap} />
+      <CategoryBar
+        categories={[
+          { name: "อาหารคาว", icon: "/food1.png" },
+          { name: "อาหารหวาน", icon: "/food2.png" },
+          { name: "ของว่าง", icon: "/food4.png" },
+          { name: "อาหารเจ", icon: "/jfood7.png" },
+          { name: "อาหารต่างประเทศ", icon: "/food5.png" },
+          { name: "เครื่องดื่ม", icon: "/food3.png" },
+          { name: "เครื่องดื่มแอลกอฮอล์", icon: "/food8.png" },
+          { name: "ผักและผลไม้", icon: "/food6.png" },
+          { name: "เนื้อสัตว์", icon: "/food9.png" },
+          { name: "ซอสและเครื่องปรุง", icon: "/food10.png" },
+        ]}
+        categoryPathMap={{
+          อาหารคาว: "/line/food/savory",
+          อาหารหวาน: "/line/food/sweet",
+          ของว่าง: "/line/food/snack",
+          อาหารเจ: "/line/food/J",
+          อาหารต่างประเทศ: "/line/food/Foreign",
+          เครื่องดื่ม: "/line/food/drink",
+          เครื่องดื่มแอลกอฮอล์: "/line/food/alcohol",
+          ผักและผลไม้: "/line/food/fruit",
+          เนื้อสัตว์: "/line/food/meat",
+          ซอสและเครื่องปรุง: "/line/food/sauce",
+        }}
+      />
 
-      {/* Banner + Cart in relative wrapper */}
-      <div className="banner-cart-wrapper">
-        <div className="banner-scroll" aria-label="โปรโมชัน">
-          <div className="banner">
-            <Image
-              src="/braner1.webp"
-              alt="braner1"
-              fill
-              sizes="(max-width: 768px) 90vw, 320px"
-              priority
-              style={{ objectFit: 'cover' }}
-            />
-          </div>
-          <div className="banner">
-            <Image
-              src="/braner2.jpg"
-              alt="braner2"
-              fill
-              sizes="(max-width: 768px) 90vw, 320px"
-              style={{ objectFit: 'cover' }}
-            />
-          </div>
-          <div className="banner">
-            <Image
-              src="/braner3.jpeg"
-              alt="braner3"
-              fill
-              sizes="(max-width: 768px) 90vw, 320px"
-              style={{ objectFit: 'cover' }}
-            />
-          </div>
+    <div className="tabs">
+        <div className="tab-left">
+          <button className="active">อาหารคาว</button>
         </div>
-        <div className="cart-float">
-          <Link href="/line/food/cart" aria-label="ตะกร้าอาหาร">
-              <CartIcon onClick={() => router.push('/line/food/cart')} />
-          </Link>
+        <CartIcon count={cartCount} onClick={() => setShowSheet(true)} />
+      </div>
+      <FoodGrid foods={filteredSavoryFoods} onAdd={addToCart} />
+      
+      {showSheet && (
+        <CartSheet
+          cartItems={cartItems}
+          onClose={() => setShowSheet(false)}
+          onIncrease={increaseQty}
+          onDecrease={decreaseQty}
+          onRemove={removeFromCart}
+          onSave={saveToCart}
+        />
+      )}
+
+    <div className="tabs">
+        <div className="tab-left">
+          <button className="active">อาหารหนาว</button>
         </div>
       </div>
+      <FoodGrid foods={filteredFoods} onAdd={addToCart} />
+      
+      {showSheet && (
+        <CartSheet
+          cartItems={cartItems}
+          onClose={() => setShowSheet(false)}
+          onIncrease={increaseQty}
+          onDecrease={decreaseQty}
+          onRemove={removeFromCart}
+          onSave={saveToCart}
+        />
+      )}
 
-      {/* Food section rendering moved to a new component. */}
+      <div className="tabs">
+        <div className="tab-left">
+          <button className="active">ของว่าง</button>
+        </div>
+      </div>
+      <FoodGrid foods={filteredSnacks} onAdd={addToCart} />
+
+      {showSheet && (
+        <CartSheet
+          cartItems={cartItems}
+          onClose={() => setShowSheet(false)}
+          onIncrease={increaseQty}
+          onDecrease={decreaseQty}
+          onRemove={removeFromCart}
+          onSave={saveToCart}
+        />
+      )}
+
+       <div className="tabs">
+        <div className="tab-left">
+          <button className="active">เครื่องดื่ม</button>
+        </div>
+      </div>
+      <FoodGrid foods={filteredDrinks} onAdd={addToCart} />
+      {showSheet && (
+        <CartSheet
+          cartItems={cartItems}
+          onClose={() => setShowSheet(false)}
+          onIncrease={increaseQty}
+          onDecrease={decreaseQty}
+          onRemove={removeFromCart}
+          onSave={saveToCart}
+        />
+      )}
 
       <BottomMenu />
-
-      <style jsx>{`
+      
+      <style jsx global>{`
+        *, *::before, *::after { box-sizing: border-box; }
+        :root { color-scheme: light; }
+        html, body, #__next { height: 100%; }
+        html, body { margin: 0; padding: 0; }
+        body {
+          background: #ffffff;
+          padding-top: env(safe-area-inset-top);
+          padding-bottom: env(safe-area-inset-bottom);
+        }
         .page {
           background: #f3fdf1;
           min-height: 100vh;
-          font-family: "Noto Sans Thai", sans-serif;
+          font-family: 'Noto Sans Thai', sans-serif;
           padding-bottom: 80px;
+          margin: 0;
+        }
+        .search-wrap { position: relative; height: 0; }
+        .search-pill {
+          position: absolute; top: -45px; left: 50%; transform: translateX(-50%);
+          background: #fff; border-radius: 16px; padding: 10px 12px;
+          display: flex; align-items: center; gap: 10px;
+          box-shadow: 0 6px 14px rgba(0, 0, 0, .12);
+          width: 85%;
+        }
+        .search-pill input {
+          border: none; outline: none; flex: 1;
+          background: transparent; font-size: 16px;
+        }
+        .search-pill input::placeholder { color: #1f2937; opacity: .85; }
+        .tabs { display: flex; justify-content: space-between; align-items: center; background: #f3fdf1; padding: 10px 16px; }
+        .tab-left { display: flex; gap: 8px; align-items: center; }
+        .tabs button {
+          background: #fff; border: 1px solid #e5e7eb; border-radius: 12px;
+          padding: 6px 16px; color: #3abb47; font-weight: 700;
+        }
+        .tabs .active { background: #3abb47; border: 2px solid #3abb47; color: #fff; }
+        .add-new {
+          background: #fff; border: 1px dashed #3abb47; color: #000;
+          border-radius: 12px; padding: 10px 16px; font-weight: 700;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+          transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .add-new:active { transform: scale(0.96); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); }
+        .food-grid {
+          display: flex; /* เปลี่ยนจาก grid เป็น flex */
+          gap: 12px;
+          padding: 16px 12px;
+          overflow-x: auto; /* เพิ่มการเลื่อนแนวนอน */
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: none; /* ซ่อน scrollbar สำหรับ Firefox */
         }
 
-        .topbar {
-          position: sticky;
-          top: 0;
-          z-index: 20;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          background: #3abb47;
-          color: #fff;
-          padding: 12px 16px;
+        /* ซ่อน scrollbar สำหรับ Webkit browsers (Chrome, Safari) */
+        .food-grid::-webkit-scrollbar {
+          display: none;
+        }
+        .food-item {
+          background: #fff; border-radius: 12px; text-align: center;
+          padding: 8px; position: relative; box-shadow: 0 1px 4px rgba(0, 0, 0, .1);
+        }
+        .name { font-size: 14px; font-weight: 700; margin-top: 6px; }
+        .calories { font-size: 12px; color: #555; }
+        .add {
+          position: absolute; bottom: 8px; right: 8px;
+          width: 24px; height: 24px; border-radius: 50%;
+          background: #3abb47; color: #fff; border: none; font-size: 18px;
         }
         .banner-cart-wrapper {
           position: relative;
         }
-        .cart-float {
-          position: absolute;
-          right: 16px;
-          bottom: -12px;
-          z-index: 30;
-        }
-        .topbar h1 {
-          font-size: 18px;
-          font-weight: bold;
-        }
-        .back-btn {
-          width: 24px;
-          height: 24px;
-          border-radius: 50%;
-          background: rgba(255, 255, 255, 0.3);
-          display: inline-block;
-        }
-        .cart {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          color: #fff;
-          font-weight: 700;
-          text-decoration: none;
-        }
-
-        .search-wrapper {
-          background: #3abb47;
-          padding: 8px 16px;
-        }
-        .search-box {
-          background: #fff;
-          border-radius: 999px;
-          padding: 8px 12px;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-        .search-box input {
-          border: none;
-          outline: none;
-          flex: 1;
-          background: transparent;
-        }
-        .categories {
-          background: #f7fff3;
-          padding: 12px 0;
-        }
-
-        .category-scroll {
-          display: flex;
-          gap: 12px;
-          overflow-x: auto;
-          padding: 0 16px;
-          scroll-snap-type: x mandatory; /* เลื่อนแล้วล็อกตำแหน่ง */
-        }
-
-        .category-item {
-          flex: 0 0 auto;
-          text-align: center;
-          font-size: 12px;
-          color: #1f2937;
-          text-decoration: none;
-          scroll-snap-align: center;
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .category-item:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-        }
-
-        .category-icon {
-          width: 60px;
-          height: 60px;
-          border-radius: 14px;
-          background: white;
-          box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin-bottom: 6px;
-          transition: background 0.3s ease;
-        }
-
-        .category-item.active .category-icon {
-          background: #3abb47; /* active color */
-        }
-
-        .category-item.active {
-          color: #3abb47;
-          font-weight: bold;
-        }
-
         .banner-scroll {
           display: flex;
           gap: 16px;
-          padding: 16px 8px 20px 8px;
+          padding: 16px 8px 22px 8px;
           overflow-x: auto;
-          scrollbar-width: none; /* Firefox */
-          -ms-overflow-style: none; /* IE and Edge */
+          scrollbar-width: none;
         }
         .banner-scroll::-webkit-scrollbar {
-          display: none; /* Chrome, Safari, Opera */
+          display: none;
         }
         .banner {
           position: relative;
           width: 320px;
-          height: 220px;
+          height: 200px;
           border-radius: 16px;
           overflow: hidden;
           flex: 0 0 auto;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
           background: #e8f5e9;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
         @media (max-width: 600px) {
           .banner {
             width: 90vw;
-            height: 180px;
+            height: 170px;
           }
         }
-
-        .section {
-          padding: 0 16px 8px;
+        .overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, .35); z-index: 1000; animation: fadeIn .15s ease-out; }
+        .sheet {
+          position: fixed; left: 0; right: 0; bottom: 0; height: 66vh;
+          background: #fff; z-index: 1001;
+          border-top-left-radius: 18px; border-top-right-radius: 18px;
+          box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.1);
+          display: flex; flex-direction: column;
+          animation: slideUp .2s ease-out;
         }
-        .section h2 {
-          color: #3abb47;
-          font-size: 16px;
-          margin: 6px 0 8px;
+        .sheet-head { position: relative; padding: 10px 16px 8px; }
+        .dragbar { width: 48px; height: 5px; background: #E5E7EB; border-radius: 999px; margin: 0 auto 6px; }
+        .title { text-align: center; font-weight: 700; }
+        .close {
+          position: absolute; top: 6px; right: 10px;
+          width: 32px; height: 32px; border-radius: 50%;
+          border: none; background: #F3F4F6; font-size: 20px;
         }
-
-        .food-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 12px;
+        .sheet-list { flex: 1; overflow: auto; padding: 8px 12px 0; }
+        .row {
+          display: flex; justify-content: space-between; align-items: center;
+          background: #F3FAF4; border-radius: 12px; padding: 10px; margin-bottom: 10px;
         }
-        @media (min-width: 768px) {
-          .food-grid {
-            grid-template-columns: repeat(4, 1fr);
-          }
+        .left { display: flex; gap: 10px; align-items: center; }
+        .thumb { border-radius: 10px; }
+        .meta .r-name { font-weight: 700; font-size: 14px; }
+        .meta .r-cal { font-size: 12px; color: #4B5563; }
+        .right { display: flex; align-items: center; gap: 8px; }
+        .qtybtn { width: 28px; height: 28px; border-radius: 50%; border: none; background: #3abb47; color: #fff; font-size: 18px; }
+        .qty { width: 20px; text-align: center; font-weight: 700; }
+        .trash { background: transparent; border: none; font-size: 18px; padding: 4px; }
+        .empty { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #8a8a8a; gap: 6px; }
+        .sheet-footer { padding: 12px 16px 18px; display: flex; align-items: center; gap: 12px; }
+        .total { font-weight: 700; color: #111827; min-width: max-content; }
+        .save { flex: 1; height: 44px; border: none; border-radius: 10px; background: #7CAD87; color: #fff; font-weight: 700; }
+        .r-cal b { font-weight: 700; }
+        .icon-btn { border: none; background:  transparent; cursor: pointer; padding: 0; }
+        .trash-btn { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; background: #ffffff; box-shadow: 0 1px 4px rgba(0, 0, 0, .08); }
+        .trash-btn:active { transform: scale(0.96); }
+        .trash-icon { width: 16px; height: 16px; object-fit: contain; }
+        .input-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; }
+        .input-row input { width: 220px; padding: 10px 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; }
+        .add-btn {
+          width: 32px; height: 32px; border: none; border-radius: 50%;
+          background: #3abb47; color: #fff; font-size: 20px; cursor: pointer;
         }
-
-        .food-item {
-          background: #fff;
-          border-radius: 12px;
-          text-align: center;
-          padding: 8px;
-          position: relative;
-          box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-        }
-        .food-link {
-          text-decoration: none;
-          color: inherit;
-          display: block;
-        }
-        .thumb {
-          position: relative;
-          width: 100%;
-          height: 100px;
-          border-radius: 10px;
-          overflow: hidden;
-          background: #f0fdf4;
-        }
-        .name {
-          font-size: 14px;
-          font-weight: 700;
-          margin-top: 6px;
-        }
-        .calories {
-          font-size: 12px;
-          color: #555;
-        }
-        .add {
-          position: absolute;
-          bottom: 8px;
-          right: 8px;
-          width: 24px;
-          height: 24px;
-          border-radius: 50%;
-          background: #3abb47;
-          color: #fff;
-          border: none;
-          font-size: 18px;
-          cursor: pointer;
-        }
+        .cal-display { min-width: 80px; text-align: right; font-size: 14px; font-weight: 600; color: #333; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
       `}</style>
     </div>
   );

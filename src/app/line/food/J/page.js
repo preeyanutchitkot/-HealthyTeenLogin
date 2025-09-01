@@ -1,15 +1,18 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import CartIcon from '../../components/CartIcon';
-import Link from 'next/link';
-import { useState } from 'react';
-import BottomMenu from '../../components/menu';
-import CategoryBar from '../../components/CategoryBar';
-
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import BottomMenu from "../../components/menu";
+import CartIcon from "../../components/CartIcon";
+import CategoryBar from "../../components/CategoryBar";
+import Header from "../../components/header";
+import FoodGrid from "../../components/FoodGrid";
+import CartSheet from "../../components/CartSheet";
+import AddFoodSheet from "../../components/AddFoodSheet";
 
 const JFoods = [
- { name: 'เต้าหู้ทอด', calories: 100, image: '/foods/fried-tofu.png' },
+  { name: 'เต้าหู้ทอด', calories: 100, image: '/foods/fried-tofu.png' },
   { name: 'ผัดหมี่เจ', calories: 250, image: '/foods/vegetarian-fried-noodle.png' },
   { name: 'ข้าวผัดเจ', calories: 300, image: '/foods/vegetarian-fried-rice.png' },
   { name: 'แกงเขียวหวานเจ', calories: 180, image: '/foods/vegetarian-green-curry.png' },
@@ -31,68 +34,70 @@ const JFoods = [
   { name: 'ก๋วยเตี๋ยวหลอดเจ', calories: 150, image: '/foods/vegetarian-steamed-rice-noodle-roll.png' }
 ];
 
-
-export default function SavoryPage() {
-  const [cartCount, setCartCount] = useState(0);
+export default function JFoodsPage() {
   const [foods, setFoods] = useState(JFoods);
-  const [showModal, setShowModal] = useState(false);
-  const [newFoodName, setNewFoodName] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [cartCount, setCartCount] = useState(0);
+  const [cartItems, setCartItems] = useState([]);
+  const [showSheet, setShowSheet] = useState(false);
+  const [showAddSheet, setShowAddSheet] = useState(false);
+  const [customFoods, setCustomFoods] = useState([]);
+  const router = useRouter();
 
-  const handleAdd = () => setCartCount((prev) => prev + 1);
+  useEffect(() => {
+    const total = cartItems.reduce((sum, it) => sum + it.qty, 0);
+    setCartCount(total);
+  }, [cartItems]);
 
-  const handleAddNewFood = async () => {
-    if (!newFoodName.trim()) return;
-    setLoading(true);
-    try {
-      const response = await fetch('/api/estimate-calories', {
-        method: 'POST',
-        body: JSON.stringify({ name: newFoodName }),
-        headers: { 'Content-Type': 'application/json' }
-      });
-      const data = await response.json();
-      if (data.calories) {
-        setFoods(prev => [...prev, {
-          name: newFoodName,
-          calories: data.calories,
-          image: '/foods/default.png'
-        }]);
-        setShowModal(false);
-        setNewFoodName('');
+  const filteredFoods = useMemo(
+    () => [...foods, ...customFoods].filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())),
+    [foods, customFoods, searchQuery]
+  );
+
+  const addToCart = (food) => {
+    setCartItems((prev) => {
+      const idx = prev.findIndex((item) => item.name === food.name);
+      if (idx === -1) {
+        const updated = [...prev, { ...food, qty: 1 }];
+        localStorage.setItem("cartItems", JSON.stringify(updated));
+        return updated;
       }
-    } catch {
-      alert('เกิดข้อผิดพลาดในการประเมินแคลอรี่');
-    } finally {
-      setLoading(false);
-    }
+      const updated = [...prev];
+      updated[idx].qty += 1;
+      localStorage.setItem("cartItems", JSON.stringify(updated));
+      return updated;
+    });
   };
 
-  const filteredFoods = foods.filter(food =>
-    food.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const addCustomFood = (foodItem) => {
+    setCustomFoods((prev) => {
+      // เพิ่มเมนูใหม่ที่ด้านบนสุด
+      const updatedCustomFoods = [foodItem, ...prev];
+      return updatedCustomFoods;
+    });
+  };
+
+  const handleSaveNewFood = () => {
+    setShowAddSheet(false);
+  };
 
   return (
     <div className="page">
-      <div className="topbar">
-        <Link href="/line/home" className="back-btn"></Link>
-        <h1>บันทึกอาหาร</h1>
-        <Image src="/pig-icon.png" alt="icon" width={30} height={30} />
-      </div>
-
-      <div className="search-wrapper">
-        <div className="search-box">
-          <Image src="/icons/search.png" alt="search" width={20} height={20} />
+      <Header title="บันทึกอาหาร" cartoonImage="/8.png" />
+      <div className="search-wrap">
+        <div className="search-pill" role="search">
+          <Image src="/search.png" alt="ค้นหา" width={26} height={26} />
           <input
             type="text"
             placeholder="ค้นหา"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
-          <Image src="/icons/character.png" alt="char" width={24} height={24} />
+          <Image src="/character.png" alt="ตัวการ์ตูน" width={26} height={26} />
         </div>
       </div>
-   <CategoryBar
+
+      <CategoryBar
         categories={[
           { name: "อาหารคาว", icon: "/food1.png" },
           { name: "อาหารหวาน", icon: "/food2.png" },
@@ -121,192 +126,170 @@ export default function SavoryPage() {
 
       <div className="tabs">
         <div className="tab-left">
-          <button className="active">ของว่าง</button>
-          <button className="add-new" onClick={() => setShowModal(true)}>+ เพิ่มเมนูใหม่</button>
+          <button className="active">อาหารเจ</button>
+          <button className="add-new" onClick={() => setShowAddSheet(true)}>
+            + เพิ่มเมนูใหม่
+          </button>
         </div>
-  <CartIcon count={cartCount} />
+        <CartIcon count={cartCount} onClick={() => setShowSheet(true)} />
       </div>
 
-      <div className="food-grid">
-        {filteredFoods.map((f, i) => (
-          <div key={i} className="food-item">
-            <Image src={f.image} alt={f.name} width={80} height={80} />
-            <div className="name">{f.name}</div>
-            <div className="calories">{f.calories} แคลอรี่</div>
-            <button className="add" onClick={handleAdd}>+</button>
-          </div>
-        ))}
-      </div>
-
-      {showModal && (
-        <div className="modal">
-          <div className="modal-content">
-            <h3>เพิ่มเมนูใหม่</h3>
-            <input
-              placeholder="ชื่ออาหาร"
-              value={newFoodName}
-              onChange={(e) => setNewFoodName(e.target.value)}
-            />
-            <button onClick={handleAddNewFood} disabled={loading}>
-              {loading ? 'กำลังประเมิน...' : 'บันทึก'}
-            </button>
-            <button onClick={() => setShowModal(false)}>ยกเลิก</button>
-          </div>
-        </div>
+      <FoodGrid foods={filteredFoods} onAdd={addToCart} />
+      {showSheet && (
+        <CartSheet
+          cartItems={cartItems}
+          onClose={() => setShowSheet(false)}
+          onIncrease={(name) => {
+            setCartItems((prev) =>
+              prev.map((it) =>
+                it.name === name ? { ...it, qty: it.qty + 1 } : it
+              )
+            );
+          }}
+          onDecrease={(name) => {
+            setCartItems((prev) =>
+              prev
+                .map((it) =>
+                  it.name === name ? { ...it, qty: it.qty - 1 } : it
+                )
+                .filter((it) => it.qty > 0)
+            );
+          }}
+          onRemove={(name) => {
+            setCartItems((prev) => prev.filter((it) => it.name !== name));
+          }}
+          onSave={() => router.push("/line/food/cart")}
+        />
       )}
+
+      {showAddSheet && (
+        <AddFoodSheet
+          customFoods={customFoods}
+          setCustomFoods={setCustomFoods}
+          onAddCustom={addCustomFood}
+          onSave={handleSaveNewFood}
+          onClose={() => setShowAddSheet(false)}
+        />
+      )}
+
       <BottomMenu />
 
-      <style jsx>{`
+      <style jsx global>{`
+         *, *::before, *::after { box-sizing: border-box; }
+        :root { color-scheme: light; }
+        html, body, #__next { height: 100%; }
+        html, body { margin: 0; padding: 0; }
+        body {
+          background: #ffffff;
+          padding-top: env(safe-area-inset-top);
+          padding-bottom: env(safe-area-inset-bottom);
+        }
         .page {
           background: #f3fdf1;
           min-height: 100vh;
           font-family: 'Noto Sans Thai', sans-serif;
           padding-bottom: 80px;
+          margin: 0;
+          
         }
-        .topbar {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          background: #3abb47;
-          color: white;
-          padding: 12px 16px;
+        .search-wrap { position: relative; height: 0; }
+        .search-pill {
+          position: absolute; top: -45px; left: 50%; transform: translateX(-50%);
+          background: #fff; border-radius: 16px; padding: 10px 12px;
+          display: flex; align-items: center; gap: 10px;
+          box-shadow: 0 6px 14px rgba(0, 0, 0, .12);
+          width: 85%;
         }
-        .topbar h1 {
-          font-size: 18px;
-          font-weight: bold;
+        .search-pill input {
+          border: none; outline: none; flex: 1;
+          background: transparent; font-size: 16px;
         }
-        .search-wrapper {
-          background: #3abb47;
-          padding: 0 16px;
-          padding-top: 8px;
-        }
-        .search-box {
-          background: white;
-          border-radius: 999px;
-          padding: 8px 12px;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-        .search-box input {
-          border: none;
-          outline: none;
-          flex: 1;
-        }
-        .categories {
-          background: #f7fff3;
-          padding: 12px 0;
-        }
-        .category-scroll {
-          display: flex;
-          overflow-x: auto;
-          padding: 0 16px;
-          gap: 12px;
-        }
-        .category-item {
-          text-align: center;
-          font-size: 12px;
-        }
-        .tabs {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          background: white;
-          padding: 10px 16px;
-        }
-        .tab-left {
-          display: flex;
-          gap: 8px;
-          align-items: center;
-        }
+        .search-pill input::placeholder { color: #1f2937; opacity: .85; }
+       .tabs { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 10px 16px;margin-top: 20px; }
+        .tab-left { display: flex; gap: 8px; align-items: center; }
         .tabs button {
-          background: #e8f8e3;
-          border: none;
-          border-radius: 12px;
-          padding: 6px 16px;
-          color: #3abb47;
-          font-weight: bold;
+          background: #fff; border: 1px solid #e5e7eb; border-radius: 12px;
+          padding: 6px 16px; color: #3abb47; font-weight: 700;
         }
-        .tabs .active {
-          background: #3abb47;
-          color: white;
-        }
+        .tabs .active { background: #3abb47; border: 2px solid #3abb47; color: #fff; }
         .add-new {
-          background: transparent;
-          color: #3abb47;
-          font-size: 14px;
+          background: #fff; border: 1px dashed #3abb47; color: #000;
+          border-radius: 12px; padding: 10px 16px; font-weight: 700;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+          transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
-        .cart {
-          display: flex;
-          align-items: center;
-          font-size: 14px;
-          color: #3abb47;
-          gap: 4px;
-        }
+        .add-new:active { transform: scale(0.96); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); }
         .food-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 12px;
-          padding: 16px;
+          display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+          padding: 16px 12px; max-width: 420px; margin: 0 auto;
+          background: #fff;
         }
         .food-item {
-          background: white;
-          border-radius: 12px;
-          text-align: center;
-          padding: 8px;
-          position: relative;
-          box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+          background: #fff; border-radius: 12px; text-align: center;
+          padding: 8px; position: relative; box-shadow: 0 1px 4px rgba(0, 0, 0, .1);
         }
-        .name {
-          font-size: 14px;
-          font-weight: bold;
-          margin-top: 6px;
-        }
-        .calories {
-          font-size: 12px;
-          color: #555;
-        }
+        .name { font-size: 14px; font-weight: 700; margin-top: 6px; }
+        .calories { font-size: 12px; color: #555; }
         .add {
-          position: absolute;
-          bottom: 8px;
-          right: 8px;
-          width: 24px;
-          height: 24px;
+          position: absolute; bottom: 8px; right: 8px;
+          width: 24px; height: 24px; border-radius: 50%;
+          background: #3abb47; color: #fff; border: none; font-size: 18px;
+        }
+        .overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, .35); z-index: 1000; animation: fadeIn .15s ease-out; }
+        .sheet {
+          position: fixed; left: 0; right: 0; bottom: 0; height: 61vh;
+          background: #fff; z-index: 1001;
+          border-top-left-radius: 18px; border-top-right-radius: 18px;
+          box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.1);
+          display: flex; flex-direction: column;
+          animation: slideUp .2s ease-out;
+        }
+        .sheet-head { position: relative; padding: 10px 16px 8px; }
+        .dragbar { width: 48px; height: 5px; background: #E5E7EB; border-radius: 999px; margin: 0 auto 6px; }
+        .title { text-align: center; font-weight: 700; }
+        .close {
+          position: absolute; top: 6px; right: 10px;
+          width: 32px; height: 32px; border-radius: 50%;
+          border: none; background: #F3F4F6; font-size: 20px;
+        }
+        .sheet-list { flex: 1; overflow: auto; padding: 8px 12px 0; }
+        .row {
+          display: flex; justify-content: space-between; align-items: center;
+          background: #F3FAF4; border-radius: 12px; padding: 10px; margin-bottom: 10px;
+        }
+        .left { display: flex; gap: 10px; align-items: center; }
+        .thumb { border-radius: 10px; }
+        .meta .r-name { font-weight: 700; font-size: 14px; }
+        .meta .r-cal { font-size: 12px; color: #4B5563; }
+        .right { display: flex; align-items: center; gap: 8px; }
+        .qtybtn { width: 28px; height: 28px; border-radius: 50%; border: none; background: #3abb47; color: #fff; font-size: 18px; }
+        .qty { width: 20px; text-align: center; font-weight: 700; }
+        .trash { background: transparent; border: none; font-size: 18px; padding: 4px; }
+        .empty { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #8a8a8a; gap: 6px; }
+        .sheet-footer { padding: 12px 16px 18px; display: flex; align-items: center; gap: 12px; }
+        .total { font-weight: 700; color: #111827; min-width: max-content; }
+        .save { flex: 1; height: 44px; border: none; border-radius: 10px; background: #7CAD87; color: #fff; font-weight: 700; }
+        .r-cal b { font-weight: 700; }
+        .icon-btn { border: none; background: transparent; cursor: pointer; padding: 0; }
+        .trash-btn { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; background: #ffffff; box-shadow: 0 1px 4px rgba(0, 0, 0, .08); }
+        .trash-btn:active { transform: scale(0.96); }
+        .trash-icon { width: 16px; height: 16px; object-fit: contain; }
+
+        .add-btn,
+        .delete-btn {
+          flex-shrink: 0;
+          align-self: center;
+          width: 32px;
+          height: 32px;
           border-radius: 50%;
-          background: #3abb47;
-          color: white;
-          border: none;
-          font-size: 18px;
+          display: grid;
+          place-items: center;
+          cursor: pointer;
         }
-        .modal {
-          position: fixed;
-          top: 0; left: 0;
-          width: 100%; height: 100%;
-          background: rgba(0,0,0,0.4);
-          display: flex; justify-content: center; align-items: center;
-        }
-        .modal-content {
-          background: white;
-          padding: 20px;
-          border-radius: 12px;
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-          width: 80%;
-        }
-        .modal-content input {
-          padding: 8px;
-          border: 1px solid #ccc;
-          border-radius: 8px;
-        }
-        .modal-content button {
-          padding: 8px;
-          border: none;
-          border-radius: 8px;
-          background: #3abb47;
-          color: white;
-          font-weight: bold;
-        }
+
+        /* --- Keyframe Animations --- */
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
       `}</style>
     </div>
   );

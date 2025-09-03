@@ -16,7 +16,6 @@ const snackFoods = [
   { name: 'หมูปิ้ง (3 ไม้)', calories: 250, image: '/foods/moo-ping-3.png' },
   { name: 'ลูกชิ้นปิ้ง (5 ลูก)', calories: 120, image: '/foods/look-chin-ping-5.png' },
   { name: 'เฉาก๊วย', calories: 120, image: '/foods/chao-kuai.png' },
-  { name: 'ไข่ตุ๋น', calories: 120, image: '/foods/kai-tun.png' },
   { name: 'ข้าวโพดปิ้ง', calories: 100, image: '/foods/khao-phot-ping.png' },
   { name: 'กล้วยทอด', calories: 250, image: '/foods/kluai-thot.png' },
   { name: 'มันทอด', calories: 150, image: '/foods/man-thot.png' },
@@ -39,19 +38,7 @@ const snackFoods = [
   { name: 'คุกกี้เนย (1 ชิ้น)', calories: 150, image: '/foods/butter-cookie.png' },
   { name: 'ข้าวเกรียบกุ้ง (1 แผ่น)', calories: 60, image: '/foods/shrimp-cracker.png' },
   { name: 'ขนมปังกรอบ', calories: 100, image: '/foods/crispy-bread.png' },
-  { name: 'มะพร้าวอบแห้ง (1 ถุง)', calories: 200, image: '/foods/dried-coconut.png' },
-  { name: 'ถั่วลิสงอบกรอบ (1 ถุง)', calories: 180, image: '/foods/roasted-peanut.png' },
-  { name: 'อัลมอนด์ (10 เม็ด)', calories: 100, image: '/foods/almond.png' },
-  { name: 'เวเฟอร์ช็อกโกแลต', calories: 180, image: '/foods/chocolate-wafer.png' },
-  { name: 'แครกเกอร์ (1 แผ่น)', calories: 60, image: '/foods/cracker.png' },
-  { name: 'นมข้นหวาน (1 ช้อนโต๊ะ)', calories: 50, image: '/foods/sweetened-condensed-milk.png' },
-  { name: 'ชีสสติ๊ก (1 ชิ้น)', calories: 80, image: '/foods/cheese-stick.png' },
-  { name: 'ไอศกรีมวานิลลา (1 สกู๊ป)', calories: 130, image: '/foods/vanilla-ice-cream.png' },
-  { name: 'บะหมี่กึ่งสำเร็จรูป', calories: 300, image: '/foods/instant-noodle.png' },
-  { name: 'กุนเชียง (1 ชิ้น)', calories: 150, image: '/foods/chinese-sausage.png' },
-  { name: 'เนยถั่ว (1 ช้อนโต๊ะ)', calories: 90, image: '/foods/peanut-butter.png' },
-  { name: 'โยเกิร์ตรสธรรมชาติ', calories: 100, image: '/foods/plain-yogurt.png' },
-  { name: 'แยมโรล (1 ชิ้น)', calories: 120, image: '/foods/jam-roll.png' }
+
 ];
 
 

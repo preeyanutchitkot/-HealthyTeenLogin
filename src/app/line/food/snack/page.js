@@ -22,14 +22,12 @@ const snackFoods = [
   { name: 'ถั่วทอด', calories: 200, image: '/foods/thua-thot.png' },
   { name: 'เกี๊ยวทอด', calories: 190, image: '/foods/kiao-thot.png' },
   { name: 'ปลาเส้นทอดกรอบ', calories: 140, image: '/foods/pla-sen-thot-krop.png' },
-  { name: 'ทอดมันปลากราย', calories: 220, image: '/foods/thot-man-pla-krai.png' },
   { name: 'แหนมหม้อ', calories: 180, image: '/foods/naem-mor.png' },
   { name: 'ปอเปี๊ยะทอด', calories: 200, image: '/foods/por-pia-thot.png' },
   { name: 'ไส้กรอกอีสาน', calories: 250, image: '/foods/sai-krok-isan.png' },
   { name: 'หอยทอด', calories: 300, image: '/foods/hoi-thot.png' },
-  { name: 'ข้าวเกรียบปากหม้อ', calories: 200, image: '/foods/khao-kriap-pak-mor.png' },
+  { name: 'ข้าวเกรียบ', calories: 200, image: '/foods/khao-kriap.png' },
   { name: 'เต้าหู้ทอด', calories: 120, image: '/foods/tao-hu-thot.png' },
-  { name: 'ลูกเดือยต้ม', calories: 100, image: '/foods/look-dueai-tom.png' },
   { name: 'ปลาหมึกบด', calories: 150, image: '/foods/pla-muek-bot.png' },
   { name: 'มันฝรั่งทอดกรอบ (1 ถุง)', calories: 150, image: '/foods/potato-chips.png' },
   { name: 'ป๊อปคอร์น (1 ถ้วย)', calories: 55, image: '/foods/popcorn.png' },
@@ -116,8 +114,7 @@ export default function snackFoodsPage() {
           { name: "เครื่องดื่ม", icon: "/food3.png" },
           { name: "เครื่องดื่มแอลกอฮอล์", icon: "/food8.png" },
           { name: "ผักและผลไม้", icon: "/food6.png" },
-          { name: "เนื้อสัตว์", icon: "/food9.png" },
-          { name: "ซอสและเครื่องปรุง", icon: "/food10.png" },
+     
         ]}
         categoryPathMap={{
           อาหารคาว: "/line/food/savory",
@@ -128,8 +125,7 @@ export default function snackFoodsPage() {
           เครื่องดื่ม: "/line/food/drink",
           เครื่องดื่มแอลกอฮอล์: "/line/food/alcohol",
           ผักและผลไม้: "/line/food/fruit",
-          เนื้อสัตว์: "/line/food/meat",
-          ซอสและเครื่องปรุง: "/line/food/sauce",
+     
         }}
       />
 

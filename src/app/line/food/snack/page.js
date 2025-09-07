@@ -41,7 +41,7 @@ const snackFoods = [
 ];
 
 export default function SweetFoodsPage() {
-  const [foods, setFoods] = useState(sweetFoods);
+  const [foods, setFoods] = useState(snackFoods);
   const [searchQuery, setSearchQuery] = useState("");
   const [cartCount, setCartCount] = useState(0);
   const [cartItems, setCartItems] = useState([]);

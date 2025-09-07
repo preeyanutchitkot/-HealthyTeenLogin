@@ -205,7 +205,7 @@ export default function FoodsPage() {
 
     <div className="tabs">
         <div className="tab-left">
-          <button className="active">อาหารหนาว</button>
+          <button className="active">อาหารหวาน</button>
         </div>
       </div>
       <FoodGrid foods={filteredFoods} onAdd={addToCart} />
@@ -302,30 +302,65 @@ export default function FoodsPage() {
           transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
         .add-new:active { transform: scale(0.96); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); }
-        .food-grid {
-          display: flex; /* เปลี่ยนจาก grid เป็น flex */
-          gap: 12px;
-          padding: 16px 12px;
-          overflow-x: auto; /* เพิ่มการเลื่อนแนวนอน */
-          -webkit-overflow-scrolling: touch;
-          scrollbar-width: none; /* ซ่อน scrollbar สำหรับ Firefox */
-        }
 
-        /* ซ่อน scrollbar สำหรับ Webkit browsers (Chrome, Safari) */
-        .food-grid::-webkit-scrollbar {
-          display: none;
-        }
-        .food-item {
-          background: #fff; border-radius: 12px; text-align: center;
-          padding: 8px; position: relative; box-shadow: 0 1px 4px rgba(0, 0, 0, .1);
-        }
-        .name { font-size: 14px; font-weight: 700; margin-top: 6px; }
-        .calories { font-size: 12px; color: #555; }
-        .add {
-          position: absolute; bottom: 8px; right: 8px;
-          width: 24px; height: 24px; border-radius: 50%;
-          background: #3abb47; color: #fff; border: none; font-size: 18px;
-        }
+      .food-grid{
+        --card-w: 120px;   
+        --card-h: 160px;   /* เพิ่มความสูงขึ้นนิดหน่อย */
+        --gap: 8px;        
+        --pad: 8px;        
+        --img: 70px;       /* เดิม 60px → เพิ่มขนาดรูป */
+        --btn: 24px;       /* ขยายปุ่ม + อีกนิด */
+      }
+
+      /* แถวเดียว เลื่อนแนวนอน */
+      .food-grid{ display: flex; gap: var(--gap); padding: 12px 12px 6px; width: 100%; max-width: none; overflow-x: auto; -webkit-overflow-scrolling: touch;scrollbar-width: none; 
+      }
+      .food-grid::-webkit-scrollbar{
+        display: none;                   /* Chrome/Safari ซ่อนสกรอลบาร์ */
+      }
+
+      .food-item{
+        flex: 0 0 var(--card-w);         /* ความกว้างคงที่ → ต่อกันเป็นแถวเดียว */
+        min-height: var(--card-h);
+        background: #fff;
+        border-radius: 12px;
+        text-align: center;
+        padding: var(--pad) var(--pad) calc(var(--pad) + var(--btn) + 6px);
+        position: relative;
+        box-shadow: 0 1px 4px rgba(0,0,0,.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      /* รูปในการ์ด (ถ้าใช้ <Image> ให้ใส่ className="thumb" ที่ wrapper หรือรูป) */
+      .food-item img,
+      .food-item .thumb{
+        width: var(--img);
+        height: var(--img);
+        object-fit: contain;
+        margin: 0 auto 6px;
+        display: block;
+      }
+
+      .name{ font-size: 14px; font-weight: 700; }
+      .calories{ font-size: 13px; color: #555; }
+
+      /* ปุ่ม + มุมล่างขวา */
+      .add{
+        position: absolute;
+        right: 8px;
+        bottom: 8px;
+        width: var(--btn);
+        height: var(--btn);
+        border-radius: 50%;
+        border: none;
+        background: #3abb47;
+        color: #fff;
+        font-size: 16px;
+        line-height: 1;
+      }
+
         .banner-cart-wrapper {
           position: relative;
         }

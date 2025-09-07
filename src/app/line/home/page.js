@@ -4,12 +4,14 @@ import Image from "next/image";
 import Link from "next/link";
 import BottomMenu from "../components/menu";
 import CalorieSummary from "../components/CalorieSummary";
-import MenuPopup from "../components/MenuPopup"; // ✅ ใช้ path เดียวกับหน้า Me
+import MenuPopup from "../components/MenuPopup";
 
 import { auth, db } from "../lib/firebase";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 
+const OA_URL    = "https://line.me/R/ti/p/@696kpmzu"; // แนะนำอาหาร (Official Account)
+const GROUP_URL = "https://line.me/ti/g/t8BaEgh4cw";   // พูดคุย (Group)
 
 const toYMD = (d) => {
   const y = d.getFullYear();
@@ -22,23 +24,16 @@ export default function HomePage() {
   const [uid, setUid] = useState(null);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [menuOpen, setMenuOpen] = useState(false); // ✅ state สำหรับป๊อปอัป
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // รอสถานะล็อกอิน
-useEffect(() => {
-  const unsubscribe = onAuthStateChanged(auth, (user) => {
-    if (user) {
-      console.log("User UID:", user.uid);
-      setUid(user.uid);  // Set the UID for the user
-    } else {
-      console.log("No user is logged in");
-    }
-  });
-
-  // Clean up the subscription when the component is unmounted
-  return () => unsubscribe();
-}, []);  // This ensures the effect runs once when the component mounts
-
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) setUid(user.uid);
+      else setUid(null);
+    });
+    return () => unsubscribe();
+  }, []);
 
   // ดึงเมนูของ "วันนี้" ตาม uid + ymd
   useEffect(() => {
@@ -61,7 +56,8 @@ useEffect(() => {
           const x = d.data();
           return {
             name: x.name || x.item || "",
-            img: "/test.png", // รูปโลคัล
+            // ✅ ใช้รูปจริงจาก Firestore; ถ้าไม่มีค่อย fallback เป็นโลคัล
+            img: x.imageUrl || "/placeholder.png",
             calText:
               x.qty && Number(x.qty) > 1
                 ? `${Number(x.calories || 0)}x${Number(x.qty)}`
@@ -81,14 +77,8 @@ useEffect(() => {
 
   return (
     <div className="page">
-      {/* รีเซ็ตขอบขาวรอบนอก */}
       <style jsx global>{`
-        html, body, #__next {
-          height: 100%;
-          margin: 0;
-          padding: 0;
-          background-color: #f3faee;
-        }
+        html, body, #__next { height: 100%; margin: 0; padding: 0; background-color: #f3faee; }
       `}</style>
 
       {/* Header */}
@@ -102,7 +92,6 @@ useEffect(() => {
             <Image src="/Doorbell.png" alt="doorbell" width={28} height={40} />
           </Link>
 
-          {/* 🔽 เปลี่ยนจาก Link ไป /editmenu เป็นปุ่มเปิดเมนู */}
           <button
             type="button"
             aria-haspopup="dialog"
@@ -124,26 +113,42 @@ useEffect(() => {
           </button>
         </div>
 
-        {/* Summary Box: floating */}
         <CalorieSummary variant="floating" />
       </div>
 
-      {/* เมนูไอคอน 4 วงกลม */}
-      <div className="circle-menu">
-        {[
-          { label: "บันทึกอาหาร", href: "/line/food",      img: "/m1.png" },
-          { label: "แนะนำอาหาร", href: "/line/recommend",  img: "/m2.png" },
-          { label: "พูดคุย",     href: "/line/chat",       img: "/m3.png" },
-          { label: "วิดีโอสุขภาพ", href: "/line/lookvideo", img: "/m4.png" },
-        ].map((item) => (
+    {/* เมนูไอคอน 4 วงกลม */}
+    <div className="circle-menu">
+      {[
+        { label: "บันทึกอาหาร", href: "/line/food",      img: "/m1.png", external: false },
+        { label: "แนะนำอาหาร", href: OA_URL,              img: "/m2.png", external: true  },
+        { label: "พูดคุย",     href: GROUP_URL,           img: "/m3.png", external: true  },
+        { label: "วิดีโอสุขภาพ", href: "/line/lookvideo", img: "/m4.png", external: false },
+      ].map((item) =>
+        item.external ? (
+          // ➜ ลิงก์ภายนอก: เปิดใน LINE / เบราว์เซอร์
+          <a
+            key={item.label}
+            href={item.href}
+            className="circle-menu-item"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <div className="circle-icon">
+              <Image src={item.img} alt={item.label} width={46} height={50} />
+            </div>
+            <div className="circle-label">{item.label}</div>
+          </a>
+        ) : (
+          // ➜ ลิงก์ภายในแอป: ใช้ Next Link เหมือนเดิม
           <Link href={item.href} key={item.label} className="circle-menu-item">
             <div className="circle-icon">
               <Image src={item.img} alt={item.label} width={46} height={50} />
             </div>
             <div className="circle-label">{item.label}</div>
           </Link>
-        ))}
-      </div>
+        )
+      )}
+    </div>
 
       {/* เมนูวันนี้ */}
       <div className="menu-today">
@@ -155,18 +160,22 @@ useEffect(() => {
           </div>
 
           {loading ? (
-            <div className="menu-row">
-              <div className="empty">กำลังโหลด...</div>
-            </div>
+            <div className="menu-row"><div className="empty">กำลังโหลด...</div></div>
           ) : items.length === 0 ? (
-            <div className="menu-row">
-              <div className="empty">ยังไม่มีบันทึกในวันนี้</div>
-            </div>
+            <div className="menu-row"><div className="empty">ยังไม่มีบันทึกในวันนี้</div></div>
           ) : (
             items.map((it, idx) => (
               <div className="menu-row" key={`${it.name}-${idx}`}>
                 <div className="menu-col-img">
-                  <Image src={it.img} alt={it.name} width={50} height={50} />
+                  {/* ✅ unoptimized เพื่อให้โชว์ได้แม้เป็นรูปจากโดเมนภายนอก */}
+                  <Image
+                    src={it.img}
+                    alt={it.name}
+                    width={50}
+                    height={50}
+                    style={{ borderRadius: 8, objectFit: "cover" }}
+                    unoptimized
+                  />
                 </div>
                 <div className="menu-col-name">{it.name}</div>
                 <div className="menu-col-cal">{it.calText}</div>
@@ -176,8 +185,8 @@ useEffect(() => {
         </div>
       </div>
 
-      {/* ✅ วางป๊อปอัปก่อน BottomMenu ให้ซ้อนทับได้ */}
-      <MenuPopup isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
+      <MenuPopup isOpen={menuOpen} onClose={() => setMenuOpen(false)} size="compact" />
+
 
       <BottomMenu />
 

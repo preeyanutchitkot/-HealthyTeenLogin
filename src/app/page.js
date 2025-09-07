@@ -10,7 +10,7 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
- 
+
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
@@ -31,25 +31,26 @@ export default function Login() {
           padding: 0;
           background: #e9f8ea;
           font-family: 'Noto Sans Thai', sans-serif;
+          -webkit-text-size-adjust: 100%;
         }
+
         .page {
           min-height: 100vh;
           display: flex;
           align-items: center;
-          justify-content: center; 
+          justify-content: center;
         }
 
-        /* โปร่งใส: ไม่มีกรอบ/พื้น/เงา */
         .container {
           width: 100%;
           max-width: 420px;
-          padding: 0;               
+          padding: 0;
           display: flex;
           flex-direction: column;
           align-items: center;
         }
 
-        .hero {
+        .logo {
           width: 220px;
           height: auto;
           margin: 0 auto 8px;
@@ -73,15 +74,26 @@ export default function Login() {
 
         .field { position: relative; }
 
+        /* กัน iOS auto-zoom: ทำให้ทุก input >= 16px */
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="number"],
+        select,
+        textarea {
+          font-size: 16px;     /* <<< สำคัญ */
+          -webkit-text-size-adjust: 100%;
+        }
+
         .input {
           width: 100%;
           height: 44px;
           padding: 0 14px;
-          padding-right: 44px;      /* เผื่อที่ให้ปุ่มตา */
+          padding-right: 44px;  /* เผื่อปุ่มตา */
           border-radius: 12px;
           border: 1.5px solid #cfd8dc;
           background: #fff;
-          font-size: 15px;
+          font-size: 16px;      /* <<< สำคัญ */
           color: #111827;
           outline: none;
           box-sizing: border-box;
@@ -120,7 +132,7 @@ export default function Login() {
           width: 100%;
           cursor: pointer;
           font-weight: bold;
-          font-size: 16px;
+          font-size: 16px;   /* ให้ปุ่มดูสมส่วนกับ input */
         }
 
         .divider {
@@ -181,7 +193,6 @@ export default function Login() {
               onClick={() => setShowPw(!showPw)}
               aria-label={showPw ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน'}
             >
-
               <img src="/eye2.png" alt="toggle password" />
             </button>
           </div>

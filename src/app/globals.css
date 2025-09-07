@@ -1,33 +1,68 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai&display=swap');
-/* ✅ ต้องอยู่บนสุด */
+/* ❗ ถ้าใช้ next/font อยู่แล้ว ให้ลบบรรทัดนี้ทิ้งเพื่อเลี่ยงโหลดซ้ำ  */
+/* @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai&display=swap'); */
 
-/* ✅ Tailwind ต้องมาก่อนโค้ดปกติทั้งหมด */
+/* Tailwind ต้องมาก่อน */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Remove underline from all links globally */
+/* ===== Global resets / UX tweaks ===== */
+
+/* กัน iOS ปรับขนาดอักษรเอง และทำให้ฟอนต์คมขึ้น */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* กัน iOS ซูมตอนโฟกัส input โดยกำหนด font-size >= 16px */
+input, select, textarea {
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+/* ลดโอกาส double-tap zoom บนปุ่ม/ลิงก์ (ยังลาก/แตะได้ปกติ) */
+button, a {
+  touch-action: manipulation;
+}
+
+/* ตัดแถบไฮไลต์แตะบน iOS ให้ดูเนียนขึ้น (เลือกได้ตามชอบ) */
+a, button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ลิงก์ไม่ขีดเส้นใต้ทั้งแอป */
 a, a:visited, a:active, a:focus, a:hover {
   text-decoration: none !important;
 }
 
-/* ✅ font-family รวมไว้ที่ body เดียวพอ */
+/* ฟอนต์หลัก + สีธีม */
 body {
+  /* ถ้าใช้ next/font แล้ว ไม่ต้องตั้ง family ซ้ำก็ได้
+     แต่ตั้งไว้ก็ไม่เป็นไร เพราะเป็น fallback */
   font-family: 'Noto Sans Thai', sans-serif;
   background: var(--background);
   color: var(--foreground);
 }
 
-/* ✅ ตัวแปรสีพื้นฐาน */
+/* ตัวแปรสีธีม */
 :root {
   --background: #ffffff;
   --foreground: #171717;
 }
 
-/* ✅ Dark mode */
+/* Dark mode */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
+}
+
+/* ภาพ/วิดีโอไม่ทะลุกรอบ + responsive */
+img, picture, video, canvas, svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
 }

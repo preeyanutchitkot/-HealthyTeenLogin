@@ -1,60 +1,104 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Header from "../../components/header";
+import { db, signInIfNeeded } from "../../lib/firebase";
+import {
+  collection,
+  query,
+  where,
+  orderBy,
+  getDocs,
+  Timestamp,
+  limit,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 
-export default function CartPage() {
-  const [cartItems, setCartItems] = useState([]);
-  const router = useRouter();
+function getThisMonthRange() {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+  const end = new Date(now.getFullYear(), now.getMonth() + 1, 1, 0, 0, 0, 0);
+  return { start, end };
+}
 
-  // ดึงข้อมูลจาก localStorage เมื่อ component โหลด
+export default function ThisMonthFoodListPage() {
+  const [foods, setFoods] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState(null);
+
   useEffect(() => {
-    const storedCartItems = JSON.parse(localStorage.getItem("cartItems") || "[]");
-    console.log("Stored Cart Items from localStorage:", storedCartItems);
-    setCartItems(storedCartItems);
+    (async () => {
+      setLoading(true);
+      try {
+        const user = await signInIfNeeded();
+        const uid = user?.uid;
+        if (!uid) throw new Error("No user");
+
+        const { start, end } = getThisMonthRange();
+        const q = query(
+          collection(db, "food"),
+          where("uid", "==", uid),
+          where("date", ">=", Timestamp.fromDate(start)),
+          where("date", "<", Timestamp.fromDate(end)),
+          orderBy("date", "desc"),
+          limit(500)
+        );
+
+        const snap = await getDocs(q);
+        const list = snap.docs.map((d) => {
+          const x = d.data();
+          return {
+            id: d.id,
+            item: x.item ?? x.name ?? x.menu ?? "ไม่ระบุเมนู",
+            calories: Number(x.calories ?? 0),
+            qty: Number(x.qty ?? 1),
+            imageUrl: x.imageUrl ?? x.image ?? "/placeholder.png",
+            date: x.date?.toDate?.() ?? null,
+          };
+        });
+
+        setFoods(list);
+      } catch (e) {
+        console.error("load this-month foods error:", e);
+        setFoods([]);
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
 
-  const updateQty = (index, newQty) => {
-    if (newQty < 1) {
-      // ถ้าจำนวนเป็น 0 หรือน้อยกว่า ให้ลบรายการนั้นออก
-      removeItem(index);
-      return;
+  const handleDelete = async (id) => {
+    if (!id) return;
+    if (!confirm("ต้องการลบรายการนี้หรือไม่?")) return;
+    try {
+      setDeletingId(id);
+      await deleteDoc(doc(db, "food", id));
+      setFoods((prev) => prev.filter((f) => f.id !== id));
+    } catch (e) {
+      console.error("delete error:", e);
+      alert("ลบไม่สำเร็จ");
+    } finally {
+      setDeletingId(null);
     }
-    const updated = [...cartItems];
-    updated[index].qty = newQty;
-    console.log("Updated cart items:", updated);
-    setCartItems(updated);
-    // บันทึกข้อมูลที่อัปเดตลง localStorage
-    localStorage.setItem("cartItems", JSON.stringify(updated));
   };
 
-  const removeItem = (index) => {
-    const updated = cartItems.filter((_, i) => i !== index);
-    console.log("Removed item, updated cart:", updated);
-    setCartItems(updated);
-    // บันทึกข้อมูลที่อัปเดตลง localStorage
-    localStorage.setItem("cartItems", JSON.stringify(updated));
-  };
+  if (loading) {
+    return (
+      <div style={{ padding: 16, textAlign: "center", color: "#888" }}>
+        กำลังโหลดเมนู...
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <Header title="เมนูของคุณ" cartoonImage="/mymenu.png" />
+    <div style={{ paddingBottom: 24 }}>
       <style jsx global>{`
-        *, *::before, *::after {
-          box-sizing: border-box;
-        }
-        :root {
-          color-scheme: light;
-        }
-        html, body, #__next {
-          height: 100%;
-        }
-        html, body {
-          margin: 0;
-          padding: 0;
-        }
+        *, *::before, *::after { box-sizing: border-box; }
+        :root { color-scheme: light; }
+        html, body, #__next { height: 100%; }
+        html, body { margin: 0; padding: 0; }
         body {
           background: #ffffff;
           padding-top: env(safe-area-inset-top);
@@ -62,119 +106,94 @@ export default function CartPage() {
         }
       `}</style>
 
-      {cartItems.length === 0 ? (
-        <div
-          style={{
-            minHeight: "60vh",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Image src="/bear.png" alt="เมนูของคุณ" width={190} height={240} />
+      <Header title="เมนูของคุณ" cartoonImage="/mymenu.png" />
+
+      <div style={{ padding: 16, maxWidth: 560, margin: "0 auto" }}>
+        {foods.length === 0 && (
           <div
             style={{
-              marginTop: 8,
-              fontSize: 18,
+              minHeight: "60vh",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
               color: "#888",
-              textAlign: "center",
             }}
           >
-            คุณยังไม่เพิ่มอาหารของคุณ
+            <Image src="/bear.png" alt="เมนูของคุณ" width={190} height={240} />
+            <div style={{ marginTop: 8, fontSize: 18 }}>เดือนนี้ยังไม่มีเมนูอาหาร</div>
           </div>
-        </div>
-      ) : (
-        <div style={{ padding: "16px" }}>
-          {cartItems.map((item, index) => (
-            <div
-              key={index}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                background: "#F3FAF4",
-                borderRadius: "12px",
-                padding: "10px",
-                marginBottom: "12px",
-                boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
-              }}
-            >
-              <Image
-                src={item.image}
-                alt={item.name}
-                width={60}
-                height={60}
-                style={{ borderRadius: "8px" }}
-              />
+        )}
 
-              <div style={{ flex: 1, marginLeft: "12px" }}>
-                <div style={{ fontWeight: "700" }}>{item.name}</div>
-                <div style={{ fontSize: "14px", color: "#555" }}>
-                  {item.calories} แคลอรี่
-                </div>
-              </div>
+        {foods.map((food) => (
+          <div
+            key={food.id}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              background: "#F3FAF4",
+              borderRadius: 12,
+              padding: 10,
+              marginBottom: 10,
+              boxShadow: "0 1px 4px rgba(0,0,0,.08)",
+              gap: 12,
+            }}
+          >
+            <Image
+              src={food.imageUrl}
+              alt={food.item}
+              width={60}
+              height={60}
+              style={{ borderRadius: 8, objectFit: "cover" }}
+              unoptimized
+            />
 
+            <div style={{ flex: 1, minWidth: 0 }}>
               <div
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
+                  fontWeight: 700,
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
                 }}
               >
-                <button
-                  onClick={() => updateQty(index, item.qty - 1)}
-                  style={{
-                    width: "28px",
-                    height: "28px",
-                    borderRadius: "50%",
-                    border: "none",
-                    background: "#3abb47",
-                    color: "#fff",
-                    fontSize: "18px",
-                    cursor: "pointer",
-                  }}
-                >
-                  -
-                </button>
-                <span style={{ fontWeight: "700" }}>{item.qty}</span>
-                <button
-                  onClick={() => updateQty(index, item.qty + 1)}
-                  style={{
-                    width: "28px",
-                    height: "28px",
-                    borderRadius: "50%",
-                    border: "none",
-                    background: "#3abb47",
-                    color: "#fff",
-                    fontSize: "18px",
-                    cursor: "pointer",
-                  }}
-                >
-                  +
-                </button>
+                {food.item}
               </div>
-
-              <button
-                onClick={() => removeItem(index)}
-                style={{
-                  background: "transparent",
-                  border: "none",
-                  cursor: "pointer",
-                  marginLeft: "10px",
-                }}
-              >
-                <Image
-                  src="/trash.png"
-                  alt="ลบ"
-                  width={22}
-                  height={22}
-                />
-              </button>
+              <div style={{ fontSize: 14, color: "#555" }}>
+                {food.calories} แคลอรี่
+              </div>
             </div>
-          ))}
-        </div>
-      )}
+
+            <div style={{ fontWeight: 700, minWidth: 24, textAlign: "right" }}>
+              {food.qty}
+            </div>
+
+            <button
+              onClick={() => handleDelete(food.id)}
+              disabled={deletingId === food.id}
+              title="ลบ"
+              style={{
+                marginLeft: 8,
+                border: "none",
+                background: "#fff",
+                width: 32,
+                height: 32,
+                borderRadius: "50%",
+                boxShadow: "0 1px 4px rgba(0,0,0,.08)",
+                display: "grid",
+                placeItems: "center",
+                cursor: "pointer",
+              }}
+            >
+              {deletingId === food.id ? (
+                <span style={{ fontSize: 12, color: "#999" }}>…</span>
+              ) : (
+                <Image src="/trash.png" alt="ลบ" width={16} height={16} />
+              )}
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

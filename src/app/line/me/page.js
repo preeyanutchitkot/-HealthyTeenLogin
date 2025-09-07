@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import BottomMenu from "../components/menu";
 import CalorieSummary from "../components/CalorieSummary";
-import MenuPopup from "../components//MenuPopup";
+import MenuPopup from "../components/MenuPopup"; // ← แก้ path ให้เหลือ /MenuPopup เดียว
 import { Noto_Sans_Thai } from "next/font/google";
 
 /* ===== Firebase ===== */
@@ -28,7 +28,6 @@ const notoSansThai = Noto_Sans_Thai({
 });
 
 export default function MePage() {
-  /* ---------- utils ---------- */
   const fmtDate = (d) =>
     new Date(d).toLocaleDateString("th-TH", {
       day: "2-digit",
@@ -37,7 +36,6 @@ export default function MePage() {
     });
   const today = useMemo(() => fmtDate(new Date()), []);
 
-  /* ---------- state ---------- */
   const [bmi, setBmi] = useState(null);
   const [bmr, setBmr] = useState(null);
   const [dailyLogs, setDailyLogs] = useState([]);
@@ -47,31 +45,28 @@ export default function MePage() {
   const toggleDate = (date) =>
     setOpenDates((prev) => ({ ...prev, [date]: !prev[date] }));
 
-  /* ---------- load data (users + food) ---------- */
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (!user) return;
 
-      // 1) BMI/BMR จาก users/<uid>
+      // users/<uid> — อ่าน BMI/BMR
       try {
         const uSnap = await getDoc(doc(db, "users", user.uid));
         const uData = uSnap.exists() ? uSnap.data() : null;
-  setBmi(uData?.bmi != null ? Number(uData.bmi) : null);
-  setBmr(uData?.bmr != null ? Number(uData.bmr) : null);
+        setBmi(uData?.bmi != null ? Number(uData.bmi) : null);
+        setBmr(uData?.bmr != null ? Number(uData.bmr) : null);
       } catch (e) {
         console.error("load BMI/BMR error:", e);
       }
 
-      // 2) อาหารจากคอลเลกชันที่ rules อนุญาต: food/*
-      //    รูปแบบเอกสาร (ให้ตรงกับ rules):
-      //    { uid: string, ymd: string, date: timestamp, calories: number, qty: number, name?: string, img?: string }
+      // food/* — อ่าน log ทั้งหมดของผู้ใช้ เรียงล่าสุดก่อน
       try {
-        const q = query(
+        const qy = query(
           collection(db, "food"),
           where("uid", "==", user.uid),
           orderBy("date", "desc")
         );
-        const snap = await getDocs(q);
+        const snap = await getDocs(qy);
 
         const byDate = {};
         snap.forEach((docSnap) => {
@@ -79,17 +74,20 @@ export default function MePage() {
           const dateStr = d?.date?.toDate ? fmtDate(d.date.toDate()) : today;
 
           if (!byDate[dateStr]) byDate[dateStr] = [];
-        const itemName = d.item ?? d.name ?? d.menu ?? d.title ?? "ไม่ระบุเมนู";
-        byDate[dateStr].push({
-          name: itemName,
-          cal:
-            d.calories != null && d.qty != null
-              ? `${d.calories}x${d.qty}`
-              : String(d.calories ?? "-"),
-          img: d.img ?? "/test.png",
-        });
+
+          const itemName = d.item ?? d.name ?? d.menu ?? d.title ?? "ไม่ระบุเมนู";
+          byDate[dateStr].push({
+            name: itemName,
+            cal:
+              d.calories != null && d.qty != null
+                ? `${Number(d.calories)}x${Number(d.qty)}`
+                : String(d.calories ?? "-"),
+            // ✅ ใช้รูปจริงจาก Firestore; fallback เป็น placeholder
+            img: d.imageUrl || d.img || "/placeholder.png",
+          });
         });
 
+        // เรียงวันที่ใหม่ → ล่าสุดก่อน
         const orderedDates = Object.keys(byDate).sort((a, b) => {
           const [da, ma, ya] = a.split("/").map(Number);
           const [dbb, mb, yb] = b.split("/").map(Number);
@@ -110,7 +108,6 @@ export default function MePage() {
         setOpenDates({ [logsArr[0].date]: true });
       } catch (e) {
         console.error("load food logs error:", e);
-        // fallback อย่างสุภาพเพื่อไม่ให้จอว่างเปล่า
         const fallback = [{ date: today, items: [] }];
         setDailyLogs(fallback);
         setOpenDates({ [today]: true });
@@ -149,18 +146,20 @@ export default function MePage() {
 
         <div className="metrics">
           <div>
-            BMI{bmi != null && !isNaN(bmi) ? `: ${Number(bmi).toFixed(1)}` : "..........................................."}
+            BMI
+            {bmi != null && !isNaN(bmi)
+              ? `: ${Number(bmi).toFixed(1)}`
+              : "..........................................."}
             {bmr != null && !isNaN(bmr) ? ` | BMR: ${Number(bmr)}` : ""}
           </div>
         </div>
       </div>
 
-      {/* กล่องสรุปแคลอรี่ (ดีไซน์เดิม) */}
       <div className="summary-wrap">
         <CalorieSummary variant="floating" bunnyImage="/bunny.png" />
       </div>
 
-      {/* รายการวันที่แบบกดแล้วกาง */}
+      {/* รายการแบบกางวัน */}
       <div className="day-accordion">
         {dailyLogs.map((d) => {
           const open = !!openDates[d.date];
@@ -192,7 +191,16 @@ export default function MePage() {
                     {d.items.map((item, idx) => (
                       <div className="menu-row" key={`${item.name}-${idx}`}>
                         <div className="menu-col-img">
-                          <Image src={item.img} alt={item.name} width={50} height={50} />
+                          {/* ✅ unoptimized: แสดงรูปจากโดเมนภายนอกได้ทันที
+                              ถ้าต้องการ optimize ให้ไปเพิ่มโดเมนใน next.config.js */}
+                          <Image
+                            src={item.img}
+                            alt={item.name}
+                            width={50}
+                            height={50}
+                            style={{ borderRadius: 8, objectFit: "cover" }}
+                            unoptimized
+                          />
                         </div>
                         <div className="menu-col-name">{item.name}</div>
                         <div className="menu-col-cal">{item.cal}</div>

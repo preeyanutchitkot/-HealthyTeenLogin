@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+
 import BottomMenu from "../../components/menu";
 import CartIcon from "../../components/CartIcon";
 import CategoryBar from "../../components/CategoryBar";
@@ -10,6 +11,8 @@ import Header from "../../components/header";
 import FoodGrid from "../../components/FoodGrid";
 import CartSheet from "../../components/CartSheet";
 import AddFoodSheet from "../../components/AddFoodSheet";
+
+import { saveCartToFirestore } from "../../lib/saveCart";
 
 const drinkMenus = [
   { name: 'น้ำส้มคั้น', calories: 100, image: '/foods/orange-juice.png' },
@@ -45,77 +48,89 @@ export default function drinkMenusPage() {
   const [customFoods, setCustomFoods] = useState([]);
   const router = useRouter();
 
-  // ปิด scroll เมื่อ popup เปิด
-  useEffect(() => {
-    document.body.style.overflow = showSheet || showAddSheet ? "hidden" : "";
-    return () => (document.body.style.overflow = "");
-  }, [showSheet, showAddSheet]);
 
-  // sync cartCount
+  // ✅ NEW: โหลดตะกร้าจาก localStorage เมื่อเปิดหน้า
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("cartItems");
+      if (raw) setCartItems(JSON.parse(raw));
+    } catch (_) {}
+  }, []);
+
+  // อัปเดตตัวเลขบนไอคอนรถเข็น
   useEffect(() => {
     const total = cartItems.reduce((sum, it) => sum + it.qty, 0);
     setCartCount(total);
   }, [cartItems]);
 
-  // filtered foods
   const filteredFoods = useMemo(
-    () => foods.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())),
-    [foods, searchQuery]
+    () =>
+      [...foods, ...customFoods].filter((f) =>
+        f.name.toLowerCase().includes(searchQuery.toLowerCase())
+      ),
+    [foods, customFoods, searchQuery]
   );
 
-  // add to cart
+  const persist = (items) => {
+    setCartItems(items);
+    localStorage.setItem("cartItems", JSON.stringify(items)); // ✅ ให้ตรงกันเสมอ
+  };
+
   const addToCart = (food) => {
     setCartItems((prev) => {
       const idx = prev.findIndex((item) => item.name === food.name);
-      if (idx === -1) return [...prev, { ...food, qty: 1 }];
-      const updated = [...prev];
-      updated[idx].qty += 1;
+      let updated;
+      if (idx === -1) {
+        updated = [...prev, { ...food, qty: 1 }];
+      } else {
+        updated = [...prev];
+        updated[idx].qty += 1;
+      }
+      localStorage.setItem("cartItems", JSON.stringify(updated)); // มีอยู่แล้ว
       return updated;
     });
   };
 
-  // increase quantity
-  const increaseQty = (name) =>
-    setCartItems((prev) => prev.map((it) => (it.name === name ? { ...it, qty: it.qty + 1 } : it)));
-
-  // decrease quantity
-  const decreaseQty = (name) =>
-    setCartItems((prev) => prev.map((it) => (it.name === name ? { ...it, qty: it.qty - 1 } : it)).filter((it) => it.qty > 0));
-
-  // remove from cart
-  const removeFromCart = (name) => setCartItems((prev) => prev.filter((it) => it.name !== name));
-
-  // save to cart
-  const saveToCart = () => {
-    setShowSheet(false);
-    router.push("/line/food/cart");
+  const addCustomFood = (foodItem) => {
+    setCustomFoods((prev) => [foodItem, ...prev]);
   };
 
-  // add custom food
-  const addCustomFood = () => {
-    if (!newFood.name) return;
-    setCustomFoods((prev) => [...prev, { ...newFood, image: "/foods/custom.png" }]);
-    setNewFood({ name: "", calories: 350 });
-  };
+  const handleSaveNewFood = () => setShowAddSheet(false);
 
-  // save new food
-  const saveNewFood = () => {
-    if (customFoods.length === 0) return;
-    const updatedFoods = [...foods, ...customFoods];
-    setFoods(updatedFoods);
-    setCustomFoods([]);
-    setShowAddSheet(false);
+  // ✅ NEW: บันทึกลง Firestore ตาม rules ของคุณ
+  const handleSaveCart = async () => {
+    try {
+      if (!cartItems.length) return;
+      setIsSaving(true);
+      await saveCartToFirestore(cartItems);
+
+      // เคลียร์/ปิด sheet
+      persist([]);
+      setShowSheet(false);
+
+      // ✅ เด้งไปหน้ารายการ (วันนี้/เดือนนี้ แล้วแต่คุณตั้ง)
+      router.replace("/line/food/cart");
+    } catch (err) {
+      console.error(err);
+      alert(err?.message || "บันทึกล้มเหลว");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
     <div className="page">
       <Header title="บันทึกอาหาร" cartoonImage="/8.png" />
 
-      {/* ค้นหา */}
       <div className="search-wrap">
         <div className="search-pill" role="search">
           <Image src="/search.png" alt="ค้นหา" width={26} height={26} />
-          <input type="text" placeholder="ค้นหา" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+          <input
+            type="text"
+            placeholder="ค้นหา"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
           <Image src="/character.png" alt="ตัวการ์ตูน" width={26} height={26} />
         </div>
       </div>
@@ -130,8 +145,6 @@ export default function drinkMenusPage() {
           { name: "เครื่องดื่ม", icon: "/food3.png" },
           { name: "เครื่องดื่มแอลกอฮอล์", icon: "/food8.png" },
           { name: "ผักและผลไม้", icon: "/food6.png" },
-          { name: "เนื้อสัตว์", icon: "/food9.png" },
-          { name: "ซอสและเครื่องปรุง", icon: "/food10.png" },
         ]}
         categoryPathMap={{
           อาหารคาว: "/line/food/savory",
@@ -142,44 +155,55 @@ export default function drinkMenusPage() {
           เครื่องดื่ม: "/line/food/drink",
           เครื่องดื่มแอลกอฮอล์: "/line/food/alcohol",
           ผักและผลไม้: "/line/food/fruit",
-          เนื้อสัตว์: "/line/food/meat",
-          ซอสและเครื่องปรุง: "/line/food/sauce",
         }}
       />
 
       <div className="tabs">
         <div className="tab-left">
           <button className="active">เครื่องดื่ม</button>
-          <button className="add-new" onClick={() => setShowAddSheet(true)}>+ เพิ่มเมนูใหม่</button>
+          <button className="add-new" onClick={() => setShowAddSheet(true)}>
+            + เพิ่มเมนูใหม่
+          </button>
         </div>
         <CartIcon count={cartCount} onClick={() => setShowSheet(true)} />
       </div>
 
-      {/* รายการอาหาร */}
       <FoodGrid foods={filteredFoods} onAdd={addToCart} />
 
-      {/* popup ตะกร้า */}
       {showSheet && (
         <CartSheet
           cartItems={cartItems}
           onClose={() => setShowSheet(false)}
-          onIncrease={increaseQty}
-          onDecrease={decreaseQty}
-          onRemove={removeFromCart}
-          onSave={saveToCart}
+          onIncrease={(name) => {
+            const updated = cartItems.map((it) =>
+              it.name === name ? { ...it, qty: it.qty + 1 } : it
+            );
+            persist(updated); // ✅ อัปเดต localStorage ด้วย
+          }}
+          onDecrease={(name) => {
+            const updated = cartItems
+              .map((it) =>
+                it.name === name ? { ...it, qty: it.qty - 1 } : it
+              )
+              .filter((it) => it.qty > 0);
+            persist(updated); // ✅
+          }}
+          onRemove={(name) => {
+            const updated = cartItems.filter((it) => it.name !== name);
+            persist(updated); // ✅
+          }}
+          onSave={handleSaveCart} // ✅ เปลี่ยนจาก router.push เป็นบันทึกจริง
+          isSaving={isSaving}     // ✅ ส่งสถานะไปให้ปุ่ม
         />
       )}
 
-      {/* popup เพิ่มเมนู */}
       {showAddSheet && (
         <AddFoodSheet
           customFoods={customFoods}
-          newFood={newFood}
           setCustomFoods={setCustomFoods}
-          setNewFood={setNewFood}
-          onClose={() => setShowAddSheet(false)}
           onAddCustom={addCustomFood}
-          onSave={saveNewFood}
+          onSave={handleSaveNewFood}
+          onClose={() => setShowAddSheet(false)}
         />
       )}
 
@@ -202,7 +226,6 @@ export default function drinkMenusPage() {
           padding-bottom: 80px;
           margin: 0;
         }
-  
         .search-wrap { position: relative; height: 0; }
         .search-pill {
           position: absolute; top: -45px; left: 50%; transform: translateX(-50%);
@@ -216,8 +239,7 @@ export default function drinkMenusPage() {
           background: transparent; font-size: 16px;
         }
         .search-pill input::placeholder { color: #1f2937; opacity: .85; }
-
-        .tabs { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 10px 16px; }
+        .tabs { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 10px 16px;margin-top: 20px; }
         .tab-left { display: flex; gap: 8px; align-items: center; }
         .tabs button {
           background: #fff; border: 1px solid #e5e7eb; border-radius: 12px;
@@ -231,27 +253,78 @@ export default function drinkMenusPage() {
           transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
         .add-new:active { transform: scale(0.96); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); }
+        .food-grid{
+        --card-w: 120px;   
+        --card-h: 160px;   /* เพิ่มความสูงขึ้นนิดหน่อย */
+        --gap: 8px;        
+        --pad: 8px;        
+        --img: 70px;       /* เดิม 60px → เพิ่มขนาดรูป */
+        --btn: 30px;       /* ขยายปุ่ม + อีกนิด */
+        }
 
-        .food-grid {
-          display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
-          padding: 16px 12px; max-width: 420px; margin: 0 auto;
-          background: #fff;
-        }
-        .food-item {
-          background: #fff; border-radius: 12px; text-align: center;
-          padding: 8px; position: relative; box-shadow: 0 1px 4px rgba(0, 0, 0, .1);
-        }
-        .name { font-size: 14px; font-weight: 700; margin-top: 6px; }
-        .calories { font-size: 12px; color: #555; }
-        .add {
-          position: absolute; bottom: 8px; right: 8px;
-          width: 24px; height: 24px; border-radius: 50%;
-          background: #3abb47; color: #fff; border: none; font-size: 18px;
-        }
+      .food-grid{
+        display: grid;
+        grid-template-columns: repeat(3, 1fr); /* 3 คอลัมน์เท่ากัน */
+        gap: var(--gap);
+        padding: 12px;
+        width: 100%;
+        max-width: 400px;  /* กำหนดความกว้างสูงสุดถ้าต้องการ */
+        margin: 0 auto;    /* จัดกลาง */
+        background: #fff;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+      }
+
+      .food-grid::-webkit-scrollbar{ display: none; }
+
+      .food-grid::-webkit-scrollbar{
+        display: none;                   /* Chrome/Safari ซ่อนสกรอลบาร์ */
+      }
+
+      .food-item{
+        flex: 0 0 var(--card-w);         /* ความกว้างคงที่ → ต่อกันเป็นแถวเดียว */
+        min-height: var(--card-h);
+        background: #fff;
+        border-radius: 12px;
+        text-align: center;
+        padding: var(--pad) var(--pad) calc(var(--pad) + var(--btn) + 6px);
+        position: relative;
+        box-shadow: 0 1px 4px rgba(0,0,0,.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      /* รูปในการ์ด (ถ้าใช้ <Image> ให้ใส่ className="thumb" ที่ wrapper หรือรูป) */
+      .food-item img,
+      .food-item .thumb{
+        width: var(--img);
+        height: var(--img);
+        object-fit: contain;
+        margin: 0 auto 6px;
+        display: block;
+      }
+
+      .name{ font-size: 14px; font-weight: 700; }
+      .calories{ font-size: 13px; color: #555; }
+
+      /* ปุ่ม + มุมล่างขวา */
+      .add{
+        position: absolute;
+        right: 8px;
+        bottom: 8px;
+        width: var(--btn);
+        height: var(--btn);
+        border-radius: 50%;
+        border: none;
+        background: #3abb47;
+        color: #fff;
+        font-size: 16px;
+        line-height: 1;
+      }
 
         .overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, .35); z-index: 1000; animation: fadeIn .15s ease-out; }
         .sheet {
-          position: fixed; left: 0; right: 0; bottom: 0; height: 66vh;
+          position: fixed; left: 0; right: 0; bottom: 0; height: 61vh;
           background: #fff; z-index: 1001;
           border-top-left-radius: 18px; border-top-right-radius: 18px;
           box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.1);
@@ -289,13 +362,16 @@ export default function drinkMenusPage() {
         .trash-btn:active { transform: scale(0.96); }
         .trash-icon { width: 16px; height: 16px; object-fit: contain; }
 
-        .input-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; }
-        .input-row input { width: 220px; padding: 10px 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; }
-        .add-btn {
-          width: 32px; height: 32px; border: none; border-radius: 50%;
-          background: #3abb47; color: #fff; font-size: 20px; cursor: pointer;
+        .add-btn, .delete-btn {
+          flex-shrink: 0;
+          align-self: center;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          display: grid;
+          place-items: center;
+          cursor: pointer;
         }
-        .cal-display { min-width: 80px; text-align: right; font-size: 14px; font-weight: 600; color: #333; }
 
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

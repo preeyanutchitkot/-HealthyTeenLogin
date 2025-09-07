@@ -1,15 +1,9 @@
 import React from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 
 const Header = ({ title, cartoonImage }) => {
   return (
     <header className="header-bar">
-      <Link href="/line/home">
-        <button className="back-button" aria-label="back">
-          <Image src="/backbotton.png" alt="back" width={24} height={24} />
-        </button>
-      </Link>
       <div className="header-center">
         <span className="header-title">{title}</span> 
         <Image className="header-cartoon" src={cartoonImage} alt="cartoon" width={45} height={60} />
@@ -24,24 +18,6 @@ const Header = ({ title, cartoonImage }) => {
           padding: 20px 16px 24px 16px;
           border-radius: 0 0 16px 16px;
           margin-bottom: 24px;
-        }
-        .back-button {
-          position: absolute;
-          left: 16px;
-          top: 50%;
-          transform: translateY(-50%);
-          width: 36px;
-          height: 36px;
-          border-radius: 50%;
-          background: #e9f8ea;
-          border: none;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 22px;
-          color: #3ABB47;
-          cursor: pointer;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.08);
         }
         .header-center {
           display: flex;

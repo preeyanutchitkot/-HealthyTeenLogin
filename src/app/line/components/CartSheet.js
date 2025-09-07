@@ -1,8 +1,18 @@
+// components/CartSheet.jsx
 "use client";
 
 import Image from "next/image";
+import React from "react";
 
-export default function CartSheet({ cartItems, onClose, onIncrease, onDecrease, onRemove, onSave }) {
+export default function CartSheet({
+  cartItems,
+  onClose,
+  onIncrease,
+  onDecrease,
+  onRemove,
+  onSave,
+  isSaving = false,
+}) {
   return (
     <>
       <div className="overlay" onClick={onClose} />
@@ -17,12 +27,21 @@ export default function CartSheet({ cartItems, onClose, onIncrease, onDecrease, 
           {cartItems.map((it) => (
             <div key={it.name} className="row">
               <div className="left">
-                <Image src={it.image} alt={it.name} width={56} height={56} className="thumb" />
+                <Image
+                  src={it.image || "/placeholder.png"}
+                  alt={it.name}
+                  width={56}
+                  height={56}
+                  className="thumb"
+                />
                 <div className="meta">
                   <div className="r-name">{it.name}</div>
-                  <div className="r-cal">{it.calories} × {it.qty} = <b>{it.calories * it.qty}</b> แคลอรี่</div>
+                  <div className="r-cal">
+                    {it.calories} × {it.qty} = <b>{it.calories * it.qty}</b> แคลอรี่
+                  </div>
                 </div>
               </div>
+
               <div className="right">
                 <button className="qtybtn" onClick={() => onDecrease(it.name)}>−</button>
                 <span className="qty">{it.qty}</span>
@@ -33,10 +52,20 @@ export default function CartSheet({ cartItems, onClose, onIncrease, onDecrease, 
               </div>
             </div>
           ))}
+
+          {cartItems.length === 0 && (
+            <div className="empty-hint">ยังไม่มีรายการอาหาร</div>
+          )}
         </div>
 
         <div className="sheet-footer">
-          <button className="save" disabled={cartItems.length === 0} onClick={onSave}>บันทึก</button>
+          <button
+            className="save"
+            disabled={cartItems.length === 0 || isSaving}
+            onClick={onSave}
+          >
+            {isSaving ? "กำลังบันทึก..." : "บันทึก"}
+          </button>
         </div>
       </div>
     </>

@@ -34,7 +34,7 @@ export default function NotificationPage() {
           const d=doc.data(); return s + Number(d.calories||0)*Number(d.qty||1);
         },0);
         setCalorie(sum);
-        // 3. คำนวณ level
+
         let lv = "normal";
         let ic = <img src="/enough.png" alt="enough" style={{ width: 80 }} />;
         if (bmrVal && sum > bmrVal) {

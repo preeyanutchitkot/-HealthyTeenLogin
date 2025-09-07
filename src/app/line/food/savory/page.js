@@ -31,8 +31,7 @@ const savoryFoods = [
   { name: "ข้าวหมกไก่", calories: 520, image: "/foods/khao-mok-kai.png" },
   { name: "ข้าวกล่องไก่ย่าง", calories: 450, image: "/foods/khao-klong-kai-yang.png" },
   { name: "บะหมี่หมูแดง", calories: 450, image: "/foods/ba-mee-moo-daeng.png" },
-  { name: "ก๋วยเตี๋ยวหลอด", calories: 350, image: "/foods/kuay-tiew-lord.png" },
-  { name: "ข้าวน้ํามะยงชิด", calories: 620, image: "/foods/khao-nam-mayong-chid.png" },
+  { name: "ก๋วยเตี๋ยว", calories: 350, image: "/foods/kuay-tiew-lord.png" },
   { name: "ข้าวคั่วกลิ้งหมูกรอบ", calories: 600, image: "/foods/khao-kua-kling-moo-krob.png" },
   { name: "ข้าวต้มปลา", calories: 180, image: "/foods/khao-tom-pla.png" },
 ];
@@ -143,6 +142,7 @@ export default function savoryFoodsPage() {
           { name: "เครื่องดื่ม", icon: "/food3.png" },
           { name: "เครื่องดื่มแอลกอฮอล์", icon: "/food8.png" },
           { name: "ผักและผลไม้", icon: "/food6.png" },
+     
         ]}
         categoryPathMap={{
           อาหารคาว: "/line/food/savory",
@@ -153,6 +153,7 @@ export default function savoryFoodsPage() {
           เครื่องดื่ม: "/line/food/drink",
           เครื่องดื่มแอลกอฮอล์: "/line/food/alcohol",
           ผักและผลไม้: "/line/food/fruit",
+       
         }}
       />
 

@@ -12,29 +12,32 @@ import FoodGrid from "../../components/FoodGrid";
 import CartSheet from "../../components/CartSheet";
 import AddFoodSheet from "../../components/AddFoodSheet";
 
-import { saveCartToFirestore } from "../../lib/saveCart";
+const snackFoods = [
+  { name: 'ขนมครก', calories: 180, image: '/foods/khanom-khrok.png' },
+  { name: 'หมูปิ้ง (3 ไม้)', calories: 250, image: '/foods/moo-ping-3.png' },
+  { name: 'ลูกชิ้นปิ้ง (5 ลูก)', calories: 120, image: '/foods/look-chin-ping-5.png' },
+  { name: 'เฉาก๊วย', calories: 120, image: '/foods/chao-kuai.png' },
+  { name: 'ข้าวโพดปิ้ง', calories: 100, image: '/foods/khao-phot-ping.png' },
+  { name: 'กล้วยทอด', calories: 250, image: '/foods/kluai-thot.png' },
+  { name: 'มันทอด', calories: 150, image: '/foods/man-thot.png' },
+  { name: 'ถั่วทอด', calories: 200, image: '/foods/thua-thot.png' },
+  { name: 'เกี๊ยวทอด', calories: 190, image: '/foods/kiao-thot.png' },
+  { name: 'ปลาเส้นทอดกรอบ', calories: 140, image: '/foods/pla-sen-thot-krop.png' },
+  { name: 'แหนมหม้อ', calories: 180, image: '/foods/naem-mor.png' },
+  { name: 'ปอเปี๊ยะทอด', calories: 200, image: '/foods/por-pia-thot.png' },
+  { name: 'ไส้กรอกอีสาน', calories: 250, image: '/foods/sai-krok-isan.png' },
+  { name: 'หอยทอด', calories: 300, image: '/foods/hoi-thot.png' },
+  { name: 'ข้าวเกรียบ', calories: 200, image: '/foods/khao-kriap.png' },
+  { name: 'เต้าหู้ทอด', calories: 120, image: '/foods/tao-hu-thot.png' },
+  { name: 'ปลาหมึกบด', calories: 150, image: '/foods/pla-muek-bot.png' },
+  { name: 'มันฝรั่งทอดกรอบ (1 ถุง)', calories: 150, image: '/foods/potato-chips.png' },
+  { name: 'ป๊อปคอร์น (1 ถ้วย)', calories: 55, image: '/foods/popcorn.png' },
+  { name: 'ขนมปังโฮลวีต (1 แผ่น)', calories: 70, image: '/foods/whole-wheat-bread.png' },
+  { name: 'โยเกิร์ตผลไม้ (1 ถ้วย)', calories: 120, image: '/foods/fruit-yogurt.png' },
+  { name: 'คุกกี้เนย (1 ชิ้น)', calories: 150, image: '/foods/butter-cookie.png' },
+  { name: 'ข้าวเกรียบกุ้ง (1 แผ่น)', calories: 60, image: '/foods/shrimp-cracker.png' },
+  { name: 'ขนมปังกรอบ', calories: 100, image: '/foods/crispy-bread.png' },
 
-const sweetFoods = [
-  { name: "ทับทิมกรอบ", calories: 200, image: "/foods/tub-tim-krob.png" },
-  { name: "ขนมชั้น", calories: 220, image: "/foods/khanom-chan.png" },
-  { name: "บัวลอย", calories: 240, image: "/foods/bua-loi.png" },
-  { name: "ข้าวเหนียวมะม่วง", calories: 330, image: "/foods/khao-niew-mamuang.png" },
-  { name: "ลูกชุบ", calories: 150, image: "/foods/look-chup.png" },
-  { name: "เครปเค้ก", calories: 350, image: "/foods/crepe-cake.png" },
-  { name: "พายสัปปะรด", calories: 270, image: "/foods/pineapple-pie.png" },
-  { name: "ชีสเค้ก", calories: 400, image: "/foods/cheesecake.png" },
-  { name: "ทองหยิบ", calories: 210, image: "/foods/thong-yip.png" },
-  { name: "ฝอยทอง", calories: 180, image: "/foods/foi-thong.png" },
-  { name: "วุ้นกะทิ", calories: 150, image: "/foods/woon-kati.png" },
-  { name: "เค้กช็อกโกแลต", calories: 450, image: "/foods/chocolate-cake.png" },
-  { name: "บราวนี่", calories: 400, image: "/foods/brownie.png" },
-  { name: "ขนมปังสังขยา", calories: 250, image: "/foods/khanom-pang-sangkaya.png" },
-  { name: "โรตีใส่นม", calories: 350, image: "/foods/roti-sai-nom.png" },
-  { name: "โรตีโอวัลติน", calories: 370, image: "/foods/roti-ovaltine.png" },
-  { name: "เค้กกล้วยหอม", calories: 280, image: "/foods/banana-cake.png" },
-  { name: "ขนมต้ม", calories: 200, image: "/foods/khanom-tom.png" },
-  { name: "ขนมกล้วย", calories: 220, image: "/foods/khanom-kluai.png" },
-  { name: "ขนมถ้วย", calories: 150, image: "/foods/khanom-tuay.png" },
 ];
 
 export default function SweetFoodsPage() {
@@ -144,6 +147,7 @@ export default function SweetFoodsPage() {
           { name: "เครื่องดื่ม", icon: "/food3.png" },
           { name: "เครื่องดื่มแอลกอฮอล์", icon: "/food8.png" },
           { name: "ผักและผลไม้", icon: "/food6.png" },
+     
         ]}
         categoryPathMap={{
           อาหารคาว: "/line/food/savory",
@@ -154,6 +158,7 @@ export default function SweetFoodsPage() {
           เครื่องดื่ม: "/line/food/drink",
           เครื่องดื่มแอลกอฮอล์: "/line/food/alcohol",
           ผักและผลไม้: "/line/food/fruit",
+     
         }}
       />
 

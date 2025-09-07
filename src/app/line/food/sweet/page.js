@@ -154,10 +154,6 @@ export default function SweetFoodsPage() {
           เครื่องดื่ม: "/line/food/drink",
           เครื่องดื่มแอลกอฮอล์: "/line/food/alcohol",
           ผักและผลไม้: "/line/food/fruit",
-        }}
-      />
-
-      <div className="tabs">
         <div className="tab-left">
           <button className="active">อาหารหวาน</button>
           <button className="add-new" onClick={() => setShowAddSheet(true)}>

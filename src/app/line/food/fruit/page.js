@@ -127,8 +127,7 @@ export default function fruitMenusPage() {
           { name: "เครื่องดื่ม", icon: "/food3.png" },
           { name: "เครื่องดื่มแอลกอฮอล์", icon: "/food8.png" },
           { name: "ผักและผลไม้", icon: "/food6.png" },
-          { name: "เนื้อสัตว์", icon: "/food9.png" },
-          { name: "ซอสและเครื่องปรุง", icon: "/food10.png" },
+     
         ]}
         categoryPathMap={{
           อาหารคาว: "/line/food/savory",
@@ -139,8 +138,7 @@ export default function fruitMenusPage() {
           เครื่องดื่ม: "/line/food/drink",
           เครื่องดื่มแอลกอฮอล์: "/line/food/alcohol",
           ผักและผลไม้: "/line/food/fruit",
-          เนื้อสัตว์: "/line/food/meat",
-          ซอสและเครื่องปรุง: "/line/food/sauce",
+   
         }}
       />
 

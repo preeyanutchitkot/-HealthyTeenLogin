@@ -145,7 +145,6 @@ export default function SweetFoodsPage() {
           { name: "อาหารเจ", icon: "/jfood7.png" },
           { name: "อาหารต่างประเทศ", icon: "/food5.png" },
           { name: "เครื่องดื่ม", icon: "/food3.png" },
-          { name: "เครื่องดื่มแอลกอฮอล์", icon: "/food8.png" },
           { name: "ผักและผลไม้", icon: "/food6.png" },
      
         ]}
@@ -156,7 +155,6 @@ export default function SweetFoodsPage() {
           อาหารเจ: "/line/food/J",
           อาหารต่างประเทศ: "/line/food/Foreign",
           เครื่องดื่ม: "/line/food/drink",
-          เครื่องดื่มแอลกอฮอล์: "/line/food/alcohol",
           ผักและผลไม้: "/line/food/fruit",
      
         }}

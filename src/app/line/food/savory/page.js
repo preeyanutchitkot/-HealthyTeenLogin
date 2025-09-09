@@ -33,6 +33,7 @@ const savoryFoods = [
   { name: "ก๋วยเตี๋ยว", calories: 350, image: "/foods/kuay-tiew-lord.png" },
   { name: "ข้าวคั่วกลิ้งหมูกรอบ", calories: 600, image: "/foods/khao-kua-kling-moo-krob.png" },
   { name: "ข้าวต้มปลา", calories: 180, image: "/foods/khao-tom-pla.png" },
+  { name: "ส้มตำ", calories: 180, image: "/foods/som-tam.png" },
 ];
 
 export default function savoryFoodsPage() {

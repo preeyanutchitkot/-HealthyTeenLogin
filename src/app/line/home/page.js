@@ -21,6 +21,17 @@ const toYMD = (d) => {
 };
 
 export default function HomePage() {
+  // แจ้งเตือน: สี badge ตามสถานะแจ้งเตือนจาก localStorage
+  const [showNotif, setShowNotif] = useState(true);
+  const [notifColor, setNotifColor] = useState('green');
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const lv = window.localStorage.getItem('notifLevel');
+      if (lv === 'over') setNotifColor('red');
+      else if (lv === 'near') setNotifColor('yellow');
+      else setNotifColor('green');
+    }
+  }, []);
   const [uid, setUid] = useState(null);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -84,12 +95,26 @@ export default function HomePage() {
       {/* Header */}
       <div className="header">
         <div className="profile">
-          <Image src="/profile.png" alt="profile" width={72} height={72} />
+          <Image src="/profile.png" alt="profile" width={72} height={72} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
         </div>
 
+
         <div className="header-icons">
-          <Link href="/line/notification" aria-label="การแจ้งเตือน">
+          <Link href="/line/notification" aria-label="การแจ้งเตือน" onClick={() => setShowNotif(false)} style={{position:'relative',display:'inline-block'}}>
             <Image src="/Doorbell.png" alt="doorbell" width={28} height={40} />
+            {showNotif && (
+              <span style={{
+                position: 'absolute',
+                bottom: 10,
+                right: 0,
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                border: '1.5px solid #fff',
+                background: notifColor === 'red' ? '#F44336' : notifColor === 'yellow' ? '#FFD600' : '#4CAF50',
+                zIndex: 2
+              }} />
+            )}
           </Link>
 
           <button
@@ -195,7 +220,8 @@ export default function HomePage() {
 
         .header { background-color:#3ABB47; position:relative; height:240px; }
         .header-icons { position:absolute; top:10px; right:20px; display:flex; gap:16px; z-index:20; }
-        .profile { position:absolute; top:16px; left:50%; transform:translateX(-50%); background:#fff; border-radius:50%; overflow:hidden; width:72px; height:72px; box-shadow:0 2px 6px rgba(0,0,0,.2); z-index:20; }
+  .profile { position:absolute; top:16px; left:50%; transform:translateX(-50%); background:#fff; border-radius:50%; overflow:hidden; width:72px; height:72px; box-shadow:0 2px 6px rgba(0,0,0,.2); z-index:20; }
+  .profile img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 
         .summary-container { position:absolute; top:120px; left:50%; transform:translateX(-50%); width:90vw; max-width:300px; background:#fff; border-radius:16px; box-shadow:0 4px 16px rgba(0,0,0,.1); padding:20px 16px; text-align:center; z-index:10; }
         .bunny-img { position:absolute; top:-24px; right:-12px; width:72px; }

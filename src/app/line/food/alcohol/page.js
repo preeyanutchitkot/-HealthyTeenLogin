@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -130,7 +131,9 @@ export default function AlcoholPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
-          <Image src="/character.png" alt="ตัวการ์ตูน" width={26} height={26} />
+          <Link href="/line/food/cart">
+            <Image src="/character.png" alt="ตัวการ์ตูน" width={26} height={26} style={{cursor:'pointer'}} />
+          </Link>
         </div>
       </div>
 

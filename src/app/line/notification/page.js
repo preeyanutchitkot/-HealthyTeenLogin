@@ -46,6 +46,10 @@ export default function NotificationPage() {
         }
         setLevel(lv);
         setIcon(ic);
+        // ส่งค่า level ไปหน้า Home ผ่าน localStorage
+        if (typeof window !== 'undefined') {
+          window.localStorage.setItem('notifLevel', lv);
+        }
       } finally {
         setLoading(false);
       }

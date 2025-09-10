@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import BottomMenu from "../components/menu";
 import CartIcon from "../components/CartIcon";
 import CategoryBar from "../components/CategoryBar";
@@ -152,7 +153,9 @@ export default function FoodsPage() {
         <div className="search-pill" role="search">
           <Image src="/search.png" alt="ค้นหา" width={23} height={23} />
           <input type="text" placeholder="ค้นหา" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
-          <Image src="/character.png" alt="ตัวการ์ตูน" width={26} height={26} />
+           <Link href="/line/food/cart">
+             <Image src="/character.png" alt="ตัวการ์ตูน" width={26} height={26} style={{cursor:'pointer'}} />
+           </Link>
         </div>
       </div>
 

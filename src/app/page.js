@@ -197,7 +197,7 @@ export default function Login() {
             </button>
           </div>
 
-          <a className="link-small" href="/line/forgot">ลืมรหัสผ่าน</a>
+          <a className="link-small" href="/line/forgotpassword">ลืมรหัสผ่าน</a>
 
           <button type="submit" className="btn">เข้าสู่ระบบ</button>
 

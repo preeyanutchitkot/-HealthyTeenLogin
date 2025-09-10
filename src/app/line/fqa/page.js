@@ -1,4 +1,4 @@
-import BottomMenu from "@/app/line/components/menu";
+import BottomMenu from "../components/menu";
 import styles from "./faq.module.css"; // อยู่ในโฟลเดอร์ fqa
 
 export default function AgreementPage() {

@@ -19,7 +19,6 @@ const savoryFoods = [
   { name: "ข้าวคลุกกะปิ", calories: 450, image: "/foods/khao-kluk-kapi.png" },
   { name: "ข้าวหน้าเป็ด", calories: 520, image: "/foods/khao-na-ped.png" },
   { name: "ข้าวแกงกะหรี่ไก่", calories: 610, image: "/foods/khao-kaeng-karee-kai.png" },
-  { name: "ข้าวผัดหมู", calories: 520, image: "/foods/khao-pad-moo-2.png" },
   { name: "โรตีหมูสับไข่", calories: 540, image: "/foods/roti-moo-sap-kai.png" },
 ];
 // ข้อมูลอาหารหวาน
@@ -49,24 +48,24 @@ const snackFoods = [
   { name: 'ถั่วทอด', calories: 200, image: '/foods/thua-thot.png' },
   { name: 'เกี๊ยวทอด', calories: 190, image: '/foods/kiao-thot.png' },
 ];
-const drinkMenus = [
-  { name: 'น้ำส้มคั้น', calories: 100, image: '/foods/orange-juice.png' },
-  { name: 'โค้ก', calories: 150, image: '/foods/coke.png' },
-  { name: 'น้ำเปล่า', calories: 0, image: '/foods/water.png' },
-  { name: 'อเมริกาโน่', calories: 10, image: '/foods/americano.png' },
-  { name: 'ลาเต้ร้อน', calories: 150, image: '/foods/hot-latte.png' },
-  { name: 'น้ำมะนาว', calories: 90, image: '/foods/lemonade.png' },
-  { name: 'น้ำแตงโมปั่น', calories: 250, image: '/foods/watermelon-smoothie.png' },
-  { name: 'นมสดเย็น', calories: 370, image: '/foods/cold-milk.png' },
-  { name: 'ชานมไข่มุก', calories: 450, image: '/foods/bubble-tea.png' },
-  { name: 'ชาเขียวเย็น', calories: 200, image: '/foods/iced-green-tea.png' },
-  ];
+// const drinkMenus = [
+//   { name: 'น้ำส้มคั้น', calories: 100, image: '/foods/orange-juice.png' },
+//   { name: 'โค้ก', calories: 150, image: '/foods/coke.png' },
+//   { name: 'น้ำเปล่า', calories: 0, image: '/foods/water.png' },
+//   { name: 'อเมริกาโน่', calories: 10, image: '/foods/americano.png' },
+//   { name: 'ลาเต้ร้อน', calories: 150, image: '/foods/hot-latte.png' },
+//   { name: 'น้ำมะนาว', calories: 90, image: '/foods/lemonade.png' },
+//   { name: 'น้ำแตงโมปั่น', calories: 250, image: '/foods/watermelon-smoothie.png' },
+//   { name: 'นมสดเย็น', calories: 370, image: '/foods/cold-milk.png' },
+//   { name: 'ชานมไข่มุก', calories: 450, image: '/foods/bubble-tea.png' },
+//   { name: 'ชาเขียวเย็น', calories: 200, image: '/foods/iced-green-tea.png' },
+//   ];
 
 export default function FoodsPage() {
   const [foods, setFoods] = useState(sweetFoods);
   const [snacks, setSnacks] = useState(snackFoods);
   const [savoryFoodsState, setSavoryFoods] = useState(savoryFoods);
-  const [drinks, setDrinks] = useState(drinkMenus);
+  // const [drinks, setDrinks] = useState(drinkMenus);
   const [searchQuery, setSearchQuery] = useState("");
   const [cartCount, setCartCount] = useState(0);
   const [cartItems, setCartItems] = useState([]);
@@ -109,10 +108,10 @@ export default function FoodsPage() {
     [savoryFoods, searchQuery]
   );
 
-  const filteredDrinks = useMemo(
-    () => drinks.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())),
-    [drinks, searchQuery]
-  );
+  // const filteredDrinks = useMemo(
+  //   () => drinks.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())),
+  //   [drinks, searchQuery]
+  // );
 
   // Add a food item to the cart
   const addToCart = (food) => {
@@ -236,7 +235,7 @@ export default function FoodsPage() {
         />
       )}
 
-       <div className="tabs">
+       {/* <div className="tabs">
         <div className="tab-left">
           <button className="active">เครื่องดื่ม</button>
         </div>
@@ -251,7 +250,7 @@ export default function FoodsPage() {
           onRemove={removeFromCart}
           onSave={saveToCart}
         />
-      )}
+      )} */}
 
       <BottomMenu />
       

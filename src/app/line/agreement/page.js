@@ -1,4 +1,3 @@
-import BottomMenu from "../components/menu";
 import styles from "./fga.module.css";
 import FgaClient from "./FgaClient";
 
@@ -9,10 +8,7 @@ export default function FgaPage() {
 
       <FgaClient styles={styles} />
 
-      {/* เมนูล่างติดจอ (ถ้าคอมโพเนนต์เมนูของคุณ fixed อยู่แล้วก็ยังโอเค) */}
-      <div className={styles.menuDock}>
-        <BottomMenu />
-      </div>
+
     </div>
   );
 }

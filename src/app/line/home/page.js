@@ -84,7 +84,7 @@ export default function HomePage() {
       {/* Header */}
       <div className="header">
         <div className="profile">
-          <Image src="/test.png" alt="profile" width={72} height={72} />
+          <Image src="/profile.png" alt="profile" width={72} height={72} />
         </div>
 
         <div className="header-icons">

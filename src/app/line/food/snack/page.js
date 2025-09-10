@@ -40,18 +40,18 @@ const snackFoods = [
 
 ];
 
-export default function SweetFoodsPage() {
-  const [foods, setFoods] = useState(sweetFoods);
+export default function snackFoodsPage() {
+  const [foods, setFoods] = useState(snackFoods);
   const [searchQuery, setSearchQuery] = useState("");
   const [cartCount, setCartCount] = useState(0);
   const [cartItems, setCartItems] = useState([]);
   const [showSheet, setShowSheet] = useState(false);
   const [showAddSheet, setShowAddSheet] = useState(false);
   const [customFoods, setCustomFoods] = useState([]);
-  const [isSaving, setIsSaving] = useState(false); // ✅ NEW
+  const [isSaving, setIsSaving] = useState(false); 
   const router = useRouter();
 
-  // ✅ NEW: โหลดตะกร้าจาก localStorage เมื่อเปิดหน้า
+
   useEffect(() => {
     try {
       const raw = localStorage.getItem("cartItems");

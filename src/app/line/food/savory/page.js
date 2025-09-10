@@ -23,7 +23,6 @@ const savoryFoods = [
   { name: "ข้าวคลุกกะปิ", calories: 450, image: "/foods/khao-kluk-kapi.png" },
   { name: "ข้าวหน้าเป็ด", calories: 520, image: "/foods/khao-na-ped.png" },
   { name: "ข้าวแกงกะหรี่ไก่", calories: 610, image: "/foods/khao-kaeng-karee-kai.png" },
-  { name: "ข้าวผัดหมู", calories: 520, image: "/foods/khao-pad-moo-2.png" },
   { name: "โรตีหมูสับไข่", calories: 540, image: "/foods/roti-moo-sap-kai.png" },
   { name: "ข้าวผัดกุ้ง", calories: 520, image: "/foods/khao-pad-kung.png" },
   { name: "ข้าวไข่เจียว", calories: 400, image: "/foods/khao-kai-jiew.png" },
@@ -44,6 +43,7 @@ export default function savoryFoodsPage() {
   const [showSheet, setShowSheet] = useState(false);
   const [showAddSheet, setShowAddSheet] = useState(false);
   const [customFoods, setCustomFoods] = useState([]);
+  const [isSaving, setIsSaving] = useState(false);
   const router = useRouter();
 
   // ✅ NEW: โหลดตะกร้าจาก localStorage เมื่อเปิดหน้า

@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { auth, db } from "../lib/firebase";
@@ -100,16 +98,17 @@ export default function CalorieSummary({
         }
         .summary-container.floating{
           position: absolute;
-          top: var(--cs-top, 120px);  /* ✅ ได้ค่าจาก style inline */
+          top: var(--cs-top, 120px); 
           left: 50%;
           transform: translateX(-50%);
         }
         .summary-container.inline{ position: static; transform:none; margin:16px auto; }
 
-        .bunny-img{
+        .bunny-img {
           position: absolute;
           top: -24px;
-          right: -12px;               /* ✅ ชิดขวา */
+          left: 50%;              /* วางให้อยู่กึ่งกลางแนวนอน */
+          transform: translateX(-50%); /* เลื่อนครึ่งนึงของความกว้างรูป */
           width: 72px;
           height: auto;
           margin: 0;

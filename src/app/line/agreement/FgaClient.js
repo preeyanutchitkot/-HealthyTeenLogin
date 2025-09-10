@@ -117,7 +117,7 @@ export default function FgaClient({ styles }) {
             <button
               className={styles.nextBtn}
               disabled={!isChecked}
-              onClick={() => router.push("/line/liff")}
+              onClick={() => router.push("/line/home")}
               type="button"
             >
               ต่อไป

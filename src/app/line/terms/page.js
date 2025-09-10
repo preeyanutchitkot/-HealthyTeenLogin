@@ -1,4 +1,4 @@
-import BottomMenu from "@/app/line/components/menu";
+import BottomMenu from "../components/menu";
 import styles from "./fga.module.css";
 import FgaClient from "./FgaClient";
 

@@ -32,10 +32,7 @@ const ForeignFoods = [
   { name: 'ฟิชแอนด์ชิพส์', calories: 450, image: '/foods/fish-and-chips.png' },
   { name: 'ข้าวผัดญี่ปุ่น', calories: 280, image: '/foods/japanese-fried-rice.png' },
   { name: 'ซุปหัวหอม', calories: 150, image: '/foods/onion-soup.png' },
-  { name: 'เครปซอสส้ม', calories: 250, image: '/foods/orange-crepe.png' },
-  { name: 'แพนเค้กเนยน้ำผึ้ง', calories: 350, image: '/foods/pancake-honey-butter.png' },
-  { name: 'ซาลาเปาไส้หมูแดง', calories: 230, image: '/foods/bbq-pork-bun.png' },
-  { name: 'ราเมน (1 ชาม)', calories: 450, image: '/foods/ramen.png' }
+
 ];
 
 export default function ForeignFoodsPage() {
@@ -145,7 +142,6 @@ export default function ForeignFoodsPage() {
           { name: "อาหารเจ", icon: "/jfood7.png" },
           { name: "อาหารต่างประเทศ", icon: "/food5.png" },
           { name: "เครื่องดื่ม", icon: "/food3.png" },
-          { name: "เครื่องดื่มแอลกอฮอล์", icon: "/food8.png" },
           { name: "ผักและผลไม้", icon: "/food6.png" },
         ]}
         categoryPathMap={{
@@ -155,7 +151,6 @@ export default function ForeignFoodsPage() {
           อาหารเจ: "/line/food/J",
           อาหารต่างประเทศ: "/line/food/Foreign",
           เครื่องดื่ม: "/line/food/drink",
-          เครื่องดื่มแอลกอฮอล์: "/line/food/alcohol",
           ผักและผลไม้: "/line/food/fruit",
         }}
       />

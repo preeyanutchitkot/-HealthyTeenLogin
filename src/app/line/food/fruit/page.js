@@ -50,11 +50,8 @@ const fruitMenus = [
   { name: 'เห็ดฟาง (1 ถ้วย)', calories: 35, image: '/foods/straw-mushroom.png' },
   { name: 'ผักบุ้ง (1 ถ้วย)', calories: 25, image: '/foods/morning-glory.png' },
   { name: 'ข้าวโพดอ่อน (1 ถ้วย)', calories: 55, image: '/foods/baby-corn.png' },
-  { name: 'ต้นหอม (1 ถ้วย)', calories: 20, image: '/foods/green-onion.png' },
   { name: 'มันฝรั่ง (1 หัว)', calories: 110, image: '/foods/potato.png' },
-  { name: 'ฟักเขียว (1 ถ้วย)', calories: 15, image: '/foods/winter-melon.png' },
-  { name: 'ใบบัวบก (1 ถ้วย)', calories: 20, image: '/foods/gotu-kola.png' },
-  { name: 'สะระแหน่ (1 ถ้วย)', calories: 25, image: '/foods/mint.png' }
+
 ];
 
 export default function fruitMenusPage() {
@@ -65,6 +62,7 @@ export default function fruitMenusPage() {
   const [showSheet, setShowSheet] = useState(false);
   const [showAddSheet, setShowAddSheet] = useState(false);
   const [customFoods, setCustomFoods] = useState([]);
+  const [isSaving, setIsSaving] = useState(false);
   const router = useRouter();
 
 
@@ -162,7 +160,6 @@ export default function fruitMenusPage() {
           { name: "อาหารเจ", icon: "/jfood7.png" },
           { name: "อาหารต่างประเทศ", icon: "/food5.png" },
           { name: "เครื่องดื่ม", icon: "/food3.png" },
-          { name: "เครื่องดื่มแอลกอฮอล์", icon: "/food8.png" },
           { name: "ผักและผลไม้", icon: "/food6.png" },
         ]}
         categoryPathMap={{
@@ -172,7 +169,6 @@ export default function fruitMenusPage() {
           อาหารเจ: "/line/food/J",
           อาหารต่างประเทศ: "/line/food/Foreign",
           เครื่องดื่ม: "/line/food/drink",
-          เครื่องดื่มแอลกอฮอล์: "/line/food/alcohol",
           ผักและผลไม้: "/line/food/fruit",
         }}
       />

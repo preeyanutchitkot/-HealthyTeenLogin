@@ -3,7 +3,7 @@ import Image from "next/image";
 
 const manualImages = [
   "/m1.png",
-  "/mm2.png",
+  "/mmm2.png",
   "/m3.png",
   "/m4.png",
   "/m5.png",

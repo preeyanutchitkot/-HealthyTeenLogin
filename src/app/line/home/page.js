@@ -119,10 +119,10 @@ export default function HomePage() {
     {/* เมนูไอคอน 4 วงกลม */}
     <div className="circle-menu">
       {[
-        { label: "บันทึกอาหาร", href: "/line/food",      img: "/m1.png", external: false },
-        { label: "แนะนำอาหาร", href: OA_URL,              img: "/m2.png", external: true  },
-        { label: "พูดคุย",     href: GROUP_URL,           img: "/m3.png", external: true  },
-        { label: "วิดีโอสุขภาพ", href: "/line/lookvideo", img: "/m4.png", external: false },
+        { label: "บันทึกอาหาร", href: "/line/food",      img: "/enough.png", external: false },
+        { label: "แนะนำอาหาร", href: OA_URL,              img: "/ploy3.png", external: true  },
+        { label: "พูดคุย",     href: GROUP_URL,           img: "/mo.png", external: true  },
+        { label: "วิดีโอสุขภาพ", href: "/line/lookvideo", img: "/p4.png", external: false },
       ].map((item) =>
         item.external ? (
           // ➜ ลิงก์ภายนอก: เปิดใน LINE / เบราว์เซอร์

@@ -150,7 +150,7 @@ export default function FoodsPage() {
       {/* ค้นหา */}
       <div className="search-wrap">
         <div className="search-pill" role="search">
-          <Image src="/search.png" alt="ค้นหา" width={26} height={26} />
+          <Image src="/search.png" alt="ค้นหา" width={23} height={23} />
           <input type="text" placeholder="ค้นหา" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
           <Image src="/character.png" alt="ตัวการ์ตูน" width={26} height={26} />
         </div>

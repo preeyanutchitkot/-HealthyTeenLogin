@@ -7,8 +7,7 @@ const Header = ({ title, cartoonImage }) => {
   return (
     <header className="header-bar">
       <div className="header-center">
-        <span className="header-title">{title}</span> 
-        <Image className="header-cartoon" src={cartoonImage} alt="cartoon" width={45} height={60} />
+        <span className="header-title">{title}</span>
       </div>
       <style>{`
         .header-bar {
@@ -20,14 +19,18 @@ const Header = ({ title, cartoonImage }) => {
           padding: 20px 16px 24px 16px;
           border-radius: 0 0 16px 16px;
           margin-bottom: 24px;
+          min-width: 320px;
+          min-height: 90px;
         }
         .header-center {
           display: flex;
-          align-items: center; /* ทำให้การ์ตูนและข้อความอยู่กลางแนวตั้ง */
-          justify-content: center; /* จัดตำแหน่งแนวนอนให้ข้อความและการ์ตูน */
-          gap: 8px; /* ระยะห่างระหว่างข้อความและการ์ตูน */
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          min-width: 145px;
         }
         .header-title {
+          position: static;
           font-family: 'Noto Sans Thai', sans-serif;
           font-size: 28px;
           font-weight: bold;
@@ -36,20 +39,17 @@ const Header = ({ title, cartoonImage }) => {
           line-height: 1;
           white-space: nowrap;
         }
-        .header-cartoon {
-          display: inline-block;
-          vertical-align: middle; /* ให้การ์ตูนแสดงในแนวกลาง */
-        }
         @media (max-width: 500px) {
           .header-title {
             font-size: 20px;
           }
-          .header-cartoon {
-            width: 70px !important;
-            height: 90px !important;
-          }
           .header-bar {
-             padding: 24px 16px 24px 16px; 
+             padding: 24px 16px 24px 16px;
+             min-width: 200px;
+             min-height: 120px;
+          }
+          .header-center {
+            min-width: 98px;
           }
         }
       `}</style>

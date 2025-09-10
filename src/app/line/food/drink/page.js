@@ -124,7 +124,7 @@ export default function drinkMenusPage() {
 
       <div className="search-wrap">
         <div className="search-pill" role="search">
-          <Image src="/search.png" alt="ค้นหา" width={26} height={26} />
+          <Image src="/search.png" alt="ค้นหา" width={23} height={23} />
           <input
             type="text"
             placeholder="ค้นหา"

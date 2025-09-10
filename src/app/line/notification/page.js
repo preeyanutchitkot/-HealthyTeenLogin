@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Header from "../components/header";
-import CalorieAlertCard from "../components/CalorieAlertCard";
+import CalorieAlertCard from "../components/CalorieAlertCard.js";
 import BottomMenu from "../components/menu";
 import { auth, db } from "../lib/firebase";
 import { doc, getDoc, collection, getDocs, query, where } from "firebase/firestore";

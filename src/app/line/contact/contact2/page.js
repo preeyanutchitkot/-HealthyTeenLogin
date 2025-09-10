@@ -1,12 +1,10 @@
 import Image from "next/image";
-import Header from "../../components/header";
 import styles from "./contact.module.css";
 
 export default function ContactPage() {
   return (
     <div className={styles.wrapper}>
 
-      <Header title="Healthy Teen" cartoonImage="/9.png" />
 
       {/* Text */}
       <div className={styles.content}>

@@ -14,44 +14,39 @@ import AddFoodSheet from "../../components/AddFoodSheet";
 
 import { saveCartToFirestore } from "../../lib/saveCart";
 
-const snackFoods = [
-  { name: 'ขนมครก', calories: 180, image: '/foods/khanom-khrok.png' },
-  { name: 'หมูปิ้ง (3 ไม้)', calories: 250, image: '/foods/moo-ping-3.png' },
-  { name: 'ลูกชิ้นปิ้ง (5 ลูก)', calories: 120, image: '/foods/look-chin-ping-5.png' },
-  { name: 'เฉาก๊วย', calories: 120, image: '/foods/chao-kuai.png' },
-  { name: 'ข้าวโพดปิ้ง', calories: 100, image: '/foods/khao-phot-ping.png' },
-  { name: 'กล้วยทอด', calories: 250, image: '/foods/kluai-thot.png' },
-  { name: 'มันทอด', calories: 150, image: '/foods/man-thot.png' },
-  { name: 'ถั่วทอด', calories: 200, image: '/foods/thua-thot.png' },
-  { name: 'เกี๊ยวทอด', calories: 190, image: '/foods/kiao-thot.png' },
-  { name: 'ปลาเส้นทอดกรอบ', calories: 140, image: '/foods/pla-sen-thot-krop.png' },
-  { name: 'แหนมหม้อ', calories: 180, image: '/foods/naem-mor.png' },
-  { name: 'ปอเปี๊ยะทอด', calories: 200, image: '/foods/por-pia-thot.png' },
-  { name: 'ไส้กรอกอีสาน', calories: 250, image: '/foods/sai-krok-isan.png' },
-  { name: 'หอยทอด', calories: 300, image: '/foods/hoi-thot.png' },
-  { name: 'ข้าวเกรียบ', calories: 200, image: '/foods/khao-kriap.png' },
-  { name: 'เต้าหู้ทอด', calories: 120, image: '/foods/tao-hu-thot.png' },
-  { name: 'ปลาหมึกบด', calories: 150, image: '/foods/pla-muek-bot.png' },
-  { name: 'มันฝรั่งทอดกรอบ (1 ถุง)', calories: 150, image: '/foods/potato-chips.png' },
-  { name: 'ป๊อปคอร์น (1 ถ้วย)', calories: 55, image: '/foods/popcorn.png' },
-  { name: 'ขนมปังโฮลวีต (1 แผ่น)', calories: 70, image: '/foods/whole-wheat-bread.png' },
-  { name: 'โยเกิร์ตผลไม้ (1 ถ้วย)', calories: 120, image: '/foods/fruit-yogurt.png' },
-  { name: 'คุกกี้เนย (1 ชิ้น)', calories: 150, image: '/foods/butter-cookie.png' },
-  { name: 'ข้าวเกรียบกุ้ง (1 แผ่น)', calories: 60, image: '/foods/shrimp-cracker.png' },
-  { name: 'ขนมปังกรอบ', calories: 100, image: '/foods/crispy-bread.png' },
-
+const alcohols = [
+  { name: 'เบียร์ (1 กระป๋อง)', calories: 150, image: '/foods/beer.png' },
+  { name: 'ไวน์แดง (1 แก้ว)', calories: 125, image: '/foods/red-wine.png' },
+  { name: 'ไวน์ขาว (1 แก้ว)', calories: 120, image: '/foods/white-wine.png' },
+  { name: 'วิสกี้ (1 ช็อต)', calories: 70, image: '/foods/whiskey.png' },
+  { name: 'ค็อกเทล (1 แก้ว)', calories: 200, image: '/foods/cocktail.png' },
+  { name: 'วอดก้า (1 ช็อต)', calories: 65, image: '/foods/vodka.png' },
+  { name: 'จิน (1 ช็อต)', calories: 65, image: '/foods/gin.png' },
+  { name: 'เตกีล่า (1 ช็อต)', calories: 65, image: '/foods/tequila.png' },
+  { name: 'เหล้ารัม (1 ช็อต)', calories: 65, image: '/foods/rum.png' },
+  { name: 'เบียร์ดำ (1 กระป๋อง)', calories: 170, image: '/foods/dark-beer.png' },
+  { name: 'แชมเปญ (1 แก้ว)', calories: 90, image: '/foods/champagne.png' },
+  { name: 'มาร์การิต้า (1 แก้ว)', calories: 250, image: '/foods/margarita.png' },
+  { name: 'ไซเดอร์ (1 กระป๋อง)', calories: 150, image: '/foods/cider.png' },
+  { name: 'เหล้าเบอร์เบิน (1 ช็อต)', calories: 70, image: '/foods/bourbon.png' },
+  { name: 'คาลัวร์ (1 ช็อต)', calories: 120, image: '/foods/kahlua.png' },
+  { name: 'เหล้าอมเร็ตโต (1 ช็อต)', calories: 110, image: '/foods/amaretto.png' },
+  { name: 'สาเก (1 แก้ว)', calories: 120, image: '/foods/sake.png' },
+  { name: 'ม็อกเทล (1 แก้ว)', calories: 100, image: '/foods/mocktail.png' },
+  { name: 'เบียร์ไร้แอลกอฮอล์ (1 กระป๋อง)', calories: 90, image: '/foods/non-alcoholic-beer.png' },
+  { name: 'เหล้าจินเจอร์ (1 ช็อต)', calories: 85, image: '/foods/ginger-liqueur.png' }
 ];
 
-export default function snackFoodsPage() {
-  const [foods, setFoods] = useState(snackFoods);
+export default function AlcoholPage() {
+  const [foods, setFoods] = useState(alcohols);
   const [searchQuery, setSearchQuery] = useState("");
   const [cartCount, setCartCount] = useState(0);
   const [cartItems, setCartItems] = useState([]);
   const [showSheet, setShowSheet] = useState(false);
   const [showAddSheet, setShowAddSheet] = useState(false);
   const [customFoods, setCustomFoods] = useState([]);
-  const [isSaving, setIsSaving] = useState(false); // ✅ NEW
   const router = useRouter();
+
 
   // ✅ NEW: โหลดตะกร้าจาก localStorage เมื่อเปิดหน้า
   useEffect(() => {
@@ -164,7 +159,7 @@ export default function snackFoodsPage() {
 
       <div className="tabs">
         <div className="tab-left">
-          <button className="active">ของว่าง</button>
+          <button className="active">เครื่องดื่มแอลกอฮอล์</button>
           <button className="add-new" onClick={() => setShowAddSheet(true)}>
             + เพิ่มเมนูใหม่
           </button>

@@ -41,6 +41,17 @@ export default function MePage() {
   const [dailyLogs, setDailyLogs] = useState([]);
   const [openDates, setOpenDates] = useState({});
   const [menuOpen, setMenuOpen] = useState(false);
+  // แจ้งเตือน: สี badge ตามสถานะแจ้งเตือนจาก localStorage (ให้เหมือนหน้า Home)
+  const [showNotif, setShowNotif] = useState(true);
+  const [notifColor, setNotifColor] = useState('green');
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const lv = window.localStorage.getItem('notifLevel');
+      if (lv === 'over') setNotifColor('red');
+      else if (lv === 'near') setNotifColor('yellow');
+      else setNotifColor('green');
+    }
+  }, []);
 
   const toggleDate = (date) =>
     setOpenDates((prev) => ({ ...prev, [date]: !prev[date] }));
@@ -132,8 +143,28 @@ export default function MePage() {
         </div>
 
         <div className="header-icons">
-          <Link href="/line/notification">
+          <Link href="/line/notification" aria-label="การแจ้งเตือน" onClick={() => setShowNotif(false)} style={{ position: 'relative', display: 'inline-block' }}>
             <Image src="/Doorbell.png" alt="doorbell" width={28} height={40} />
+            {showNotif && (
+              <span
+                style={{
+                  position: 'absolute',
+                  bottom: 10,
+                  right: 0,
+                  width: 8,
+                  height: 8,
+                  borderRadius: '50%',
+                  border: '1.5px solid #fff',
+                  background:
+                    notifColor === 'red'
+                      ? '#F44336'
+                      : notifColor === 'yellow'
+                      ? '#FFD600'
+                      : '#4CAF50',
+                  zIndex: 2,
+                }}
+              />
+            )}
           </Link>
           <button
             style={{ background: "none", border: "none", padding: 0, margin: 0, cursor: "pointer" }}

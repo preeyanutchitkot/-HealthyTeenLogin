@@ -3,7 +3,7 @@ import Image from "next/image";
 
 const manualImages = [
   "/m1.png",
-  "/m2.png",
+  "/mm2.png",
   "/m3.png",
   "/m4.png",
   "/m5.png",
@@ -11,7 +11,7 @@ const manualImages = [
   "/m7.png",
   "/m8.png",
   "/m9.png",
-  "/m10.png",
+  "/mm10.png",
 ];
 
 export default function ManualPage() {

@@ -11,6 +11,8 @@ import Header from "../components/header";
 import FoodGrid from "../components/FoodGrid";
 import CartSheet from "../components/CartSheet";
 
+import { saveCartToFirestore } from "../lib/saveCart";
+
 const savoryFoods = [
   { name: "ข้าวกะเพราไก่ไข่ดาว", calories: 630, image: "/foods/khao-krapao-kai-kai-dao.png" },
   { name: "ข้าวผัดหมู", calories: 590, image: "/foods/khao-pad-moo.png" },
@@ -22,126 +24,124 @@ const savoryFoods = [
   { name: "ข้าวแกงกะหรี่ไก่", calories: 610, image: "/foods/khao-kaeng-karee-kai.png" },
   { name: "โรตีหมูสับไข่", calories: 540, image: "/foods/roti-moo-sap-kai.png" },
 ];
-// ข้อมูลอาหารหวาน
+
 const sweetFoods = [
-  { name: 'ทับทิมกรอบ', calories: 200, image: '/foods/tub-tim-krob.png' },
-  { name: 'ขนมชั้น', calories: 220, image: '/foods/khanom-chan.png' },
-  { name: 'บัวลอย', calories: 240, image: '/foods/bua-loi.png' },
-  { name: 'ข้าวเหนียวมะม่วง', calories: 330, image: '/foods/khao-niew-mamuang.png' },
-  { name: 'ลูกชุบ', calories: 150, image: '/foods/look-chup.png' },
-  { name: 'เครปเค้ก', calories: 350, image: '/foods/crepe-cake.png' },
-  { name: 'พายสัปปะรด', calories: 270, image: '/foods/pineapple-pie.png' },
-  { name: 'ชีสเค้ก', calories: 400, image: '/foods/cheesecake.png' },
-  { name: 'ทองหยิบ', calories: 210, image: '/foods/thong-yip.png' },
-  { name: 'ฝอยทอง', calories: 180, image: '/foods/foi-thong.png' },
+  { name: "ทับทิมกรอบ", calories: 200, image: "/foods/tub-tim-krob.png" },
+  { name: "ขนมชั้น", calories: 220, image: "/foods/khanom-chan.png" },
+  { name: "บัวลอย", calories: 240, image: "/foods/bua-loi.png" },
+  { name: "ข้าวเหนียวมะม่วง", calories: 330, image: "/foods/khao-niew-mamuang.png" },
+  { name: "ลูกชุบ", calories: 150, image: "/foods/look-chup.png" },
+  { name: "เครปเค้ก", calories: 350, image: "/foods/crepe-cake.png" },
+  { name: "พายสัปปะรด", calories: 270, image: "/foods/pineapple-pie.png" },
+  { name: "ชีสเค้ก", calories: 400, image: "/foods/cheesecake.png" },
+  { name: "ทองหยิบ", calories: 210, image: "/foods/thong-yip.png" },
+  { name: "ฝอยทอง", calories: 180, image: "/foods/foi-thong.png" },
 ];
 
-// ข้อมูลอาหารว่าง
 const snackFoods = [
-  { name: 'ขนมครก', calories: 180, image: '/foods/khanom-khrok.png' },
-  { name: 'หมูปิ้ง (3 ไม้)', calories: 250, image: '/foods/moo-ping-3.png' },
-  { name: 'ลูกชิ้นปิ้ง (5 ลูก)', calories: 120, image: '/foods/look-chin-ping-5.png' },
-  { name: 'เฉาก๊วย', calories: 120, image: '/foods/chao-kuai.png' },
-  { name: 'ไข่ตุ๋น', calories: 120, image: '/foods/kai-tun.png' },
-  { name: 'ข้าวโพดปิ้ง', calories: 100, image: '/foods/khao-phot-ping.png' },
-  { name: 'กล้วยทอด', calories: 250, image: '/foods/kluai-thot.png' },
-  { name: 'มันทอด', calories: 150, image: '/foods/man-thot.png' },
-  { name: 'ถั่วทอด', calories: 200, image: '/foods/thua-thot.png' },
-  { name: 'เกี๊ยวทอด', calories: 190, image: '/foods/kiao-thot.png' },
+  { name: "ขนมครก", calories: 180, image: "/foods/khanom-khrok.png" },
+  { name: "หมูปิ้ง ", calories: 75, image: "/foods/moo-ping-3.png" },
+  { name: "ลูกชิ้นปิ้ง", calories: 25, image: "/foods/look-chin-ping-5.png" },
+  { name: "เฉาก๊วย", calories: 120, image: "/foods/chao-kuai.png" },
+  { name: "ไข่ตุ๋น", calories: 120, image: "/foods/kai-tun.png" },
+  { name: "ข้าวโพดปิ้ง", calories: 100, image: "/foods/khao-phot-ping.png" },
+  { name: "กล้วยทอด", calories: 250, image: "/foods/kluai-thot.png" },
+  { name: "มันทอด", calories: 150, image: "/foods/man-thot.png" },
+  { name: "ถั่วทอด", calories: 200, image: "/foods/thua-thot.png" },
+  { name: "เกี๊ยวทอด", calories: 190, image: "/foods/kiao-thot.png" },
 ];
-// const drinkMenus = [
-//   { name: 'น้ำส้มคั้น', calories: 100, image: '/foods/orange-juice.png' },
-//   { name: 'โค้ก', calories: 150, image: '/foods/coke.png' },
-//   { name: 'น้ำเปล่า', calories: 0, image: '/foods/water.png' },
-//   { name: 'อเมริกาโน่', calories: 10, image: '/foods/americano.png' },
-//   { name: 'ลาเต้ร้อน', calories: 150, image: '/foods/hot-latte.png' },
-//   { name: 'น้ำมะนาว', calories: 90, image: '/foods/lemonade.png' },
-//   { name: 'น้ำแตงโมปั่น', calories: 250, image: '/foods/watermelon-smoothie.png' },
-//   { name: 'นมสดเย็น', calories: 370, image: '/foods/cold-milk.png' },
-//   { name: 'ชานมไข่มุก', calories: 450, image: '/foods/bubble-tea.png' },
-//   { name: 'ชาเขียวเย็น', calories: 200, image: '/foods/iced-green-tea.png' },
-//   ];
 
 export default function FoodsPage() {
   const [foods, setFoods] = useState(sweetFoods);
   const [snacks, setSnacks] = useState(snackFoods);
   const [savoryFoodsState, setSavoryFoods] = useState(savoryFoods);
-  // const [drinks, setDrinks] = useState(drinkMenus);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [cartCount, setCartCount] = useState(0);
   const [cartItems, setCartItems] = useState([]);
   const [showSheet, setShowSheet] = useState(false);
+  const [isSaving, setIsSaving] = useState(false); // ✅ ประกาศ state นี้
+
   const router = useRouter();
 
-  // Load cart items from localStorage on initial render
+  // โหลดตะกร้าจาก localStorage ครั้งแรก
   useEffect(() => {
     try {
       const storedCart = localStorage.getItem("cartItems");
-      if (storedCart) {
-        setCartItems(JSON.parse(storedCart));
-      }
+      if (storedCart) setCartItems(JSON.parse(storedCart));
     } catch (e) {
       console.error("Failed to load cart from localStorage", e);
     }
-  }, []); // Run only once on component mount
+  }, []);
 
-  // Sync cartCount whenever cartItems change
+  // อัปเดตตัวนับ + persist ทุกครั้งที่ cartItems เปลี่ยน
   useEffect(() => {
     const total = cartItems.reduce((sum, it) => sum + it.qty, 0);
     setCartCount(total);
-    // Persist cartItems to localStorage whenever they change
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
   }, [cartItems]);
-  
-  // Filter foods based on search query
+
+  // helper persist ให้แก้ state + localStorage พร้อมกัน
+  const persist = (next) => {
+    setCartItems(next);
+    try {
+      localStorage.setItem("cartItems", JSON.stringify(next));
+    } catch (e) {
+      console.error("Failed to persist cart", e);
+    }
+  };
+
+  // Filter ตาม search
   const filteredFoods = useMemo(
     () => foods.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())),
     [foods, searchQuery]
   );
-
   const filteredSnacks = useMemo(
     () => snacks.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())),
     [snacks, searchQuery]
   );
-
   const filteredSavoryFoods = useMemo(
-    () => savoryFoods.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())),
-    [savoryFoods, searchQuery]
+    () => savoryFoodsState.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())), // ✅ ใช้ state
+    [savoryFoodsState, searchQuery]
   );
 
-  // const filteredDrinks = useMemo(
-  //   () => drinks.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())),
-  //   [drinks, searchQuery]
-  // );
-
-  // Add a food item to the cart
+  // เพิ่มรายการ
   const addToCart = (food) => {
     setCartItems((prev) => {
       const idx = prev.findIndex((item) => item.name === food.name);
-      if (idx === -1) {
-        return [...prev, { ...food, qty: 1 }];
-      }
-      const updated = [...prev];
-      updated[idx].qty += 1;
+      const updated = idx === -1 ? [...prev, { ...food, qty: 1 }] : prev.map((it, i) => i === idx ? { ...it, qty: it.qty + 1 } : it);
+      localStorage.setItem("cartItems", JSON.stringify(updated));
       return updated;
     });
   };
 
-  // Increase quantity of a food item in the cart
   const increaseQty = (name) =>
     setCartItems((prev) => prev.map((it) => (it.name === name ? { ...it, qty: it.qty + 1 } : it)));
 
-  // Decrease quantity of a food item in the cart
   const decreaseQty = (name) =>
     setCartItems((prev) => prev.map((it) => (it.name === name ? { ...it, qty: it.qty - 1 } : it)).filter((it) => it.qty > 0));
 
-  // Remove a food item from the cart
-  const removeFromCart = (name) => setCartItems((prev) => prev.filter((it) => it.name !== name));
+  const removeFromCart = (name) =>
+    setCartItems((prev) => prev.filter((it) => it.name !== name));
 
-  // Navigate to the cart page
-  const saveToCart = () => {
-    setShowSheet(false);
-    router.push("/line/food/cart");
+  // บันทึกตะกร้าขึ้น Firestore
+  const handleSaveCart = async () => {
+    try {
+      if (!cartItems.length) return;
+      setIsSaving(true);
+      await saveCartToFirestore(cartItems);
+
+      // เคลียร์ตะกร้าแล้วปิด sheet
+      persist([]);
+      setShowSheet(false);
+
+      router.replace("/line/food/cart");
+    } catch (err) {
+      console.error(err);
+      alert(err?.message || "บันทึกล้มเหลว");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -152,10 +152,15 @@ export default function FoodsPage() {
       <div className="search-wrap">
         <div className="search-pill" role="search">
           <Image src="/search.png" alt="ค้นหา" width={23} height={23} />
-          <input type="text" placeholder="ค้นหา" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
-           <Link href="/line/food/cart">
-             <Image src="/character.png" alt="ตัวการ์ตูน" width={26} height={26} style={{cursor:'pointer'}} />
-           </Link>
+          <input
+            type="text"
+            placeholder="ค้นหา"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <Link href="/line/food/cart">
+            <Image src="/character.png" alt="ตัวการ์ตูน" width={26} height={26} style={{ cursor: "pointer" }} />
+          </Link>
         </div>
       </div>
 
@@ -167,7 +172,7 @@ export default function FoodsPage() {
           { name: "อาหารเจ", icon: "/jfood7.png" },
           { name: "อาหารต่างประเทศ", icon: "/food5.png" },
           { name: "เครื่องดื่ม", icon: "/food3.png" },
-          { name: "ผักและผลไม้", icon: "/food6.png" }
+          { name: "ผักและผลไม้", icon: "/food6.png" },
         ]}
         categoryPathMap={{
           อาหารคาว: "/line/food/savory",
@@ -177,47 +182,27 @@ export default function FoodsPage() {
           อาหารต่างประเทศ: "/line/food/Foreign",
           เครื่องดื่ม: "/line/food/drink",
           ผักและผลไม้: "/line/food/fruit",
-        
         }}
       />
 
-    <div className="tabs">
+      {/* อาหารคาว */}
+      <div className="tabs">
         <div className="tab-left">
           <button className="active">อาหารคาว</button>
         </div>
         <CartIcon count={cartCount} onClick={() => setShowSheet(true)} />
       </div>
       <FoodGrid foods={filteredSavoryFoods} onAdd={addToCart} />
-      
-      {showSheet && (
-        <CartSheet
-          cartItems={cartItems}
-          onClose={() => setShowSheet(false)}
-          onIncrease={increaseQty}
-          onDecrease={decreaseQty}
-          onRemove={removeFromCart}
-          onSave={saveToCart}
-        />
-      )}
 
-    <div className="tabs">
+      {/* อาหารหวาน */}
+      <div className="tabs">
         <div className="tab-left">
           <button className="active">อาหารหวาน</button>
         </div>
       </div>
       <FoodGrid foods={filteredFoods} onAdd={addToCart} />
-      
-      {showSheet && (
-        <CartSheet
-          cartItems={cartItems}
-          onClose={() => setShowSheet(false)}
-          onIncrease={increaseQty}
-          onDecrease={decreaseQty}
-          onRemove={removeFromCart}
-          onSave={saveToCart}
-        />
-      )}
 
+      {/* ของว่าง */}
       <div className="tabs">
         <div className="tab-left">
           <button className="active">ของว่าง</button>
@@ -225,33 +210,33 @@ export default function FoodsPage() {
       </div>
       <FoodGrid foods={filteredSnacks} onAdd={addToCart} />
 
+      {/* CartSheet — ตัวเดียวพอ */}
       {showSheet && (
-        <CartSheet
-          cartItems={cartItems}
-          onClose={() => setShowSheet(false)}
-          onIncrease={increaseQty}
-          onDecrease={decreaseQty}
-          onRemove={removeFromCart}
-          onSave={saveToCart}
-        />
+        <>
+          <div className="overlay" onClick={() => setShowSheet(false)} />
+          <CartSheet
+            cartItems={cartItems}
+            onClose={() => setShowSheet(false)}
+            onIncrease={(name) => {
+              const updated = cartItems.map((it) => (it.name === name ? { ...it, qty: it.qty + 1 } : it));
+              persist(updated);
+            }}
+            onDecrease={(name) => {
+              const updated = cartItems
+                .map((it) => (it.name === name ? { ...it, qty: it.qty - 1 } : it))
+                .filter((it) => it.qty > 0);
+              persist(updated);
+            }}
+            onRemove={(name) => {
+              const updated = cartItems.filter((it) => it.name !== name);
+              persist(updated);
+            }}
+            onSave={handleSaveCart}
+            isSaving={isSaving}
+          />
+        </>
       )}
 
-       {/* <div className="tabs">
-        <div className="tab-left">
-          <button className="active">เครื่องดื่ม</button>
-        </div>
-      </div>
-      <FoodGrid foods={filteredDrinks} onAdd={addToCart} />
-      {showSheet && (
-        <CartSheet
-          cartItems={cartItems}
-          onClose={() => setShowSheet(false)}
-          onIncrease={increaseQty}
-          onDecrease={decreaseQty}
-          onRemove={removeFromCart}
-          onSave={saveToCart}
-        />
-      )} */}
 
       <BottomMenu />
       

@@ -4,10 +4,10 @@ import { Noto_Sans_Thai } from "next/font/google";
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { auth, db } from "../lib/firebase";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
-import BottomMenu from "../components/menu";
+// import BottomMenu from "../components/menu"; // ใช้จริงคงเปิดบรรทัดนี้
 
 const notoSansThai = Noto_Sans_Thai({
   weight: ["300", "400", "500", "700"],
@@ -22,8 +22,11 @@ export default function EditMenuPage() {
   const [age, setAge] = useState("");
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
-  const [saving, setSaving] = useState(false);
 
+  // ★ เพิ่ม state สำหรับ activityFactor (อาจมีอยู่แล้วในโปรไฟล์)
+  const [activityFactor, setActivityFactor] = useState("");
+
+  const [saving, setSaving] = useState(false);
   const router = useRouter();
 
   // ===== อ่านข้อมูลผู้ใช้ =====
@@ -39,27 +42,70 @@ export default function EditMenuPage() {
         setAge((data.age ?? "").toString());
         setHeight((data.height ?? "").toString());
         setWeight((data.weight ?? "").toString());
+        // ★ ดึง activityFactor ถ้ามี
+        setActivityFactor(
+          data.activityFactor !== undefined && data.activityFactor !== null
+            ? String(data.activityFactor)
+            : ""
+        );
       }
     });
     return () => unsub();
   }, []);
 
-  // ===== เซฟข้อมูล =====
+  // ===== ฟังก์ชันแปลงตัวเลขแบบปลอดภัย =====
+  const toNum = (v) => {
+    if (v === "" || v === null || v === undefined) return null;
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  };
+
+  // ===== เซฟข้อมูล + คำนวณ BMI/BMR/TDEE =====
   const handleSave = async () => {
     if (!uid) return;
-    // แปลงตัวเลขแบบปลอดภัย
-    const toNum = (v) => {
-      if (v === "" || v === null || v === undefined) return null;
-      const n = Number(v);
-      return Number.isFinite(n) ? n : null;
-    };
+
+    // แปลงชนิดข้อมูล
+    const ageNum = toNum(age);
+    const heightNum = toNum(height); // หน่วยซม.
+    const weightNum = toNum(weight); // หน่วยกก.
+    const activityNum = toNum(activityFactor);
+
+    // คำนวณ BMI
+    let bmi = null;
+    if (heightNum && heightNum > 0 && weightNum && weightNum > 0) {
+      const hM = heightNum / 100; // แปลงเป็นเมตร
+      bmi = Number((weightNum / (hM * hM)).toFixed(2));
+    }
+
+    // คำนวณ BMR (Harris-Benedict)
+    let bmr = null;
+    if (gender && ageNum && heightNum && weightNum) {
+      if (gender === "male") {
+        bmr = 66.47 + 13.75 * weightNum + 5.003 * heightNum - 6.755 * ageNum;
+      } else if (gender === "female") {
+        bmr = 655.1 + 9.563 * weightNum + 1.85 * heightNum - 4.676 * ageNum;
+      }
+      if (bmr !== null) bmr = Math.round(bmr);
+    }
+
+    // คำนวณ TDEE (ถ้ามี activityFactor)
+    let tdee = null;
+    if (bmr && activityNum) {
+      tdee = Math.round(bmr * activityNum);
+    }
 
     const payload = {
       gender: gender || "",
-      age: toNum(age),
-      height: toNum(height),
-      weight: toNum(weight),
-      // อาจเพิ่ม updatedAt ตามต้องการ
+      age: ageNum,
+      height: heightNum,
+      weight: weightNum,
+      // ★ update ค่าใหม่
+      bmi: bmi ?? null,
+      bmr: bmr ?? null,
+      // ★ เก็บ activityFactor ถ้ามี (ถ้ายังไม่อยากให้แก้จากหน้านี้สามารถคงค่าเดิมไว้ได้)
+      activityFactor: activityNum ?? null,
+      tdee: tdee ?? null,
+      updatedAt: serverTimestamp(), // ★ timestamp เมื่ออัปเดต
     };
 
     try {
@@ -107,14 +153,12 @@ export default function EditMenuPage() {
     <div
       className={notoSansThai.className}
       style={{
-        // กันโดนเมนูล่างทับ (ถ้าไม่รู้สูงจริง ใช้ 100px เผื่อไว้)
         paddingBottom: "calc(var(--menu-h, 100px) + env(safe-area-inset-bottom))",
         background: "#fff",
         minHeight: "100vh",
         paddingTop: "env(safe-area-inset-top)",
       }}
     >
-      {/* Header + เนื้อหา */}
       <div
         style={{
           maxWidth: 400,
@@ -124,7 +168,7 @@ export default function EditMenuPage() {
           boxSizing: "border-box",
         }}
       >
-        {/* ปุ่มย้อนกลับ + หัวข้อ */}
+        {/* Header */}
         <div style={{ display: "flex", alignItems: "center", marginBottom: 18 }}>
           <button
             onClick={() => router.back()}
@@ -335,7 +379,7 @@ export default function EditMenuPage() {
         </div>
 
         {/* Height + Weight */}
-        <div style={{ display: "flex", gap: 12, marginBottom: 28, width: "100%", maxWidth: 400 }}>
+        <div style={{ display: "flex", gap: 12, marginBottom: 12, width: "100%", maxWidth: 400 }}>
           <div
             style={{
               flex: 1,
@@ -403,6 +447,32 @@ export default function EditMenuPage() {
           </div>
         </div>
 
+        {/* ★ ถ้าต้องการให้แก้ไข activityFactor ได้จากหน้านี้ด้วย ให้ปลดคอมเมนต์
+        <div style={{ marginBottom: 28 }}>
+          <div style={{ color: "#3ABB47", fontWeight: 700, fontSize: 15, marginBottom: 6 }}>Activity Factor</div>
+          <select
+            value={activityFactor}
+            onChange={(e) => setActivityFactor(e.target.value)}
+            style={{
+              width: "100%",
+              height: 44,
+              borderRadius: 10,
+              border: "1.5px solid #E0E0E0",
+              padding: "0 12px",
+              fontSize: 15,
+              background: "#fff",
+            }}
+          >
+            <option value="">— เลือก —</option>
+            <option value="1.2">1.2 (ไม่ค่อยขยับ)</option>
+            <option value="1.375">1.375 (ออกกำลังน้อย)</option>
+            <option value="1.55">1.55 (ปานกลาง)</option>
+            <option value="1.725">1.725 (หนัก)</option>
+            <option value="1.9">1.9 (หนักมาก)</option>
+          </select>
+        </div>
+        */}
+
         {/* Save button */}
         <button
           onClick={handleSave}
@@ -427,8 +497,7 @@ export default function EditMenuPage() {
       </div>
 
       {/* เมนูด้านล่างติดจอ */}
-      <div id="bottom-menu" style={menuDockStyle}>
-      </div>
+      <div id="bottom-menu" style={menuDockStyle}></div>
     </div>
   );
 }

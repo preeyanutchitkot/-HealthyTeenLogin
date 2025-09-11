@@ -17,8 +17,8 @@ import { saveCartToFirestore } from "../../lib/saveCart";
 
 const snackFoods = [
   { name: 'ขนมครก', calories: 180, image: '/foods/khanom-khrok.png' },
-  { name: 'หมูปิ้ง (3 ไม้)', calories: 250, image: '/foods/moo-ping-3.png' },
-  { name: 'ลูกชิ้นปิ้ง (5 ลูก)', calories: 120, image: '/foods/look-chin-ping-5.png' },
+  { name: 'หมูปิ้ง', calories: 75, image: '/foods/moo-ping-3.png' },
+  { name: 'ลูกชิ้นปิ้ง', calories: 25, image: '/foods/look-chin-ping-5.png' },
   { name: 'เฉาก๊วย', calories: 120, image: '/foods/chao-kuai.png' },
   { name: 'ข้าวโพดปิ้ง', calories: 100, image: '/foods/khao-phot-ping.png' },
   { name: 'กล้วยทอด', calories: 250, image: '/foods/kluai-thot.png' },

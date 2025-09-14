@@ -1,14 +1,11 @@
-"use client";
 import { useState } from "react";
 import Image from "next/image";
 import { pickImageByName } from "../lib/pickImageByName";
 
 export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
-  // ช่องกรอก
+
   const [foodInputs, setFoodInputs] = useState([{ name: "", calories: "" }]);
-  // ผลลัพธ์จาก n8n แยกต่อแถว (เก็บเป็นสตริง JSON ตามแบบเดิม)
   const [apiResults, setApiResults] = useState([""]);
-  // สถานะโหลดของแต่ละแถว
   const [loadingRows, setLoadingRows] = useState([false]);
 
   const handleAddInput = () => {
@@ -23,7 +20,6 @@ export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
     setLoadingRows((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // ✅ ดึงแคลอรี่จาก n8n "แบบเดิม" (ผ่าน proxy /api/calories) + มีสถานะกำลังวิเคราะห์ต่อแถว
   const handleInputBlur = async (index, value) => {
     const v = value.trim();
     if (!v) return;
@@ -35,7 +31,6 @@ export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
     });
 
     try {
-      // เปลี่ยนมาเรียกโดเมนเดียวกับเว็บ → ไม่ติด CORS
       const n8nApiUrl = "/api/calories";
 
       const res = await fetch(n8nApiUrl, {
@@ -47,7 +42,6 @@ export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
 
       const data = await res.json();
 
-      // แสดงผลลัพธ์แบบเดิม (stringify json) เฉพาะแถวนี้
       const resultStr = JSON.stringify(data, null, 2);
       setApiResults((prev) => {
         const next = [...prev];
@@ -55,7 +49,6 @@ export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
         return next;
       });
 
-      // ใส่แคลอรี่กลับไปในช่อง (แบบเดิม)
       const caloriesString = data.calories || "";
       const newCalories = parseInt(caloriesString) || "";
       setFoodInputs((prev) => {
@@ -79,7 +72,6 @@ export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
     }
   };
 
-  // อัปเดตตอนพิมพ์
   const handleInputChange = (index, field, value) => {
     setFoodInputs((prev) => {
       const next = [...prev];
@@ -88,7 +80,7 @@ export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
     });
   };
 
-  // บันทึก → ใส่รูปอัตโนมัติตามชื่อ
+
   const handleSave = () => {
     foodInputs.forEach((food) => {
       const name = food.name.trim();
@@ -148,7 +140,6 @@ export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
                 )}
               </div>
 
-              {/* ▶️ แสดงสถานะ/ผลลัพธ์ของแถวนี้ */}
               {loadingRows[index] ? (
                 <div className="result-display">
                   <span className="api-result-text">กำลังวิเคราะห์แคลอรี่…</span>

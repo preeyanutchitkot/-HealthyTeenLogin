@@ -1,6 +1,3 @@
-// components/CartSheet.jsx
-"use client";
-
 import Image from "next/image";
 import React from "react";
 
@@ -43,9 +40,9 @@ export default function CartSheet({
               </div>
 
               <div className="right">
-                <button className="qtybtn" onClick={() => onDecrease(it.name)}>−</button>
-                <span className="qty">{it.qty}</span>
-                <button className="qtybtn" onClick={() => onIncrease(it.name)}>+</button>
+                  <button className="qtybtn" onClick={() => onDecrease(it.name, 0.5)}>−</button>
+                  <span className="qty">{it.qty}</span>
+                  <button className="qtybtn" onClick={() => onIncrease(it.name, 0.5)}>+</button>
                 <button className="icon-btn trash-btn" onClick={() => onRemove(it.name)}>
                   <img src="/trash.png" alt="ลบ" className="trash-icon" />
                 </button>

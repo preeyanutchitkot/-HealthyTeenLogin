@@ -172,7 +172,7 @@ export default function Register() {
           await sendPasswordResetEmail(auth, emailNorm);
           alert('ส่งลิงก์รีเซ็ตรหัสผ่านไปที่อีเมลแล้ว');
         }
-        router.push('/app/line/login');
+        router.push('/');
         return;
       }
       alert('เกิดข้อผิดพลาด: ' + error.message);

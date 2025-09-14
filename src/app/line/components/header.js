@@ -1,14 +1,24 @@
 "use client";
 
-import React from 'react';
-import Image from 'next/image';
+import React from "react";
+import Image from "next/image";
 
 const Header = ({ title, cartoonImage }) => {
   return (
     <header className="header-bar">
       <div className="header-center">
         <span className="header-title">{title}</span>
+        {cartoonImage && (
+          <Image
+            src={cartoonImage}
+            alt="การ์ตูน"
+            width={40}
+            height={40}
+            style={{ objectFit: "contain" }}
+          />
+        )}
       </div>
+
       <style>{`
         .header-bar {
           position: relative;
@@ -30,7 +40,6 @@ const Header = ({ title, cartoonImage }) => {
           min-width: 145px;
         }
         .header-title {
-          position: static;
           font-family: 'Noto Sans Thai', sans-serif;
           font-size: 28px;
           font-weight: bold;
@@ -40,17 +49,13 @@ const Header = ({ title, cartoonImage }) => {
           white-space: nowrap;
         }
         @media (max-width: 500px) {
-          .header-title {
-            font-size: 20px;
-          }
+          .header-title { font-size: 20px; }
           .header-bar {
              padding: 24px 16px 24px 16px;
              min-width: 200px;
              min-height: 120px;
           }
-          .header-center {
-            min-width: 98px;
-          }
+          .header-center { min-width: 98px; }
         }
       `}</style>
     </header>

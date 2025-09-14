@@ -1,5 +1,3 @@
-"use client";
-
 import Image from "next/image";
 import BottomMenu from "../components/menu";
 import styles from "./contact.module.css";
@@ -7,11 +5,7 @@ import styles from "./contact.module.css";
 export default function ContactPage() {
   return (
     <div className={styles.wrapper}>
-      {/* Header */}
-      
-
-
-      {/* Text */}
+      <Header title="Healthy Teen" cartoonImage="/8.png" />
       <div className={styles.content}>
         หากคุณต้องการความช่วยเหลือ ติดต่อเราได้ที่
       </div>

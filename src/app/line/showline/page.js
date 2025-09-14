@@ -1,17 +1,16 @@
 import Image from "next/image";
 import styles from "./contact.module.css";
+import Header from "../components/header";
 
 export default function ContactPage() {
   return (
     <div className={styles.wrapper}>
+      <Header title="Healthy Teen" cartoonImage="/8.png" />
 
-
-      {/* Text */}
       <div className={styles.content}>
         หากคุณต้องการความช่วยเหลือ ติดต่อเราได้ที่
       </div>
 
-      {/* Hero image — ระบุ width/height + style height:auto กัน warning */}
       <div className={styles.heroBox}>
         <Image
           src="/doctor.png"

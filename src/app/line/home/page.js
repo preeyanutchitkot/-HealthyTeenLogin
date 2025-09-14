@@ -21,7 +21,6 @@ const toYMD = (d) => {
 };
 
 export default function HomePage() {
-  // แจ้งเตือน: สี badge ตามสถานะแจ้งเตือนจาก localStorage
   const [showNotif, setShowNotif] = useState(true);
   const [notifColor, setNotifColor] = useState('green');
   useEffect(() => {
@@ -46,7 +45,6 @@ export default function HomePage() {
     return () => unsubscribe();
   }, []);
 
-  // ดึงเมนูของ "วันนี้" ตาม uid + ymd
   useEffect(() => {
     const load = async () => {
       if (!uid) {

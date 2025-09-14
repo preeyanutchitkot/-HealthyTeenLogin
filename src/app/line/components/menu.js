@@ -17,11 +17,10 @@ export default function BottomMenu() {
     { label: 'หน้าหลัก',   type: 'internal', href: '/line/home', icon: '/home 3.png' },
     { label: 'บันทึกอาหาร', type: 'internal', href: '/line/food', icon: '/savefood.png' },
     { label: 'แชทบอท',     type: 'external', url: OA_URL,          icon: '/55.png', center: true },
-    { label: 'พูดคุย',      type: 'external', url: GROUP_URL,       icon: '/Group 230 (1).png' },
+    { label: 'สรุป',      type: 'external', url: GROUP_URL,       icon: '/Group 230 (1).png' },
     { label: 'ฉัน',         type: 'internal', href: '/line/me',     icon: '/Group 230 (2).png' },
   ];
 
-  // ✅ เปิด external: ใช้ LIFF ถ้ามี, ไม่งั้นเปิดแท็บใหม่
   const openExternal = (url) => (e) => {
     e.preventDefault();
     try {
@@ -35,7 +34,6 @@ export default function BottomMenu() {
     }
   };
 
-  // ✅ แจ้งความสูงเมนูให้ทั้งหน้า (กันคอนเทนต์โดนทับ)
   useEffect(() => {
     const nav = document.getElementById('bottom-menu');
     if (!nav) return;

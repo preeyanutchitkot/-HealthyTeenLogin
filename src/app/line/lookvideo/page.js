@@ -64,7 +64,6 @@ export default function LookvideoPage() {
         <VideoList />
       </div>
 
-      {/* เมนูล่าง */}
       <BottomMenu />
     </div>
   );

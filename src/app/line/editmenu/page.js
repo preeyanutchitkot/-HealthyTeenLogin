@@ -446,34 +446,7 @@ export default function EditMenuPage() {
             </div>
           </div>
         </div>
-
-        {/* ★ ถ้าต้องการให้แก้ไข activityFactor ได้จากหน้านี้ด้วย ให้ปลดคอมเมนต์
-        <div style={{ marginBottom: 28 }}>
-          <div style={{ color: "#3ABB47", fontWeight: 700, fontSize: 15, marginBottom: 6 }}>Activity Factor</div>
-          <select
-            value={activityFactor}
-            onChange={(e) => setActivityFactor(e.target.value)}
-            style={{
-              width: "100%",
-              height: 44,
-              borderRadius: 10,
-              border: "1.5px solid #E0E0E0",
-              padding: "0 12px",
-              fontSize: 15,
-              background: "#fff",
-            }}
-          >
-            <option value="">— เลือก —</option>
-            <option value="1.2">1.2 (ไม่ค่อยขยับ)</option>
-            <option value="1.375">1.375 (ออกกำลังน้อย)</option>
-            <option value="1.55">1.55 (ปานกลาง)</option>
-            <option value="1.725">1.725 (หนัก)</option>
-            <option value="1.9">1.9 (หนักมาก)</option>
-          </select>
-        </div>
-        */}
-
-        {/* Save button */}
+        
         <button
           onClick={handleSave}
           disabled={!uid || saving}
@@ -496,7 +469,6 @@ export default function EditMenuPage() {
         </button>
       </div>
 
-      {/* เมนูด้านล่างติดจอ */}
       <div id="bottom-menu" style={menuDockStyle}></div>
     </div>
   );

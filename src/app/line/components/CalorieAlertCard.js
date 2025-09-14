@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 
 const levelConfig = {
@@ -84,7 +82,6 @@ function CalorieAlertCard(props) {
         เป้าหมาย {maxCalorie} kcal
       </p>
 
-      {/* ✅ ศูนย์กลางรูปหมีตรงนี้ */}
       {icon && (
         <div
           style={{

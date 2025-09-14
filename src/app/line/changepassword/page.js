@@ -1,5 +1,3 @@
-"use client";
-
 import { Noto_Sans_Thai } from "next/font/google";
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
@@ -60,7 +58,6 @@ export default function ChangePasswordPage() {
     }
   };
 
-  // -------- UI: ทำฟอร์มแคบลง + ช่องสูงกำลังดี + ปุ่มตาเปิด/ปิด --------
   const formMaxW = 320; // ความกว้างสูงสุดของฟอร์ม (แคบลง)
   const inputBase = {
     width: "100%",

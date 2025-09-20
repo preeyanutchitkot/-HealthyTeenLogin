@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signOut } from "firebase/auth";
@@ -60,7 +58,7 @@ export default function MenuPopup({ isOpen, onClose }) {
       items: [
         { icon: icons.book, label: "วิธีการใช้งาน", href: "/line/manual" },
         { icon: icons.question, label: "คำถามที่พบบ่อย", href: "/line/fqa" },
-        { icon: icons.doc, label: "ข้อกำหนดและเงื่อนไขการใช้งาน", href: "/line/terms" },
+        { icon: icons.doc, label: "ข้อกำหนดและเงื่อนไขการใช้งาน", href: "/line/agreement" },
         { icon: icons.phone, label: "ติดต่อเรา", href: "/line/contact" },
       ],
     },

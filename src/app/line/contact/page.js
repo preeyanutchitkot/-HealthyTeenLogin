@@ -1,16 +1,16 @@
 import Image from "next/image";
-import BottomMenu from "../components/menu";
 import styles from "./contact.module.css";
+import Header from "../components/header";
 
 export default function ContactPage() {
   return (
-    <div className={styles.wrapper}>
-      <Header title="Healthy Teen" cartoonImage="/8.png" />
+      <div className="header-container">
+        <Header title="ติดต่อเรา" cartoonImage="/9.png" />
+
       <div className={styles.content}>
         หากคุณต้องการความช่วยเหลือ ติดต่อเราได้ที่
       </div>
 
-      {/* Hero image — ระบุ width/height + style height:auto กัน warning */}
       <div className={styles.heroBox}>
         <Image
           src="/doctor.png"
@@ -22,7 +22,6 @@ export default function ContactPage() {
         />
       </div>
 
-      {/* Social Buttons */}
       <div className={styles.social}>
         <a
           className={styles.btn}
@@ -60,11 +59,6 @@ export default function ContactPage() {
           </span>
           Facebook Nursing SUT
         </a>
-      </div>
-
-      {/* Bottom Menu */}
-      <div className={styles.bottom}>
-        <BottomMenu />
       </div>
     </div>
   );

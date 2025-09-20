@@ -1,10 +1,9 @@
-// app/api/calories/route.js
 export async function POST(req) {
   try {
     const { foodName } = await req.json();
     const n8nUrl =
       process.env.N8N_WEBHOOK_URL ||
-      "https://heroic-nicely-walleye.ngrok-free.app/webhook/js";
+      "https://healthyteen-n8n.ddns.net/webhook/food";
 
     const r = await fetch(n8nUrl, {
       method: "POST",
@@ -14,26 +13,14 @@ export async function POST(req) {
     });
 
     const status = r.status;
-    const contentType = r.headers.get("content-type") || "";
     const text = await r.text();
+    const type = r.headers.get("content-type") || "";
 
-    // 1) ถ้า body ว่าง (เช่น 204 No Content) → ส่ง JSON ว่างๆ กลับไป
-    if (!text || text.trim() === "") {
-      return Response.json({ ok: true, empty: true }, { status });
+    if (!text.trim()) return Response.json({ ok: true, empty: true }, { status });
+    if (type.includes("application/json")) {
+      try { return Response.json(JSON.parse(text), { status }); } catch {}
     }
-
-    // 2) ถ้าเป็น JSON จริง → ส่งต่อเป็น JSON เดิม
-    if (contentType.includes("application/json")) {
-      try {
-        const json = JSON.parse(text);
-        return Response.json(json, { status, headers: { "Cache-Control": "no-store" } });
-      } catch {
-        // ถ้า header บอกว่าเป็น json แต่ parse ไม่ได้ ก็ตกไปข้อ 3
-      }
-    }
-
-    // 3) ไม่ใช่ JSON → ห่อเป็น JSON ให้แน่ใจว่า client เรียก res.json() ได้
-    return Response.json({ raw: text }, { status, headers: { "Cache-Control": "no-store" } });
+    return Response.json({ raw: text }, { status });
   } catch (e) {
     return Response.json({ error: String(e) }, { status: 500 });
   }

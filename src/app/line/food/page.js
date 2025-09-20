@@ -10,8 +10,8 @@ import CategoryBar from "../components/CategoryBar";
 import Header from "../components/header";
 import FoodGrid from "../components/FoodGrid";
 import CartSheet from "../components/CartSheet";
-
 import { saveCartToFirestore } from "../lib/saveCart";
+import "./FoodsPage.module.css";
 
 const savoryFoods = [
   { name: "ข้าวกะเพราไก่ไข่ดาว", calories: 630, image: "/foods/khao-krapao-kai-kai-dao.png" },
@@ -60,11 +60,10 @@ export default function FoodsPage() {
   const [cartCount, setCartCount] = useState(0);
   const [cartItems, setCartItems] = useState([]);
   const [showSheet, setShowSheet] = useState(false);
-  const [isSaving, setIsSaving] = useState(false); // ✅ ประกาศ state นี้
+  const [isSaving, setIsSaving] = useState(false);
 
   const router = useRouter();
 
-  // โหลดตะกร้าจาก localStorage ครั้งแรก
   useEffect(() => {
     try {
       const storedCart = localStorage.getItem("cartItems");
@@ -74,14 +73,12 @@ export default function FoodsPage() {
     }
   }, []);
 
-  // อัปเดตตัวนับ + persist ทุกครั้งที่ cartItems เปลี่ยน
   useEffect(() => {
     const total = cartItems.reduce((sum, it) => sum + it.qty, 0);
     setCartCount(total);
-    localStorage.setItem("cartItems", JSON.stringify(cartItems));
   }, [cartItems]);
 
-  // helper persist ให้แก้ state + localStorage พร้อมกัน
+
   const persist = (next) => {
     setCartItems(next);
     try {
@@ -91,7 +88,6 @@ export default function FoodsPage() {
     }
   };
 
-  // Filter ตาม search
   const filteredFoods = useMemo(
     () => foods.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())),
     [foods, searchQuery]
@@ -101,40 +97,36 @@ export default function FoodsPage() {
     [snacks, searchQuery]
   );
   const filteredSavoryFoods = useMemo(
-    () => savoryFoodsState.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())), // ✅ ใช้ state
+    () => savoryFoodsState.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())),
     [savoryFoodsState, searchQuery]
   );
 
-  // เพิ่มรายการ
+  const roundHalf = (n) => Math.round(n * 2) / 2;
+
   const addToCart = (food) => {
     setCartItems((prev) => {
       const idx = prev.findIndex((item) => item.name === food.name);
-      const updated = idx === -1 ? [...prev, { ...food, qty: 1 }] : prev.map((it, i) => i === idx ? { ...it, qty: it.qty + 1 } : it);
+      const updated =
+        idx === -1
+          ? [...prev, { ...food, qty: 1 }] // ✅ ครั้งแรก = 1
+          : prev.map((it, i) =>
+              i === idx ? { ...it, qty: roundHalf(it.qty + 0.5) } : it
+            );
       localStorage.setItem("cartItems", JSON.stringify(updated));
       return updated;
     });
   };
 
-  const increaseQty = (name) =>
-    setCartItems((prev) => prev.map((it) => (it.name === name ? { ...it, qty: it.qty + 1 } : it)));
-
-  const decreaseQty = (name) =>
-    setCartItems((prev) => prev.map((it) => (it.name === name ? { ...it, qty: it.qty - 1 } : it)).filter((it) => it.qty > 0));
-
   const removeFromCart = (name) =>
     setCartItems((prev) => prev.filter((it) => it.name !== name));
 
-  // บันทึกตะกร้าขึ้น Firestore
   const handleSaveCart = async () => {
     try {
       if (!cartItems.length) return;
       setIsSaving(true);
       await saveCartToFirestore(cartItems);
-
-      // เคลียร์ตะกร้าแล้วปิด sheet
       persist([]);
       setShowSheet(false);
-
       router.replace("/line/food/cart");
     } catch (err) {
       console.error(err);
@@ -145,10 +137,10 @@ export default function FoodsPage() {
   };
 
   return (
-    <div className="page">
+    <div className="page foods-page">
       <Header title="บันทึกอาหาร" cartoonImage="/8.png" />
 
-      {/* ค้นหา */}
+      {/* Search */}
       <div className="search-wrap">
         <div className="search-pill" role="search">
           <Image src="/search.png" alt="ค้นหา" width={23} height={23} />
@@ -159,7 +151,13 @@ export default function FoodsPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
           <Link href="/line/food/cart">
-            <Image src="/character.png" alt="ตัวการ์ตูน" width={26} height={26} style={{ cursor: "pointer" }} />
+            <Image
+              src="/character.png"
+              alt="ตัวการ์ตูน"
+              width={26}
+              height={26}
+              style={{ cursor: "pointer" }}
+            />
           </Link>
         </div>
       </div>
@@ -210,20 +208,28 @@ export default function FoodsPage() {
       </div>
       <FoodGrid foods={filteredSnacks} onAdd={addToCart} />
 
-      {/* CartSheet — ตัวเดียวพอ */}
+      {/* CartSheet */}
       {showSheet && (
         <>
           <div className="overlay" onClick={() => setShowSheet(false)} />
           <CartSheet
             cartItems={cartItems}
             onClose={() => setShowSheet(false)}
-            onIncrease={(name) => {
-              const updated = cartItems.map((it) => (it.name === name ? { ...it, qty: it.qty + 1 } : it));
+            onIncrease={(name, step = 0.5) => {
+              const updated = cartItems.map((it) =>
+                it.name === name
+                  ? { ...it, qty: Math.round((it.qty + step) * 2) / 2 }
+                  : it
+              );
               persist(updated);
             }}
-            onDecrease={(name) => {
+            onDecrease={(name, step = 0.5) => {
               const updated = cartItems
-                .map((it) => (it.name === name ? { ...it, qty: it.qty - 1 } : it))
+                .map((it) =>
+                  it.name === name
+                    ? { ...it, qty: Math.max(0, Math.round((it.qty - step) * 2) / 2) }
+                    : it
+                )
                 .filter((it) => it.qty > 0);
               persist(updated);
             }}
@@ -237,193 +243,7 @@ export default function FoodsPage() {
         </>
       )}
 
-
       <BottomMenu />
-      
-      <style jsx global>{`
-        *, *::before, *::after { box-sizing: border-box; }
-        :root { color-scheme: light; }
-        html, body, #__next { height: 100%; }
-        html, body { margin: 0; padding: 0; }
-        body {
-          background: #ffffff;
-          padding-top: env(safe-area-inset-top);
-          padding-bottom: env(safe-area-inset-bottom);
-        }
-        .page {
-          background: #f3fdf1;
-          min-height: 100vh;
-          font-family: 'Noto Sans Thai', sans-serif;
-          padding-bottom: 80px;
-          margin: 0;
-        }
-        .search-wrap { position: relative; height: 0; }
-        .search-pill {
-          position: absolute; top: -45px; left: 50%; transform: translateX(-50%);
-          background: #fff; border-radius: 16px; padding: 10px 12px;
-          display: flex; align-items: center; gap: 10px;
-          box-shadow: 0 6px 14px rgba(0, 0, 0, .12);
-          width: 85%;
-        }
-        .search-pill input {
-          border: none; outline: none; flex: 1;
-          background: transparent; font-size: 16px;
-        }
-        .search-pill input::placeholder { color: #1f2937; opacity: .85; }
-        .tabs { display: flex; justify-content: space-between; align-items: center; background: #f3fdf1; padding: 10px 16px; }
-        .tab-left { display: flex; gap: 8px; align-items: center; }
-        .tabs button {
-          background: #fff; border: 1px solid #e5e7eb; border-radius: 12px;
-          padding: 6px 16px; color: #3abb47; font-weight: 700;
-        }
-        .tabs .active { background: #3abb47; border: 2px solid #3abb47; color: #fff; }
-        .add-new {
-          background: #fff; border: 1px dashed #3abb47; color: #000;
-          border-radius: 12px; padding: 10px 16px; font-weight: 700;
-          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
-          transition: transform 0.15s ease, box-shadow 0.15s ease;
-        }
-        .add-new:active { transform: scale(0.96); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); }
-
-      .food-grid{
-        --card-w: 120px;   
-        --card-h: 160px;   /* เพิ่มความสูงขึ้นนิดหน่อย */
-        --gap: 8px;        
-        --pad: 8px;        
-        --img: 70px;       /* เดิม 60px → เพิ่มขนาดรูป */
-        --btn: 24px;       /* ขยายปุ่ม + อีกนิด */
-      }
-
-      /* แถวเดียว เลื่อนแนวนอน */
-      .food-grid{ display: flex; gap: var(--gap); padding: 12px 12px 6px; width: 100%; max-width: none; overflow-x: auto; -webkit-overflow-scrolling: touch;scrollbar-width: none; 
-      }
-      .food-grid::-webkit-scrollbar{
-        display: none;                   /* Chrome/Safari ซ่อนสกรอลบาร์ */
-      }
-
-      .food-item{
-        flex: 0 0 var(--card-w);         /* ความกว้างคงที่ → ต่อกันเป็นแถวเดียว */
-        min-height: var(--card-h);
-        background: #fff;
-        border-radius: 12px;
-        text-align: center;
-        padding: var(--pad) var(--pad) calc(var(--pad) + var(--btn) + 6px);
-        position: relative;
-        box-shadow: 0 1px 4px rgba(0,0,0,.1);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-      }
-
-      /* รูปในการ์ด (ถ้าใช้ <Image> ให้ใส่ className="thumb" ที่ wrapper หรือรูป) */
-      .food-item img,
-      .food-item .thumb{
-        width: var(--img);
-        height: var(--img);
-        object-fit: contain;
-        margin: 0 auto 6px;
-        display: block;
-      }
-
-      .name{ font-size: 14px; font-weight: 700; }
-      .calories{ font-size: 13px; color: #555; }
-
-      /* ปุ่ม + มุมล่างขวา */
-      .add{
-        position: absolute;
-        right: 8px;
-        bottom: 8px;
-        width: var(--btn);
-        height: var(--btn);
-        border-radius: 50%;
-        border: none;
-        background: #3abb47;
-        color: #fff;
-        font-size: 16px;
-        line-height: 1;
-      }
-
-        .banner-cart-wrapper {
-          position: relative;
-        }
-        .banner-scroll {
-          display: flex;
-          gap: 16px;
-          padding: 16px 8px 22px 8px;
-          overflow-x: auto;
-          scrollbar-width: none;
-        }
-        .banner-scroll::-webkit-scrollbar {
-          display: none;
-        }
-        .banner {
-          position: relative;
-          width: 320px;
-          height: 200px;
-          border-radius: 16px;
-          overflow: hidden;
-          flex: 0 0 auto;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-          background: #e8f5e9;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        @media (max-width: 600px) {
-          .banner {
-            width: 90vw;
-            height: 170px;
-          }
-        }
-        .overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, .35); z-index: 1000; animation: fadeIn .15s ease-out; }
-        .sheet {
-          position: fixed; left: 0; right: 0; bottom: 0; height: 66vh;
-          background: #fff; z-index: 1001;
-          border-top-left-radius: 18px; border-top-right-radius: 18px;
-          box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.1);
-          display: flex; flex-direction: column;
-          animation: slideUp .2s ease-out;
-        }
-        .sheet-head { position: relative; padding: 10px 16px 8px; }
-        .dragbar { width: 48px; height: 5px; background: #E5E7EB; border-radius: 999px; margin: 0 auto 6px; }
-        .title { text-align: center; font-weight: 700; }
-        .close {
-          position: absolute; top: 6px; right: 10px;
-          width: 32px; height: 32px; border-radius: 50%;
-          border: none; background: #F3F4F6; font-size: 20px;
-        }
-        .sheet-list { flex: 1; overflow: auto; padding: 8px 12px 0; }
-        .row {
-          display: flex; justify-content: space-between; align-items: center;
-          background: #F3FAF4; border-radius: 12px; padding: 10px; margin-bottom: 10px;
-        }
-        .left { display: flex; gap: 10px; align-items: center; }
-        .thumb { border-radius: 10px; }
-        .meta .r-name { font-weight: 700; font-size: 14px; }
-        .meta .r-cal { font-size: 12px; color: #4B5563; }
-        .right { display: flex; align-items: center; gap: 8px; }
-        .qtybtn { width: 28px; height: 28px; border-radius: 50%; border: none; background: #3abb47; color: #fff; font-size: 18px; }
-        .qty { width: 20px; text-align: center; font-weight: 700; }
-        .trash { background: transparent; border: none; font-size: 18px; padding: 4px; }
-        .empty { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #8a8a8a; gap: 6px; }
-        .sheet-footer { padding: 12px 16px 18px; display: flex; align-items: center; gap: 12px; }
-        .total { font-weight: 700; color: #111827; min-width: max-content; }
-        .save { flex: 1; height: 44px; border: none; border-radius: 10px; background: #7CAD87; color: #fff; font-weight: 700; }
-        .r-cal b { font-weight: 700; }
-        .icon-btn { border: none; background:  transparent; cursor: pointer; padding: 0; }
-        .trash-btn { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; background: #ffffff; box-shadow: 0 1px 4px rgba(0, 0, 0, .08); }
-        .trash-btn:active { transform: scale(0.96); }
-        .trash-icon { width: 16px; height: 16px; object-fit: contain; }
-        .input-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; }
-        .input-row input { width: 220px; padding: 10px 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; }
-        .add-btn {
-          width: 32px; height: 32px; border: none; border-radius: 50%;
-          background: #3abb47; color: #fff; font-size: 20px; cursor: pointer;
-        }
-        .cal-display { min-width: 80px; text-align: right; font-size: 14px; font-weight: 600; color: #333; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-      `}</style>
     </div>
   );
 }

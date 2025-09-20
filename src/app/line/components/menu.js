@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const OA_URL    = 'https://line.me/R/ti/p/@696kpmzu';
-const GROUP_URL = 'https://line.me/ti/g/t8BaEgh4cw';
 
 export default function BottomMenu() {
   const pathname = usePathname();
@@ -17,7 +16,7 @@ export default function BottomMenu() {
     { label: 'หน้าหลัก',   type: 'internal', href: '/line/home', icon: '/home 3.png' },
     { label: 'บันทึกอาหาร', type: 'internal', href: '/line/food', icon: '/savefood.png' },
     { label: 'แชทบอท',     type: 'external', url: OA_URL,          icon: '/55.png', center: true },
-    { label: 'สรุป',      type: 'external', url: GROUP_URL,       icon: '/Group 230 (1).png' },
+    { label: 'สรุป',      type: 'internal', href: '/line/food',       icon: '/Group 230 (1).png' },
     { label: 'ฉัน',         type: 'internal', href: '/line/me',     icon: '/Group 230 (2).png' },
   ];
 

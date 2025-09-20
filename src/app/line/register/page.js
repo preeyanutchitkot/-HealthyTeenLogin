@@ -1,23 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import {
-  createUserWithEmailAndPassword,
-  fetchSignInMethodsForEmail,
-  sendPasswordResetEmail,
-} from 'firebase/auth';
+import { createUserWithEmailAndPassword, fetchSignInMethodsForEmail, } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { db, auth } from '../lib/firebase';
-import {
-  doc,
-  setDoc,
-  runTransaction,
-  serverTimestamp,
-} from 'firebase/firestore';
+import { doc, setDoc, runTransaction, serverTimestamp, } from 'firebase/firestore';
 
 export default function Register() {
   const router = useRouter();
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -28,9 +18,9 @@ export default function Register() {
   const [weight, setWeight] = useState('');
   const [bmi, setBmi] = useState('');
   const [activityFactor, setActivityFactor] = useState('');
-
   const [bmr, setBmr] = useState('');
   const [tdee, setTdee] = useState('');
+
   useEffect(() => {
     const h = parseFloat(height);
     const w = parseFloat(weight);
@@ -68,14 +58,11 @@ export default function Register() {
       setTdee('');
     }
   }, [height, weight, age, gender, activityFactor]);
-
-  // ===== ขอเลขรันนิ่ง "user1", "user2", ... แบบอะตอมมิก =====
   const getNextUserSeqId = async () => {
     const counterRef = doc(db, 'metadata', 'counters');
     const nextNum = await runTransaction(db, async (tx) => {
       const snap = await tx.get(counterRef);
       if (!snap.exists()) {
-        // create ครั้งแรก userCounter = 1  (ตรงกับ Firestore Rules)
         tx.set(counterRef, { userCounter: 1 });
         return 1;
       } else {
@@ -88,102 +75,92 @@ export default function Register() {
     return `user${nextNum}`;
   };
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
+    const handleRegister = async (e) => {
+      e.preventDefault();
 
-    const emailNorm = email.trim().toLowerCase();
+      const emailNorm = email.trim().toLowerCase();
 
-    if (password !== confirmPassword) {
-      alert('รหัสผ่านไม่ตรงกัน');
-      return;
-    }
-    if (password.length < 8) {
-      alert('รหัสผ่านควรยาวอย่างน้อย 8 ตัวอักษร');
-      return;
-    }
-
-    try {
-      // เช็กว่ามีอีเมลอยู่แล้วไหม
-      const methods = await fetchSignInMethodsForEmail(auth, emailNorm);
-      if (methods.length > 0) {
-        const doReset = confirm('อีเมลนี้มีบัญชีอยู่แล้ว ต้องการรีเซ็ตรหัสผ่านไหม?');
-        if (doReset) {
-          await sendPasswordResetEmail(auth, emailNorm);
-          alert('ส่งลิงก์รีเซ็ตรหัสผ่านไปที่อีเมลแล้ว');
-        }
-        router.push('/line/home'); // ไปหน้าเข้าสู่ระบบ
+      if (password !== confirmPassword) {
+        alert('รหัสผ่านไม่ตรงกัน');
+        return;
+      }
+      if (password.length < 8) {
+        alert('รหัสผ่านควรยาวอย่างน้อย 8 ตัวอักษร');
         return;
       }
 
-      // สมัคร Auth
-      const userCredential = await createUserWithEmailAndPassword(auth, emailNorm, password);
-      const user = userCredential.user;
-
-      // ขอ seqId เช่น "user1"
-      const seqId = await getNextUserSeqId();
-
-
-      // แปลงชนิดข้อมูล
-      const ageNum = age ? parseInt(age, 10) : null;
-      const heightNum = height ? parseFloat(height) : null;
-      const weightNum = weight ? parseFloat(weight) : null;
-      const bmiNum = bmi ? parseFloat(bmi) : null;
-      const activityNum = activityFactor ? parseFloat(activityFactor) : null;
-
-      // คำนวณ BMR (สูตร Harris-Benedict)
-      let bmr = null;
-      if (gender && ageNum && heightNum && weightNum) {
-        if (gender === 'male') {
-          bmr = 66.47 + (13.75 * weightNum) + (5.003 * heightNum) - (6.755 * ageNum);
-        } else if (gender === 'female') {
-          bmr = 655.1 + (9.563 * weightNum) + (1.850 * heightNum) - (4.676 * ageNum);
+      try {
+        // เช็กว่ามีอีเมลอยู่แล้วไหม
+        const methods = await fetchSignInMethodsForEmail(auth, emailNorm);
+        if (methods.length > 0) {
+          alert('อีเมลนี้มีบัญชีอยู่แล้ว');
+          router.push('/'); // หรือปรับเป็นหน้าเข้าสู่ระบบของคุณ
+          return;
         }
-      }
-      // คำนวณ TDEE
-      let tdee = null;
-      if (bmr && activityNum) {
-        tdee = Math.round(bmr * activityNum);
-      }
 
-      // บันทึกลง users/<uid> (doc id = uid)
-      await setDoc(doc(db, 'users', user.uid), {
-        uid: user.uid,
-        seqId,                  // ← เก็บเลขรันนิ่งไว้ในฟิลด์
-        email: emailNorm,
-        gender,
-        age: ageNum,
-        height: heightNum,
-        weight: weightNum,
-        bmi: bmiNum,
-        bmr: bmr != null ? Math.round(bmr) : null,
-        activityFactor: activityNum,
-        tdee,
-        createdAt: serverTimestamp(),
-      });
+        // สมัคร Auth
+        const userCredential = await createUserWithEmailAndPassword(auth, emailNorm, password);
+        const user = userCredential.user;
 
-      alert('สมัครสมาชิกสำเร็จ!');
-      router.push('/line/agreement');
-    } catch (error) {
-      console.error(error);
-      // ดักกรณีพิเศษอีกชั้น (กัน race condition ระหว่างเช็ก-สมัคร)
-      if (error.code === 'auth/email-already-in-use') {
-        const doReset = confirm('อีเมลนี้มีบัญชีแล้ว ต้องการรีเซ็ตรหัสผ่านไหม?');
-        if (doReset) {
-          await sendPasswordResetEmail(auth, emailNorm);
-          alert('ส่งลิงก์รีเซ็ตรหัสผ่านไปที่อีเมลแล้ว');
+        // ขอ seqId เช่น "user1"
+        const seqId = await getNextUserSeqId();
+
+        // แปลงชนิดข้อมูล
+        const ageNum = age ? parseInt(age, 10) : null;
+        const heightNum = height ? parseFloat(height) : null;
+        const weightNum = weight ? parseFloat(weight) : null;
+        const bmiNum = bmi ? parseFloat(bmi) : null;
+        const activityNum = activityFactor ? parseFloat(activityFactor) : null;
+
+        // คำนวณ BMR (สูตร Harris-Benedict)
+        let bmrCalc = null;
+        if (gender && ageNum && heightNum && weightNum) {
+          if (gender === 'male') {
+            bmrCalc = 66.47 + (13.75 * weightNum) + (5.003 * heightNum) - (6.755 * ageNum);
+          } else if (gender === 'female') {
+            bmrCalc = 655.1 + (9.563 * weightNum) + (1.850 * heightNum) - (4.676 * ageNum);
+          }
         }
-        router.push('/');
-        return;
-      }
-      alert('เกิดข้อผิดพลาด: ' + error.message);
-    }
-  };
 
-  
+        // คำนวณ TDEE
+        let tdeeCalc = null;
+        if (bmrCalc && activityNum) {
+          tdeeCalc = Math.round(bmrCalc * activityNum);
+        }
+
+        // บันทึกลง users/<uid> (doc id = uid)
+        await setDoc(doc(db, 'users', user.uid), {
+          uid: user.uid,
+          seqId,                  // ← เก็บเลขรันนิ่งไว้ในฟิลด์
+          email: emailNorm,
+          gender,
+          age: ageNum,
+          height: heightNum,
+          weight: weightNum,
+          bmi: bmiNum,
+          bmr: bmrCalc != null ? Math.round(bmrCalc) : null,
+          activityFactor: activityNum,
+          tdee: tdeeCalc,
+          createdAt: serverTimestamp(),
+        });
+
+        alert('สมัครสมาชิกสำเร็จ!');
+        router.push('/line/agreement?from=register');
+      } catch (error) {
+        console.error(error);
+
+        if (error?.code === 'auth/email-already-in-use') {
+          alert('อีเมลนี้มีบัญชีอยู่แล้ว');
+          router.push('/'); 
+          return;
+        }
+        alert('เกิดข้อผิดพลาด: ' + (error?.message || 'ไม่ทราบสาเหตุ'));
+      }
+    };
+    
   return (
     <div className="page">
-
-  <style>{`
+      <style>{`
         html, body, #__next {
           height: 100%;
           margin: 0;

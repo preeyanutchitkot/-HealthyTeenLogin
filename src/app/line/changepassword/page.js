@@ -1,3 +1,5 @@
+"use client";
+
 import { Noto_Sans_Thai } from "next/font/google";
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";

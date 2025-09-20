@@ -60,7 +60,6 @@ export default function CalorieSummary({
       className={`summary-container ${variant==="inline" ? "inline" : "floating"}`}
       style={variant==="floating" ? { ["--cs-top"]: `${topOffset}px` } : undefined}  // ✅ ส่งค่าเข้า CSS variable
     >
-      <Image src={bunnyImage} alt="bunny" width={72} height={100} className="bunny-img" priority />
 
       <p className="summary-title">สรุปแคลอรี่</p>
 
@@ -104,18 +103,6 @@ export default function CalorieSummary({
         }
         .summary-container.inline{ position: static; transform:none; margin:16px auto; }
 
-        .bunny-img {
-          position: absolute;
-          top: -24px;
-          left: 50%;              /* วางให้อยู่กึ่งกลางแนวนอน */
-          transform: translateX(-50%); /* เลื่อนครึ่งนึงของความกว้างรูป */
-          width: 72px;
-          height: auto;
-          margin: 0;
-          display: inline-block;
-          pointer-events: none;
-          user-select: none;
-        }
 
         .summary-title{ font-weight:700; font-size:18px; margin:4px 0 10px; color:#111827; }
         .summary-box{ background:#f8fafc; border-radius:12px; padding:12px 8px; display:flex; justify-content:space-between; margin-top:10px; box-shadow:0 1px 4px rgba(0,0,0,.04); }

@@ -28,12 +28,17 @@ export default function AllFoodListPage() {
         const uid = user?.uid;
         if (!uid) throw new Error("No user");
 
-        // ✅ ดึง "ทั้งหมด" ของผู้ใช้ เรียงตามวันที่ใหม่ → เก่า
+        const now = new Date();
+        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+        const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+
         const q = query(
           collection(db, "food"),
           where("uid", "==", uid),
+          where("date", ">=", startOfDay),
+          where("date", "<=", endOfDay),
           orderBy("date", "desc"),
-          limit(2000) // ปรับได้ตามต้องการ
+          limit(2000)
         );
 
         const snap = await getDocs(q);

@@ -54,7 +54,15 @@
 }
 
 /* Notification */
-.notifWrap { position: relative; display: inline-block; }
+.notifWrap {
+  position: relative;
+  display: inline-block;
+  top: 6px;
+
+}
+.notifWrap :global(img) {
+  display: block;
+}
 .notifDot {
   position: absolute;
   bottom: 10px;
@@ -72,7 +80,7 @@
 /* กระต่ายลอยด้านขวา */
 .bunnyOverlay {
   position: absolute;
-  top: 90px;         /* จัดตำแหน่งตามการ์ดสรุป */
+  top: 80px;         /* จัดตำแหน่งตามการ์ดสรุป */
   right: 16px;
   width: 72px;
   height: auto;
@@ -93,20 +101,31 @@
   align-items: center;
   text-decoration: none;
 }
+
+:root {
+  --circle-size: 60px;  /* เส้นผ่านศูนย์กลางปุ่ม */
+  --icon-size: 44px; 
+}
+
 .circleIcon {
+  width: var(--circle-size);
+  height: var(--circle-size);
   background: #fff;
   border-radius: 50%;
-  padding: 12px;
   box-shadow: 0 4px 10px rgba(0,0,0,.15);
-  width: 44px;
-  height: 44px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: grid;
+  place-items: center;
+  overflow: hidden;     /* กันรูปทะลุ */
 }
-.circleLabel { font-size: 12px; color: #333; margin-top: 4px; }
 
-/* Menu Today */
+.circleIcon :global(img) {
+  width: var(--icon-size) !important;
+  height: var(--icon-size) !important;
+  object-fit: contain;
+  display: block;
+}
+
+.circleLabel { font-size: 12px; color: #333; margin-top: 4px; }
 .menuToday { margin-top: 24px; padding: 0 16px; }
 .menuTable {
   background: #fff;

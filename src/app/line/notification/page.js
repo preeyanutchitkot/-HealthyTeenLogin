@@ -20,35 +20,52 @@ export default function NotificationPage() {
       try {
         const user = auth.currentUser;
         if (!user) return;
-        // 1. ดึง BMR
+
         const uSnap = await getDoc(doc(db, "users", user.uid));
         const uData = uSnap.exists() ? uSnap.data() : null;
         const bmrVal = uData?.bmr ? Number(uData.bmr) : null;
         setBmr(bmrVal);
-        // 2. ดึงแคลอรี่ที่กินวันนี้
+
         const today = new Date();
-        const ymd = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}-${String(today.getDate()).padStart(2,"0")}`;
-        const q = query(collection(db, "food"), where("uid", "==", user.uid), where("ymd", "==", ymd));
+        const ymd = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+        const q = query(
+          collection(db, "food"),
+          where("uid", "==", user.uid),
+          where("ymd", "==", ymd)
+        );
         const snap = await getDocs(q);
-        const sum = snap.docs.reduce((s,doc)=>{
-          const d=doc.data(); return s + Number(d.calories||0)*Number(d.qty||1);
-        },0);
+        const sum = snap.docs.reduce((s, docu) => {
+          const d = docu.data();
+          return s + Number(d.calories || 0) * Number(d.qty || 1);
+        }, 0);
         setCalorie(sum);
+
+        let percent = null;
+        if (bmrVal && bmrVal > 0) {
+          percent = Math.round((sum / bmrVal) * 100);
+        }
 
         let lv = "normal";
         let ic = <img src="/enough.png" alt="enough" style={{ width: 80 }} />;
-        if (bmrVal && sum > bmrVal) {
-          lv = "over";
-          ic = <img src="/full.png" alt="full" style={{ width: 80 }} />;
-        } else if (bmrVal && sum >= bmrVal/2) {
-          lv = "near";
-          ic = <img src="/nearfull.png" alt="nearfull" style={{ width: 80 }} />;
+
+        if (percent !== null) {
+          if (percent > 100) {
+            lv = "over";
+            ic = <img src="/full.png" alt="full" style={{ width: 80 }} />;
+          } else if (percent >= 80) {
+            lv = "near";
+            ic = <img src="/nearfull.png" alt="nearfull" style={{ width: 80 }} />;
+          } else {
+            lv = "normal";
+            ic = <img src="/enough.png" alt="enough" style={{ width: 80 }} />;
+          }
         }
+
         setLevel(lv);
         setIcon(ic);
-        // ส่งค่า level ไปหน้า Home ผ่าน localStorage
-        if (typeof window !== 'undefined') {
-          window.localStorage.setItem('notifLevel', lv);
+
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem("notifLevel", lv);
         }
       } finally {
         setLoading(false);
@@ -88,7 +105,9 @@ export default function NotificationPage() {
       <Header title="ปริมาณแคลลอรี่วันนี้" cartoonImage="/8.png" />
 
       <div className="content">
-        {loading ? <div>กำลังโหลด...</div> : (
+        {loading ? (
+          <div>กำลังโหลด...</div>
+        ) : (
           <CalorieAlertCard
             level={level}
             title={

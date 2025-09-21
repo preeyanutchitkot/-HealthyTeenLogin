@@ -53,10 +53,10 @@ export default function ForeignFoodsPage() {
   }, []);
 
   useEffect(() => {
-    const total = cartItems.reduce((sum, it) => sum + it.qty, 0);
-    setCartCount(total);
+    const totalQty = cartItems.reduce((sum, it) => sum + (Number(it.qty) || 0), 0);
+    setCartCount(Math.floor(totalQty));
   }, [cartItems]);
-
+  
   const filteredFoods = useMemo(
     () =>
       [...foods, ...customFoods].filter((f) =>

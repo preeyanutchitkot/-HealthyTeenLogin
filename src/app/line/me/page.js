@@ -11,9 +11,9 @@ import { Noto_Sans_Thai } from "next/font/google";
 /* ===== Firebase ===== */
 import { auth, db } from "../lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc, collection, query, where, orderBy, getDocs } from "firebase/firestore";
+import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
 
-import styles from "./MePage.module.css"; // ✅ ใช้ CSS Module
+import styles from "./MePage.module.css";
 
 const notoSansThai = Noto_Sans_Thai({
   weight: ["300", "400", "500", "700"],
@@ -21,66 +21,114 @@ const notoSansThai = Noto_Sans_Thai({
   display: "swap",
 });
 
+/* ---------- helpers (เหมือนหน้า Home) ---------- */
+const toYMD = (d) => {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+};
+const bellSrcByPercent = (percent) => {
+  if (percent == null) return "/b1.png"; // ไม่มีข้อมูล => เขียว
+  if (percent > 100) return "/b3.png";   // แดง
+  if (percent >= 80) return "/b2.png";   // เหลือง
+  return "/b1.png";                       // เขียว
+};
+
 export default function MePage() {
-  const fmtDate = (d) =>
-    new Date(d).toLocaleDateString("th-TH", { day: "2-digit", month: "2-digit", year: "2-digit" });
-  const today = useMemo(() => fmtDate(new Date()), []);
+  const fmtTh = (date) =>
+    new Date(date).toLocaleDateString("th-TH", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "2-digit",
+    });
+
+  const today = useMemo(() => fmtTh(new Date()), []);
 
   const [bmi, setBmi] = useState(null);
   const [bmr, setBmr] = useState(null);
+
   const [dailyLogs, setDailyLogs] = useState([]);
   const [openDates, setOpenDates] = useState({});
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // แจ้งเตือน (ให้เหมือนหน้า Home)
-  const [showNotif, setShowNotif] = useState(true);
-  const [notifColor, setNotifColor] = useState("green");
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const lv = window.localStorage.getItem("notifLevel");
-      if (lv === "over") setNotifColor("red");
-      else if (lv === "near") setNotifColor("yellow");
-      else setNotifColor("green");
-    }
-  }, []);
-  const notifDotClass =
-    notifColor === "red"
-      ? `${styles.notifDot} ${styles.dotRed}`
-      : notifColor === "yellow"
-      ? `${styles.notifDot} ${styles.dotYellow}`
-      : `${styles.notifDot} ${styles.dotGreen}`;
+  /* ระฆังเหมือนหน้า Home */
+  const [bellSrc, setBellSrc] = useState("/b1.png");
 
-  const toggleDate = (date) => setOpenDates((prev) => ({ ...prev, [date]: !prev[date] }));
+  const toggleDate = (date) =>
+    setOpenDates((prev) => ({ ...prev, [date]: !prev[date] }));
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
-      if (!user) return;
-
-      /* users/<uid> — อ่าน BMI/BMR */
-      try {
-        const uSnap = await getDoc(doc(db, "users", user.uid));
-        const uData = uSnap.exists() ? uSnap.data() : null;
-        setBmi(uData?.bmi != null ? Number(uData.bmi) : null);
-        setBmr(uData?.bmr != null ? Number(uData.bmr) : null);
-      } catch (e) {
-        console.error("load BMI/BMR error:", e);
+      if (!user) {
+        setBellSrc("/b1.png");
+        const fallback = [{ date: today, items: [] }];
+        setDailyLogs(fallback);
+        setOpenDates({ [today]: true });
+        return;
       }
 
-      /* food/* — อ่าน log ทั้งหมดของผู้ใช้ เรียงล่าสุดก่อน */
       try {
-        const qy = query(collection(db, "food"), where("uid", "==", user.uid), orderBy("date", "desc"));
+        /* --------- 1) โหลด BMR --------- */
+        const uSnap = await getDoc(doc(db, "users", user.uid));
+        const u = uSnap.exists() ? uSnap.data() : null;
+        const bmrVal = u?.bmr != null ? Number(u.bmr) : null;
+        setBmi(u?.bmi != null ? Number(u.bmi) : null);
+        setBmr(bmrVal);
+
+        /* --------- 2) คำนวณแคลวันนี้ เพื่อเลือกระฆัง --------- */
+        const ymd = toYMD(new Date());
+        const qToday = query(
+          collection(db, "food"),
+          where("uid", "==", user.uid),
+          where("ymd", "==", ymd)
+        );
+        const snapToday = await getDocs(qToday);
+
+        let sumCal = 0;
+        snapToday.forEach((docSnap) => {
+          const x = docSnap.data();
+          const cal = Number(x.calories || 0);
+          const qty = Number(x.qty || 1);
+          sumCal += cal * qty;
+        });
+
+        const percent = bmrVal && bmrVal > 0 ? Math.round((sumCal / bmrVal) * 100) : null;
+        setBellSrc(bellSrcByPercent(percent));
+      } catch (e) {
+        console.error("bell calc error:", e);
+        setBellSrc("/b1.png");
+      }
+
+      /* --------- 3) โหลด logs ทั้งหมด จัดกลุ่มตามวัน (เหมือนเดิม) --------- */
+      const ymdToTh = (ymd) => {
+        const [y, m, d] = String(ymd).split("-").map(Number);
+        return fmtTh(new Date(y, m - 1, d));
+      };
+
+      try {
+        const qy = query(collection(db, "food"), where("uid", "==", user.uid));
         const snap = await getDocs(qy);
 
         const byDate = {};
         snap.forEach((docSnap) => {
           const d = docSnap.data();
-          const dateStr = d?.date?.toDate ? fmtDate(d.date.toDate()) : today;
+          const dateStr = d?.ymd
+            ? ymdToTh(d.ymd)
+            : d?.date?.toDate
+            ? fmtTh(d.date.toDate())
+            : today;
+
           if (!byDate[dateStr]) byDate[dateStr] = [];
+
           const itemName = d.item ?? d.name ?? d.menu ?? d.title ?? "ไม่ระบุเมนู";
           byDate[dateStr].push({
             name: itemName,
-            cal: d.calories != null && d.qty != null ? `${Number(d.calories)}x${Number(d.qty)}` : String(d.calories ?? "-"),
-            img: d.imageUrl || d.img || "/placeholder.png",
+            cal:
+              d.calories != null && d.qty != null
+                ? `${Number(d.calories)}x${Number(d.qty)}`
+                : String(d.calories ?? "-"),
+            img: d.imageUrl || d.imgUrl || d.img || "/placeholder.png",
           });
         });
 
@@ -90,12 +138,13 @@ export default function MePage() {
           return new Date(2000 + yb, mb - 1, dbb) - new Date(2000 + ya, ma - 1, da);
         });
 
-        const logsArr = orderedDates.length
-          ? orderedDates.map((dateStr) => ({ date: dateStr, items: byDate[dateStr] }))
-          : [{ date: today, items: [] }];
+        const logs =
+          orderedDates.length > 0
+            ? orderedDates.map((ds) => ({ date: ds, items: byDate[ds] }))
+            : [{ date: today, items: [] }];
 
-        setDailyLogs(logsArr);
-        setOpenDates({ [logsArr[0].date]: true });
+        setDailyLogs(logs);
+        setOpenDates({ [logs[0].date]: true });
       } catch (e) {
         console.error("load food logs error:", e);
         const fallback = [{ date: today, items: [] }];
@@ -109,42 +158,46 @@ export default function MePage() {
 
   return (
     <div className={`${notoSansThai.className} ${styles.page}`}>
-      {/* global bg ให้เหมือนเดิมเป๊ะ */}
       <style jsx global>{`
-        html, body, #__next { height:100%; margin:0; padding:0; background-color:#f3faee; }
-        * { box-sizing:border-box; }
+        html, body, #__next { height: 100%; margin: 0; padding: 0; background-color: #f3faee; }
+        * { box-sizing: border-box; }
       `}</style>
 
       {/* Header */}
       <div className={styles.header}>
         <div className={styles.headerTop}>
-          <Link href="/line/home" aria-label="ย้อนกลับ" className={styles.back}></Link>
-          <div className={styles.title}></div>
-          <div className="right-icons" />
+          <Link href="/line/home" aria-label="ย้อนกลับ" className={styles.back} />
+          <div className={styles.title} />
+          <div className={styles.headerIcons}>
+            <Link
+              href="/line/notification"
+              aria-label="การแจ้งเตือน"
+              className={styles.notifWrap}
+            >
+              {/* ระฆังใช้ b1/b2/b3 ตามเปอร์เซ็นต์วันนี้ */}
+              <Image
+                src={bellSrc}
+                alt="แจ้งเตือน"
+                width={38}
+                height={50}
+                className={styles.notifBell}
+                priority
+              />
+            </Link>
+
+            <button
+              className={styles.menuBtn}
+              onClick={() => setMenuOpen(true)}
+              aria-label="เมนู"
+              type="button"
+            >
+              <Image src="/Menu.png" alt="menu" width={28} height={40} />
+            </button>
+          </div>
         </div>
 
         <div className={styles.profile}>
           <Image src="/profile.png" alt="profile" width={72} height={72} />
-        </div>
-
-        <div className={styles.headerIcons}>
-          <Link
-            href="/line/notification"
-            aria-label="การแจ้งเตือน"
-            onClick={() => setShowNotif(false)}
-            className={styles.notifWrap}
-          >
-            <Image src="/Doorbell.png" alt="doorbell" width={28} height={40} />
-            {showNotif && <span className={notifDotClass} />}
-          </Link>
-
-          <button
-            className={styles.menuBtn}
-            onClick={() => setMenuOpen(true)}
-            aria-label="เมนู"
-          >
-            <Image src="/Menu.png" alt="menu" width={28} height={40} />
-          </button>
         </div>
 
         <div className={styles.metrics}>
@@ -154,10 +207,8 @@ export default function MePage() {
             {bmr != null && !isNaN(bmr) ? ` | BMR: ${Number(bmr)}` : ""}
           </div>
         </div>
-
       </div>
 
-  
       <div className={styles.summaryWrap}>
         <CalorieSummary variant="floating" />
         <Image
@@ -174,18 +225,22 @@ export default function MePage() {
         {dailyLogs.map((d) => {
           const open = !!openDates[d.date];
           return (
-            <div className={`${styles.dayCard} ${open ? "open" : ""}`} key={d.date}>
+            <div className={`${styles.dayCard} ${open ? styles.open : ""}`} key={d.date}>
               <button
                 className={styles.dayHeader}
                 onClick={() => toggleDate(d.date)}
                 aria-expanded={open}
                 aria-controls={`panel-${d.date}`}
               >
-                <span className="day-label">{d.date}</span>
+                <span className={styles.dayLabel}>{d.date}</span>
                 <span className={`${styles.chev} ${open ? styles.rot : ""}`}>▾</span>
               </button>
 
-              <div id={`panel-${d.date}`} className={styles.dayBody} style={{ maxHeight: open ? "500px" : "0px" }}>
+              <div
+                id={`panel-${d.date}`}
+                className={styles.dayBody}
+                style={{ maxHeight: open ? "560px" : "0px" }}
+              >
                 {d.items && d.items.length > 0 ? (
                   <div className={styles.menuTable}>
                     <div className={styles.menuHeaderRow}>

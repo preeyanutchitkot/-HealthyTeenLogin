@@ -52,10 +52,9 @@ const snackFoods = [
 ];
 
 export default function FoodsPage() {
-  const [foods, setFoods] = useState(sweetFoods);
+  const [savory, setSavory] = useState(savoryFoods);
+  const [sweets, setSweets] = useState(sweetFoods);
   const [snacks, setSnacks] = useState(snackFoods);
-  const [savoryFoodsState, setSavoryFoods] = useState(savoryFoods);
-
   const [searchQuery, setSearchQuery] = useState("");
   const [cartCount, setCartCount] = useState(0);
   const [cartItems, setCartItems] = useState([]);
@@ -74,10 +73,9 @@ export default function FoodsPage() {
   }, []);
 
   useEffect(() => {
-    const total = cartItems.reduce((sum, it) => sum + it.qty, 0);
-    setCartCount(total);
+    const totalQty = cartItems.reduce((sum, it) => sum + (Number(it.qty) || 0), 0);
+    setCartCount(Math.floor(totalQty));
   }, [cartItems]);
-
 
   const persist = (next) => {
     setCartItems(next);
@@ -88,17 +86,17 @@ export default function FoodsPage() {
     }
   };
 
-  const filteredFoods = useMemo(
-    () => foods.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())),
-    [foods, searchQuery]
+  const filteredSavory = useMemo(
+    () => savory.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())),
+    [savory, searchQuery]
+  );
+  const filteredSweets = useMemo(
+    () => sweets.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())),
+    [sweets, searchQuery]
   );
   const filteredSnacks = useMemo(
     () => snacks.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())),
     [snacks, searchQuery]
-  );
-  const filteredSavoryFoods = useMemo(
-    () => savoryFoodsState.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())),
-    [savoryFoodsState, searchQuery]
   );
 
   const roundHalf = (n) => Math.round(n * 2) / 2;
@@ -108,11 +106,11 @@ export default function FoodsPage() {
       const idx = prev.findIndex((item) => item.name === food.name);
       const updated =
         idx === -1
-          ? [...prev, { ...food, qty: 1 }] // ✅ ครั้งแรก = 1
+          ? [...prev, { ...food, qty: 1 }] // ครั้งแรก = 1
           : prev.map((it, i) =>
               i === idx ? { ...it, qty: roundHalf(it.qty + 0.5) } : it
             );
-      localStorage.setItem("cartItems", JSON.stringify(updated));
+      try { localStorage.setItem("cartItems", JSON.stringify(updated)); } catch {}
       return updated;
     });
   };
@@ -137,10 +135,9 @@ export default function FoodsPage() {
   };
 
   return (
-    <div className="page foods-page">
+    <div className="page foods-page" data-scope="food">
       <Header title="บันทึกอาหาร" cartoonImage="/8.png" />
 
-      {/* Search */}
       <div className="search-wrap">
         <div className="search-pill" role="search">
           <Image src="/search.png" alt="ค้นหา" width={23} height={23} />
@@ -183,32 +180,28 @@ export default function FoodsPage() {
         }}
       />
 
-      {/* อาหารคาว */}
       <div className="tabs">
         <div className="tab-left">
           <button className="active">อาหารคาว</button>
         </div>
         <CartIcon count={cartCount} onClick={() => setShowSheet(true)} />
       </div>
-      <FoodGrid foods={filteredSavoryFoods} onAdd={addToCart} />
+      <FoodGrid foods={filteredSavory} onAdd={addToCart} />
 
-      {/* อาหารหวาน */}
-      <div className="tabs">
+      <div className="tabs" style={{ marginTop: 8 }}>
         <div className="tab-left">
           <button className="active">อาหารหวาน</button>
         </div>
       </div>
-      <FoodGrid foods={filteredFoods} onAdd={addToCart} />
+      <FoodGrid foods={filteredSweets} onAdd={addToCart} />
 
-      {/* ของว่าง */}
-      <div className="tabs">
+      <div className="tabs" style={{ marginTop: 8 }}>
         <div className="tab-left">
           <button className="active">ของว่าง</button>
         </div>
       </div>
       <FoodGrid foods={filteredSnacks} onAdd={addToCart} />
 
-      {/* CartSheet */}
       {showSheet && (
         <>
           <div className="overlay" onClick={() => setShowSheet(false)} />

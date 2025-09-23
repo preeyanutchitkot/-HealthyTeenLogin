@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import BottomMenu from "../components/menu";
@@ -8,10 +8,17 @@ import CalorieSummary from "../components/CalorieSummary";
 import MenuPopup from "../components/MenuPopup";
 import { Noto_Sans_Thai } from "next/font/google";
 
-/* ===== Firebase ===== */
 import { auth, db } from "../lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  onSnapshot,
+} from "firebase/firestore";
 
 import styles from "./MePage.module.css";
 
@@ -21,18 +28,18 @@ const notoSansThai = Noto_Sans_Thai({
   display: "swap",
 });
 
-/* ---------- helpers (เหมือนหน้า Home) ---------- */
 const toYMD = (d) => {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");
   const day = String(d.getDate()).padStart(2, "0");
   return `${y}-${m}-${day}`;
 };
+
 const bellSrcByPercent = (percent) => {
-  if (percent == null) return "/b1.png"; // ไม่มีข้อมูล => เขียว
-  if (percent > 100) return "/b3.png";   // แดง
-  if (percent >= 80) return "/b2.png";   // เหลือง
-  return "/b1.png";                       // เขียว
+  if (percent == null) return "/b1.png";
+  if (percent > 100) return "/b3.png";
+  if (percent >= 80) return "/b2.png";
+  return "/b1.png";
 };
 
 export default function MePage() {
@@ -45,6 +52,8 @@ export default function MePage() {
 
   const today = useMemo(() => fmtTh(new Date()), []);
 
+  const [uid, setUid] = useState(null);
+
   const [bmi, setBmi] = useState(null);
   const [bmr, setBmr] = useState(null);
 
@@ -52,39 +61,62 @@ export default function MePage() {
   const [openDates, setOpenDates] = useState({});
   const [menuOpen, setMenuOpen] = useState(false);
 
-  /* ระฆังเหมือนหน้า Home */
-  const [bellSrc, setBellSrc] = useState("/b1.png");
+  const [bellSrc, setBellSrc] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("bellSrc") || null;
+    }
+    return null;
+  });
+  useEffect(() => {
+    if (bellSrc) localStorage.setItem("bellSrc", bellSrc);
+  }, [bellSrc]);
 
-  const toggleDate = (date) =>
-    setOpenDates((prev) => ({ ...prev, [date]: !prev[date] }));
+  const bmrRef = useRef(null);
+  const sumTodayRef = useRef(0);
+
+  const recomputeBell = () => {
+    const b = bmrRef.current;
+    const s = sumTodayRef.current;
+    let percent = null;
+    if (b && b > 0) percent = Math.round((s / b) * 100);
+    const next = bellSrcByPercent(percent);
+    setBellSrc((prev) => (prev === next ? prev : next));
+  };
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        setBellSrc("/b1.png");
-        const fallback = [{ date: today, items: [] }];
-        setDailyLogs(fallback);
-        setOpenDates({ [today]: true });
-        return;
-      }
+    const unsub = onAuthStateChanged(auth, (user) => {
+      setUid(user ? user.uid : null);
+    });
+    return () => unsub();
+  }, []);
 
-      try {
-        /* --------- 1) โหลด BMR --------- */
-        const uSnap = await getDoc(doc(db, "users", user.uid));
-        const u = uSnap.exists() ? uSnap.data() : null;
-        const bmrVal = u?.bmr != null ? Number(u.bmr) : null;
-        setBmi(u?.bmi != null ? Number(u.bmi) : null);
-        setBmr(bmrVal);
+  useEffect(() => {
+    if (!uid) {
+      const fallback = [{ date: today, items: [] }];
+      setDailyLogs(fallback);
+      setOpenDates({ [today]: true });
+      return;
+    }
 
-        /* --------- 2) คำนวณแคลวันนี้ เพื่อเลือกระฆัง --------- */
-        const ymd = toYMD(new Date());
-        const qToday = query(
-          collection(db, "food"),
-          where("uid", "==", user.uid),
-          where("ymd", "==", ymd)
-        );
-        const snapToday = await getDocs(qToday);
+    const ymd = toYMD(new Date());
 
+    const unsubUser = onSnapshot(doc(db, "users", uid), (uSnap) => {
+      const u = uSnap.exists() ? uSnap.data() : null;
+      const bmrVal = u?.bmr != null ? Number(u.bmr) : null;
+      bmrRef.current = bmrVal;
+      setBmr(bmrVal);
+      setBmi(u?.bmi != null ? Number(u.bmi) : null);
+      recomputeBell();
+    });
+
+    const qToday = query(
+      collection(db, "food"),
+      where("uid", "==", uid),
+      where("ymd", "==", ymd)
+    );
+    const unsubFoodToday = onSnapshot(
+      qToday,
+      (snapToday) => {
         let sumCal = 0;
         snapToday.forEach((docSnap) => {
           const x = docSnap.data();
@@ -92,22 +124,31 @@ export default function MePage() {
           const qty = Number(x.qty || 1);
           sumCal += cal * qty;
         });
-
-        const percent = bmrVal && bmrVal > 0 ? Math.round((sumCal / bmrVal) * 100) : null;
-        setBellSrc(bellSrcByPercent(percent));
-      } catch (e) {
-        console.error("bell calc error:", e);
-        setBellSrc("/b1.png");
+        sumTodayRef.current = sumCal;
+        recomputeBell();
+      },
+      (e) => {
+        console.error("today food snapshot error:", e);
       }
+    );
 
-      /* --------- 3) โหลด logs ทั้งหมด จัดกลุ่มตามวัน (เหมือนเดิม) --------- */
-      const ymdToTh = (ymd) => {
-        const [y, m, d] = String(ymd).split("-").map(Number);
-        return fmtTh(new Date(y, m - 1, d));
-      };
+    return () => {
+      unsubUser();
+      unsubFoodToday();
+    };
+  }, [uid, today]);
 
+  useEffect(() => {
+    let cancelled = false;
+    const ymdToTh = (ymd) => {
+      const [y, m, d] = String(ymd).split("-").map(Number);
+      return fmtTh(new Date(y, m - 1, d));
+    };
+
+    const run = async () => {
+      if (!uid) return;
       try {
-        const qy = query(collection(db, "food"), where("uid", "==", user.uid));
+        const qy = query(collection(db, "food"), where("uid", "==", uid));
         const snap = await getDocs(qy);
 
         const byDate = {};
@@ -143,18 +184,28 @@ export default function MePage() {
             ? orderedDates.map((ds) => ({ date: ds, items: byDate[ds] }))
             : [{ date: today, items: [] }];
 
-        setDailyLogs(logs);
-        setOpenDates({ [logs[0].date]: true });
+        if (!cancelled) {
+          setDailyLogs(logs);
+          setOpenDates({ [logs[0].date]: true });
+        }
       } catch (e) {
         console.error("load food logs error:", e);
-        const fallback = [{ date: today, items: [] }];
-        setDailyLogs(fallback);
-        setOpenDates({ [today]: true });
+        if (!cancelled) {
+          const fallback = [{ date: today, items: [] }];
+          setDailyLogs(fallback);
+          setOpenDates({ [today]: true });
+        }
       }
-    });
+    };
 
-    return () => unsub();
-  }, [today]);
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [uid, today]);
+
+  const toggleDate = (date) =>
+    setOpenDates((prev) => ({ ...prev, [date]: !prev[date] }));
 
   return (
     <div className={`${notoSansThai.className} ${styles.page}`}>
@@ -174,15 +225,18 @@ export default function MePage() {
               aria-label="การแจ้งเตือน"
               className={styles.notifWrap}
             >
-              {/* ระฆังใช้ b1/b2/b3 ตามเปอร์เซ็นต์วันนี้ */}
-              <Image
-                src={bellSrc}
-                alt="แจ้งเตือน"
-                width={38}
-                height={50}
-                className={styles.notifBell}
-                priority
-              />
+              {bellSrc ? (
+                <Image
+                  src={bellSrc}
+                  alt="แจ้งเตือน"
+                  width={38}
+                  height={50}
+                  className={styles.notifBell}
+                  priority
+                />
+              ) : (
+                <div style={{ width: 38, height: 50 }} />
+              )}
             </Link>
 
             <button
@@ -209,8 +263,9 @@ export default function MePage() {
         </div>
       </div>
 
+      {/* ใช้ตำแหน่งมาตรฐาน (ไม่เลื่อนลงเยอะเหมือน Home) */}
       <div className={styles.summaryWrap}>
-        <CalorieSummary variant="floating" />
+        <CalorieSummary variant="floating" topOffset={120} />
         <Image
           src="/bunny.png"
           alt="bunny"

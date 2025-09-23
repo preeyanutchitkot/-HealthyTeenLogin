@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import BottomMenu from "../components/menu";
@@ -7,7 +7,13 @@ import CalorieSummary from "../components/CalorieSummary";
 import MenuPopup from "../components/MenuPopup";
 
 import { auth, db } from "../lib/firebase";
-import { collection, getDocs, query, where, doc, getDoc } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  doc,
+  onSnapshot,
+} from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 
 import styles from "./HomePage.module.css";
@@ -22,10 +28,10 @@ const toYMD = (d) => {
 };
 
 const bellSrcByPercent = (percent) => {
-  if (percent == null) return "/b1.png";        // ไม่มีข้อมูล => เขียวไว้ก่อน
-  if (percent > 100) return "/b3.png";          // แดง
-  if (percent >= 80) return "/b2.png";          // เหลือง
-  return "/b1.png";                              // เขียว
+  if (percent == null) return "/b1.png"; // ไม่มีข้อมูล => เขียว
+  if (percent > 100) return "/b3.png";   // แดง
+  if (percent >= 80) return "/b2.png";   // เหลือง
+  return "/b1.png";                      // เขียว
 };
 
 export default function HomePage() {
@@ -34,9 +40,33 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // รูประฆังตามเปอร์เซ็นต์ของเป้าหมายวันนี้
-  const [bellSrc, setBellSrc] = useState("/b1.png");
+  // ระฆัง: เริ่มจากค่าที่เคยเก็บไว้ เพื่อลดการกระพริบ
+  const [bellSrc, setBellSrc] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("bellSrc") || null;
+    }
+    return null;
+  });
+  useEffect(() => {
+    if (bellSrc) localStorage.setItem("bellSrc", bellSrc);
+  }, [bellSrc]);
 
+  // refs สำหรับคำนวณรวม
+  const bmrRef = useRef(null);
+  const sumRef = useRef(0);
+
+  const recomputeBell = () => {
+    const bmrVal = bmrRef.current;
+    const sumCal = sumRef.current;
+    let percent = null;
+    if (bmrVal && bmrVal > 0) {
+      percent = Math.round((sumCal / bmrVal) * 100);
+    }
+    const next = bellSrcByPercent(percent);
+    setBellSrc((prev) => (prev === next ? prev : next));
+  };
+
+  // ตามสถานะการล็อกอิน
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) setUid(user.uid);
@@ -45,31 +75,35 @@ export default function HomePage() {
     return () => unsubscribe();
   }, []);
 
+  // realtime listeners
   useEffect(() => {
-    const load = async () => {
-      if (!uid) {
-        setItems([]);
-        setBellSrc("/b1.png");
-        setLoading(false);
-        return;
-      }
-      setLoading(true);
-      try {
-        const ymd = toYMD(new Date());
+    // ไม่มีผู้ใช้: ไม่รีเซ็ตเป็นเขียว ปล่อยให้ใช้ค่าก่อนหน้า
+    if (!uid) {
+      setItems([]);
+      setLoading(false);
+      return;
+    }
 
-        // 1) ดึง BMR ผู้ใช้
-        const uSnap = await getDoc(doc(db, "users", uid));
-        const uData = uSnap.exists() ? uSnap.data() : null;
-        const bmrVal = uData?.bmr ? Number(uData.bmr) : null;
+    setLoading(true);
+    const ymd = toYMD(new Date());
 
-        // 2) ดึงรายการอาหารวันนี้ + คำนวณผลรวมแคลอรี่
-        const qRef = query(
-          collection(db, "food"),
-          where("uid", "==", uid),
-          where("ymd", "==", ymd)
-        );
-        const snap = await getDocs(qRef);
+    // ฟัง BMR แบบเรียลไทม์
+    const unsubUser = onSnapshot(doc(db, "users", uid), (uSnap) => {
+      const uData = uSnap.exists() ? uSnap.data() : null;
+      bmrRef.current = uData?.bmr ? Number(uData.bmr) : null;
+      recomputeBell();
+    });
 
+    // ฟังรายการอาหารวันนี้แบบเรียลไทม์
+    const qRef = query(
+      collection(db, "food"),
+      where("uid", "==", uid),
+      where("ymd", "==", ymd)
+    );
+
+    const unsubFood = onSnapshot(
+      qRef,
+      (snap) => {
         let sumCal = 0;
         const rows = snap.docs.map((d) => {
           const x = d.data();
@@ -79,25 +113,24 @@ export default function HomePage() {
           return {
             name: x.name || x.item || "",
             img: x.imageUrl || "/placeholder.png",
-            calText: qty > 1 ? `${cal}x${qty}` : `${cal}`
+            calText: qty > 1 ? `${cal}x${qty}` : `${cal}`,
           };
         });
         setItems(rows);
-
-        let percent = null;
-        if (bmrVal && bmrVal > 0) {
-          percent = Math.round((sumCal / bmrVal) * 100);
-        }
-        setBellSrc(bellSrcByPercent(percent));
-      } catch (e) {
-        console.error("load today menu error:", e);
-        setItems([]);
-        setBellSrc("/b1.png");
-      } finally {
+        sumRef.current = sumCal;
+        recomputeBell();
+        setLoading(false);
+      },
+      (err) => {
+        console.error("food onSnapshot error:", err);
         setLoading(false);
       }
+    );
+
+    return () => {
+      unsubUser();
+      unsubFood();
     };
-    load();
   }, [uid]);
 
   return (
@@ -129,7 +162,12 @@ export default function HomePage() {
             aria-label="การแจ้งเตือน"
             className={styles.notifWrap}
           >
-            <Image src={bellSrc} alt="doorbell" width={38} height={50} />
+            {bellSrc ? (
+              <Image src={bellSrc} alt="doorbell" width={38} height={50} />
+            ) : (
+              // placeholder กันกระโดดก่อนคำนวณเสร็จ
+              <div style={{ width: 38, height: 50 }} />
+            )}
           </Link>
 
           <button
@@ -153,30 +191,31 @@ export default function HomePage() {
         />
       </div>
 
-    <div className={styles.circleMenu}>
-      {[
-        { label: "บันทึกอาหาร", href: "/line/food", img: "/enough.png", external: false },
-        { label: "แนะนำอาหาร", href: OA_URL,       img: "/ploy3.png",  external: true  },
-        { label: "พูดคุย",     href: "/line/food",  img: "/mo.png",     external: false },
-        { label: "วิดีโอสุขภาพ", href: "/line/lookvideo", img: "/p4.png", external: false }
-      ].map((item) =>
-        item.external ? (
-          <a key={item.label} href={item.href} className={styles.circleMenuItem} target="_blank" rel="noopener noreferrer">
-            <div className={styles.circleIcon}>
-              <Image src={item.img} alt={item.label} width={36} height={36} />
-            </div>
-            <div className={styles.circleLabel}>{item.label}</div>
-          </a>
-        ) : (
-          <Link href={item.href} key={item.label} className={styles.circleMenuItem}>
-            <div className={styles.circleIcon}>
-              <Image src={item.img} alt={item.label} width={36} height={36} />
-            </div>
-            <div className={styles.circleLabel}>{item.label}</div>
-          </Link>
-        )
-      )}
-    </div>
+      <div className={styles.circleMenu}>
+        {[
+          { label: "บันทึกอาหาร", href: "/line/food", img: "/enough.png", external: false },
+          { label: "แนะนำอาหาร", href: OA_URL,       img: "/ploy3.png",  external: true  },
+          { label: "พูดคุย",     href: "/line/food",  img: "/mo.png",     external: false },
+          { label: "วิดีโอสุขภาพ", href: "/line/lookvideo", img: "/p4.png", external: false }
+        ].map((item) =>
+          item.external ? (
+            <a key={item.label} href={item.href} className={styles.circleMenuItem} target="_blank" rel="noopener noreferrer">
+              <div className={styles.circleIcon}>
+                <Image src={item.img} alt={item.label} width={36} height={36} />
+              </div>
+              <div className={styles.circleLabel}>{item.label}</div>
+            </a>
+          ) : (
+            <Link href={item.href} key={item.label} className={styles.circleMenuItem}>
+              <div className={styles.circleIcon}>
+                <Image src={item.img} alt={item.label} width={36} height={36} />
+              </div>
+              <div className={styles.circleLabel}>{item.label}</div>
+            </Link>
+          )
+        )}
+      </div>
+
       {/* เมนูวันนี้ */}
       <div className={styles.menuToday}>
         <div className={styles.menuTable}>

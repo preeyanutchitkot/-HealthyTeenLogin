@@ -1,4 +1,4 @@
-.page{
+.page {
   background-color:#f3faee;
   min-height:100vh;
   padding-bottom:calc(88px + env(safe-area-inset-bottom,0px));
@@ -10,78 +10,227 @@
 }
 
 /* Header */
-.header{ background-color:#3ABB47; position:relative; padding-bottom:40px; }
-.headerTop{ display:grid; grid-template-columns:48px 1fr 64px; align-items:center; color:#fff; padding:10px 12px; }
-.back{ color:#fff; font-size:24px; text-decoration:none; display:flex; align-items:center; }
-.title{ text-align:center; line-height:1.1; }
-.title .app{ font-weight:700; }
-.title .sub{ font-size:12px; opacity:.8; }
+.header {
+  background-color:#3ABB47;
+  position:relative;
+  padding-bottom:40px;
+}
+.headerTop {
+  display:grid;
+  grid-template-columns:48px 1fr 64px;
+  align-items:center;
+  color:#fff;
+  padding:10px 12px;
+}
+.back {
+  color:#fff;
+  font-size:24px;
+  text-decoration:none;
+  display:flex;
+  align-items:center;
+}
+.title {
+  text-align:center;
+  line-height:1.1;
+}
+.title .app {
+  font-weight:700;
+}
+.title .sub {
+  font-size:12px;
+  opacity:.8;
+}
 
 /* โปรไฟล์กลางหัว */
-.profile{ position:absolute; top:56px; left:50%; transform:translateX(-50%); background:#fff; border-radius:50%; overflow:hidden; width:72px; height:72px; box-shadow:0 2px 6px rgba(0,0,0,.2); z-index:20; }
-.profile img{ width:100%; height:100%; object-fit:cover; border-radius:50%; }
+.profile {
+  position:absolute;
+  top:56px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#fff;
+  border-radius:50%;
+  overflow:hidden;
+  width:72px;
+  height:72px;
+  box-shadow:0 2px 6px rgba(0,0,0,.2);
+  z-index:20;
+}
+.profile img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  border-radius:50%;
+}
 
 /* ไอคอนขวาบน */
-.headerIcons{ position:absolute; top:16px; right:16px; display:flex; gap:12px; z-index:20; }
-.menuBtn{ background:none; border:none; padding:0; margin:0; cursor:pointer; }
-
-.notifWrap{ position:relative; display:inline-block; }
-.notifDot{
-  position:absolute; bottom:10px; right:0;
-  width:8px; height:8px; border-radius:50%;
-  border:1.5px solid #fff; z-index:2;
+.headerIcons {
+  position:absolute;
+  top:16px;
+  right:16px;
+  display:flex;
+  gap:12px;
+  z-index:20;
 }
-.dotGreen{ background:#4CAF50; }
-.dotYellow{ background:#FFD600; }
-.dotRed{ background:#F44336; }
+.menuBtn {
+  background:none;
+  border:none;
+  padding:0;
+  margin:0;
+  cursor:pointer;
+}
 
-.metrics{
+.notifWrap {
+  position:relative;
+  display:inline-block;
+}
+.notifDot {
+  position:absolute;
+  bottom:10px;
+  right:0;
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  border:1.5px solid #fff;
+  z-index:2;
+}
+.dotGreen { background:#4CAF50; }
+.dotYellow { background:#FFD600; }
+.dotRed { background:#F44336; }
+
+/* ค่าทางโภชนาการ */
+.metrics {
   color:#fff;
   margin-top:138px;
   padding:0 20px 12px;
-  font-size:16px;   /* ⬅️ ใหญ่ขึ้นจาก 13px */
-  font-weight:600;    /* ⬅️ หนาขึ้นนิด */
+  font-size:16px;
+  font-weight:600;
   text-align:center;
 }
 
-.summaryWrap{
-  position:relative;       /* ⬅️ ให้เป็น anchor ของกระต่าย */
+/* กล่องสรุปแคล */
+.summaryWrap {
+  position:relative;       /* anchor ของกระต่าย */
   width:332px;
-  margin:-100px auto 10px;
+  margin: -120px auto 10px;
+  z-index:30;
+}
+.bunnyByCard {
+  position:absolute;
+  top:80px;    /* ⬅ ปรับได้ถ้ากระต่ายสูง/ต่ำเกิน */
+  right:-8px;
+  width:78px;
+  height:auto;
+  pointer-events:none;
   z-index:30;
 }
 
-.bunnyByCard {
-  position: absolute;
-  top: 50px;   /* ⬅️ ตรงนี้! ปรับเลขเพื่อเลื่อนขึ้น/ลง */
-  right: -8px;
-  width: 78px;
-  height: auto;
-  pointer-events: none;
-  z-index: 30;
+/* Accordion รายวัน */
+.dayAccordion {
+  padding:0 16px 12px;
+  display:grid;
+  gap:12px;
+  margin-top:350px;
+}
+.dayCard {
+  background:#fff;
+  border-radius:14px;
+  box-shadow:0 2px 8px rgba(0,0,0,.08);
+  overflow:hidden;
+}
+.dayHeader {
+  width:100%;
+  text-align:left;
+  background:#fff;
+  border:none;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:20px 16px;
+  cursor:pointer;
+  font-weight:600;
+}
+.chev {
+  transition:transform .2s ease;
+}
+.rot {
+  transform:rotate(180deg);
+}
+.dayBody {
+  overflow:hidden;
+  transition:max-height .25s ease, opacity .2s ease;
+  opacity:1;
+  padding:0 12px 12px;
+}
+.dayCard:not(.open) .dayBody {
+  opacity:0;
+  padding:0 12px;
 }
 
-
-/* Accordion รายวัน */
-.dayAccordion{ padding:0 16px 12px; display:grid; gap:12px; margin-top:320px; }
-.dayCard{ background:#fff; border-radius:14px; box-shadow:0 2px 8px rgba(0,0,0,.08); overflow:hidden; }
-.dayHeader{ width:100%; text-align:left; background:#fff; border:none; display:flex; align-items:center; justify-content:space-between; padding:20px 16px; cursor:pointer; font-weight:600; }
-.chev{ transition:transform .2s ease; }
-.rot{ transform:rotate(180deg); }
-.dayBody{ overflow:hidden; transition:max-height .25s ease, opacity .2s ease; opacity:1; padding:0 12px 12px; }
-.dayCard:not(.open) .dayBody{ opacity:0; padding:0 12px; }
-
-.empty{ background:#fafafa; border:1px dashed #e3e3e3; border-radius:10px; padding:14px; text-align:center; color:#6b7280; font-size:13px; }
+/* ข้อความว่าง */
+.empty {
+  background:#fafafa;
+  border:1px dashed #e3e3e3;
+  border-radius:10px;
+  padding:14px;
+  text-align:center;
+  color:#6b7280;
+  font-size:13px;
+}
 
 /* ตารางเมนู */
-.menuTable{ background:#fff; border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,.05); overflow:hidden; margin-top:8px; }
-.menuHeaderRow{ display:flex; background:#fff; padding:10px 12px; font-weight:700; font-size:14px; color:#333; border-bottom:1px solid #e8e8e8; }
-.menuHeaderImg{ width:90px; text-align:center; }
-.menuHeaderName{ flex:1; text-align:center; }
-.menuHeaderCal{ width:90px; text-align:center; }
+.menuTable {
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 2px 6px rgba(0,0,0,.05);
+  overflow:hidden;
+  margin-top:8px;
+}
+.menuHeaderRow {
+  display:flex;
+  background:#fff;
+  padding:10px 12px;
+  font-weight:700;
+  font-size:14px;
+  color:#333;
+  border-bottom:1px solid #e8e8e8;
+}
+.menuHeaderImg { width:90px; text-align:center; }
+.menuHeaderName { flex:1; text-align:center; }
+.menuHeaderCal { width:90px; text-align:center; }
 
-.menuRow{ display:flex; align-items:center; padding:10px 12px; border-top:1px solid #f0f0f0; background:#fff; }
-.menuColImg{ width:90px; display:flex; justify-content:center; align-items:center; }
-.menuThumb{ border-radius:8px; object-fit:cover; }
-.menuColName{ flex:1; font-size:14.5px; font-weight:500; color:#2f3a43; display:flex; justify-content:center; align-items:center; text-align:center; }
-.menuColCal{ width:90px; font-size:14px; font-weight:700; color:#2a2a2a; display:flex; justify-content:center; align-items:center; }
+.menuRow {
+  display:flex;
+  align-items:center;
+  padding:10px 12px;
+  border-top:1px solid #f0f0f0;
+  background:#fff;
+}
+.menuColImg {
+  width:90px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+.menuThumb {
+  border-radius:8px;
+  object-fit:cover;
+}
+.menuColName {
+  flex:1;
+  font-size:14.5px;
+  font-weight:500;
+  color:#2f3a43;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+}
+.menuColCal {
+  width:90px;
+  font-size:14px;
+  font-weight:700;
+  color:#2a2a2a;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}

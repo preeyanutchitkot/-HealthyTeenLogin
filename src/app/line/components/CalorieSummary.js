@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import Image from "next/image";
 import { auth, db } from "../lib/firebase";
 import { collection, getDocs, orderBy, query, where, Timestamp } from "firebase/firestore";
 
@@ -10,8 +9,6 @@ export default function CalorieSummary({
   variant = "floating",
   uid,
   daysRange = 7,
-  bunnyImage = "/bunny.png",
-  topOffset = 120,            // ✅ เพิ่มพร็อพนี้
 }) {
   const [dailyCalorie, setDailyCalorie] = useState(0);
   const [weeklyCalorie, setWeeklyCalorie] = useState(0);
@@ -56,11 +53,7 @@ export default function CalorieSummary({
   }, [uid, todayYMD, daysRange, today]);
 
   return (
-    <div
-      className={`summary-container ${variant==="inline" ? "inline" : "floating"}`}
-      style={variant==="floating" ? { ["--cs-top"]: `${topOffset}px` } : undefined}  // ✅ ส่งค่าเข้า CSS variable
-    >
-
+    <div className={`summary-container ${variant==="inline" ? "inline" : "floating"}`}>
       <p className="summary-title">สรุปแคลอรี่</p>
 
       {loading ? (
@@ -97,12 +90,11 @@ export default function CalorieSummary({
         }
         .summary-container.floating{
           position: absolute;
-          top: var(--cs-top, 120px); 
+          top: 140px;
           left: 50%;
           transform: translateX(-50%);
         }
         .summary-container.inline{ position: static; transform:none; margin:16px auto; }
-
 
         .summary-title{ font-weight:700; font-size:18px; margin:4px 0 10px; color:#111827; }
         .summary-box{ background:#f8fafc; border-radius:12px; padding:12px 8px; display:flex; justify-content:space-between; margin-top:10px; box-shadow:0 1px 4px rgba(0,0,0,.04); }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Header from "../../components/header";
 import { db, signInIfNeeded } from "../../lib/firebase";
@@ -13,6 +13,7 @@ import {
   deleteDoc,
   doc,
   limit,
+  onSnapshot,
 } from "firebase/firestore";
 
 export default function AllFoodListPage() {
@@ -20,7 +21,16 @@ export default function AllFoodListPage() {
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState(null);
 
+  const toYMD = (d) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  };
+
   useEffect(() => {
+    let unsub = null;
+
     (async () => {
       setLoading(true);
       try {
@@ -31,8 +41,17 @@ export default function AllFoodListPage() {
         const now = new Date();
         const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
         const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+        const ymd = toYMD(now);
 
-        const q = query(
+        // สร้างคิวรี 2 แบบ
+        const qYmd = query(
+          collection(db, "food"),
+          where("uid", "==", uid),
+          where("ymd", "==", ymd),
+          limit(2000)
+        );
+
+        const qDate = query(
           collection(db, "food"),
           where("uid", "==", uid),
           where("date", ">=", startOfDay),
@@ -41,27 +60,67 @@ export default function AllFoodListPage() {
           limit(2000)
         );
 
-        const snap = await getDocs(q);
-        const list = snap.docs.map((d) => {
-          const x = d.data();
-          return {
-            id: d.id,
-            item: x.item ?? x.name ?? x.menu ?? "ไม่ระบุเมนู",
-            calories: Number(x.calories ?? 0),
-            qty: Number(x.qty ?? 1),
-            imageUrl: x.imageUrl ?? x.image ?? "/placeholder.png",
-            date: x.date?.toDate?.() ?? null,
-          };
-        });
+        // ตรวจว่ามีข้อมูลแบบ ymd ไหม ถ้ามีใช้ตัวนี้, ถ้าไม่มีก็ใช้แบบ date
+        let useYmd = false;
+        try {
+          const probe = await getDocs(qYmd);
+          useYmd = !probe.empty;
+        } catch {
+          useYmd = false;
+        }
 
-        setFoods(list);
+        const activeQuery = useYmd ? qYmd : qDate;
+
+        // ฟังแบบ realtime
+        unsub = onSnapshot(
+          activeQuery,
+          (snap) => {
+            const list = snap.docs.map((d) => {
+              const x = d.data();
+              return {
+                id: d.id,
+                item: x.item ?? x.name ?? x.menu ?? "ไม่ระบุเมนู",
+                calories: Number(x.calories ?? 0),
+                qty: Number(x.qty ?? 1),
+                imageUrl: x.imageUrl ?? x.image ?? "/placeholder.png",
+                date: x.date?.toDate?.() ?? null,
+                ymd: x.ymd ?? null,
+                createdAt: x.createdAt?.toDate?.() ?? null,
+              };
+            });
+
+            // เรียงฝั่งไคลเอนต์ให้สวย (โดย date > createdAt > ymd)
+            list.sort((a, b) => {
+              const ta =
+                a.date?.getTime?.() ??
+                a.createdAt?.getTime?.() ??
+                (a.ymd ? new Date(a.ymd).getTime() : 0);
+              const tb =
+                b.date?.getTime?.() ??
+                b.createdAt?.getTime?.() ??
+                (b.ymd ? new Date(b.ymd).getTime() : 0);
+              return tb - ta; // ใหม่ไปเก่า
+            });
+
+            setFoods(list);
+            setLoading(false);
+          },
+          (err) => {
+            console.error("snapshot error:", err);
+            setFoods([]);
+            setLoading(false);
+          }
+        );
       } catch (e) {
         console.error("load foods error:", e);
         setFoods([]);
-      } finally {
         setLoading(false);
       }
     })();
+
+    return () => {
+      if (typeof unsub === "function") unsub();
+    };
   }, []);
 
   const handleDelete = async (id) => {
@@ -70,7 +129,7 @@ export default function AllFoodListPage() {
     try {
       setDeletingId(id);
       await deleteDoc(doc(db, "food", id));
-      setFoods((prev) => prev.filter((f) => f.id !== id));
+      // ไม่ต้อง setFoods เองก็ได้ onSnapshot จะอัปเดตให้
     } catch (e) {
       console.error("delete error:", e);
       alert("ลบไม่สำเร็จ");

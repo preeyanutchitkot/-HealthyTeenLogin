@@ -42,15 +42,19 @@ export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
 
       const data = await res.json();
 
-      const resultStr = JSON.stringify(data, null, 2);
+      // รองรับหลายชื่อฟิลด์ที่ Make/n8n อาจส่งมา (calories / kcal / output)
+      const caloriesRaw = data.calories ?? data.kcal ?? data.output ?? "";
+      const newCalories =
+        parseInt(String(caloriesRaw).replace(/[^\d]/g, ""), 10) || "";
+
+      // โชว์เฉพาะตัวเลขที่อ่านง่ายบน UI
       setApiResults((prev) => {
         const next = [...prev];
-        next[index] = resultStr;
+        next[index] = newCalories ? `${newCalories} kcal` : "ไม่พบข้อมูล";
         return next;
       });
 
-      const caloriesString = data.calories || "";
-      const newCalories = parseInt(caloriesString) || "";
+      // กรอกค่าแคลอรี่ลงช่องให้ด้วย
       setFoodInputs((prev) => {
         const next = [...prev];
         next[index].calories = newCalories;
@@ -79,7 +83,6 @@ export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
       return next;
     });
   };
-
 
   const handleSave = () => {
     foodInputs.forEach((food) => {
@@ -161,6 +164,7 @@ export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
           </button>
         </div>
 
+        {/* ✅ สไตล์เดิมทั้งหมด — ไม่เปลี่ยนใดๆ */}
         <style jsx>{`
           .item-wrapper { display:flex; flex-direction:column; align-items:flex-start; gap:6px; margin:8px 12px 14px; }
           .input-with-button-wrapper { display:flex; align-items:center; width:100%; gap:10px; }

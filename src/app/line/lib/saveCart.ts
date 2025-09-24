@@ -2,7 +2,6 @@
 import { writeBatch, collection, doc, serverTimestamp } from "firebase/firestore";
 import { db, signInIfNeeded } from "./firebase";
 
-// ทำ ymd ด้วย local time เพื่อไม่ให้เหลื่อมวัน (แทน toISOString)
 function toYMDLocal(d = new Date()) {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");
@@ -16,11 +15,9 @@ export async function saveCartToFirestore(items) {
   const user = await signInIfNeeded();
   const uid = user.uid;
 
-  const ymd = toYMDLocal(new Date()); // ⬅️ ใช้ local-time ให้ตรงกับการคิวรีหน้าอื่น
+  const ymd = toYMDLocal(new Date());
   const col = collection(db, "food");
 
-  // หมายเหตุ: Firestore batch limit = 500 writes ต่อ 1 commit
-  // ถ้ารายการเยอะมาก ๆ อาจต้องแตกเป็นหลาย batch (กรณีทั่วไปไม่ถึง)
   const batch = writeBatch(db);
 
   items.forEach((it) => {
@@ -30,7 +27,6 @@ export async function saveCartToFirestore(items) {
     const qty = Number(it.qty);
     const calories = Number(it.calories);
 
-    // ผ่านตาม rules: qty >= 1, calories เป็น number, ymd:string, date:timestamp, uid ตรงกับ auth
     if (!itemName) return;
     if (!Number.isFinite(qty) || qty < 1) return;
     if (!Number.isFinite(calories)) return;

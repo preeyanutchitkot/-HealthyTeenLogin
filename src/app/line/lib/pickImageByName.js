@@ -7,9 +7,13 @@ export function pickImageByName(name = "") {
     return "/foods/1/noodles.png";
   }
 
-  // ข้าวราดแกง / แกงต่าง ๆ
-  if (/(^ข้าวราด|แกงเขียวหวาน|แกงเผ็ด|แกงส้ม|มัสมั่น|พะแนง|แกงกะหรี่|แกง)/.test(s)) {
+  // ข้าวราดแกง
+  if (/(^ข้าวราด|^ข้าว)/.test(s)) {
     return "/foods/1/curry.png";
+  }
+
+    if (/(^แกงเขียวหวาน|แกงเผ็ด|แกงส้ม|มัสมั่น|พะแนง|แกงกะหรี่|แกง)/.test(s)) {
+    return "/foods/1/แกง.png";
   }
 
   // ต้ม
@@ -17,14 +21,22 @@ export function pickImageByName(name = "") {
     return "/foods/1/boiled.png";
   }
 
-  // ยำ / ส้มตำ
-  if (/(^ยำ|ตำ|somtum|papaya salad)/.test(s)) {
+  //ส้มตำ
+  if (/(^ตำ|^ส้มตำ|papaya salad)/.test(s)) {
     return "/foods/1/salad.png";
   }
 
-  // ผัด / คั่ว
-  if (/(^ผัด|คั่ว|stir fry|炒)/.test(s)) {
+  if (/(^ยำ)/.test(s)) {
+    return "/foods/1/ยำ.png";
+  }
+
+  // ผัด
+  if (/(^ผัด|stir fry|炒)/.test(s)) {
     return "/foods/1/fried.png";
+  }
+
+    if (/(^คั่ว)/.test(s)) {
+    return "/foods/1/คั่ว.png";
   }
 
   // ทอด
@@ -48,7 +60,7 @@ export function pickImageByName(name = "") {
   }
 
   // อบ / เบเกอรี่
-  if (/(อบ|^เค้ก|^ขนมปัง|เบเกอรี่|muffin|cake|bread|cookie|pie)/.test(s)) {
+  if (/(อบ|^ขนมปัง|เบเกอรี่|muffin|cake|bread|cookie|pie)/.test(s)) {
     return "/foods/1/bake.png";
   }
 
@@ -68,7 +80,11 @@ export function pickImageByName(name = "") {
   }
 
   // ขนมหวาน
-  if (/(ของหวาน|^ขนม|sweet)/.test(s)) {
+  if (/(^เค้ก)/.test(s)) {
+    return "/foods/1/cake.png";
+  }
+  
+    if (/(ของหวาน|^ขนม)/.test(s)) {
     return "/foods/1/dessert.png";
   }
 

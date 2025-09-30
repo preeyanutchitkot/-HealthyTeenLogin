@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useState } from "react";
-import Image from "next/image";
-import Header from "../../components/header";
-import { db, signInIfNeeded } from "../../lib/firebase";
+import { useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
+import Header from '../../components/header';
+import { db, signInIfNeeded } from '../../lib/firebase';
 import {
   collection,
   query,
@@ -14,7 +14,7 @@ import {
   doc,
   limit,
   onSnapshot,
-} from "firebase/firestore";
+} from 'firebase/firestore';
 
 export default function AllFoodListPage() {
   const [foods, setFoods] = useState([]);
@@ -23,8 +23,8 @@ export default function AllFoodListPage() {
 
   const toYMD = (d) => {
     const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
     return `${y}-${m}-${day}`;
   };
 
@@ -36,27 +36,41 @@ export default function AllFoodListPage() {
       try {
         const user = await signInIfNeeded();
         const uid = user?.uid;
-        if (!uid) throw new Error("No user");
+        if (!uid) throw new Error('No user');
 
         const now = new Date();
-        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
-        const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+        const startOfDay = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate(),
+          0,
+          0,
+          0
+        );
+        const endOfDay = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate(),
+          23,
+          59,
+          59
+        );
         const ymd = toYMD(now);
 
         // สร้างคิวรี 2 แบบ
         const qYmd = query(
-          collection(db, "food"),
-          where("uid", "==", uid),
-          where("ymd", "==", ymd),
+          collection(db, 'food'),
+          where('uid', '==', uid),
+          where('ymd', '==', ymd),
           limit(2000)
         );
 
         const qDate = query(
-          collection(db, "food"),
-          where("uid", "==", uid),
-          where("date", ">=", startOfDay),
-          where("date", "<=", endOfDay),
-          orderBy("date", "desc"),
+          collection(db, 'food'),
+          where('uid', '==', uid),
+          where('date', '>=', startOfDay),
+          where('date', '<=', endOfDay),
+          orderBy('date', 'desc'),
           limit(2000)
         );
 
@@ -79,10 +93,10 @@ export default function AllFoodListPage() {
               const x = d.data();
               return {
                 id: d.id,
-                item: x.item ?? x.name ?? x.menu ?? "ไม่ระบุเมนู",
+                item: x.item ?? x.name ?? x.menu ?? 'ไม่ระบุเมนู',
                 calories: Number(x.calories ?? 0),
                 qty: Number(x.qty ?? 1),
-                imageUrl: x.imageUrl ?? x.image ?? "/placeholder.png",
+                imageUrl: x.imageUrl ?? x.image ?? '/placeholder.png',
                 date: x.date?.toDate?.() ?? null,
                 ymd: x.ymd ?? null,
                 createdAt: x.createdAt?.toDate?.() ?? null,
@@ -106,33 +120,33 @@ export default function AllFoodListPage() {
             setLoading(false);
           },
           (err) => {
-            console.error("snapshot error:", err);
+            console.error('snapshot error:', err);
             setFoods([]);
             setLoading(false);
           }
         );
       } catch (e) {
-        console.error("load foods error:", e);
+        console.error('load foods error:', e);
         setFoods([]);
         setLoading(false);
       }
     })();
 
     return () => {
-      if (typeof unsub === "function") unsub();
+      if (typeof unsub === 'function') unsub();
     };
   }, []);
 
   const handleDelete = async (id) => {
     if (!id) return;
-    if (!confirm("ต้องการลบรายการนี้หรือไม่?")) return;
+    if (!confirm('ต้องการลบรายการนี้หรือไม่?')) return;
     try {
       setDeletingId(id);
-      await deleteDoc(doc(db, "food", id));
+      await deleteDoc(doc(db, 'food', id));
       // ไม่ต้อง setFoods เองก็ได้ onSnapshot จะอัปเดตให้
     } catch (e) {
-      console.error("delete error:", e);
-      alert("ลบไม่สำเร็จ");
+      console.error('delete error:', e);
+      alert('ลบไม่สำเร็จ');
     } finally {
       setDeletingId(null);
     }
@@ -141,10 +155,24 @@ export default function AllFoodListPage() {
   return (
     <div style={{ paddingBottom: 24 }}>
       <style jsx global>{`
-        *, *::before, *::after { box-sizing: border-box; }
-        :root { color-scheme: light; }
-        html, body, #__next { height: 100%; }
-        html, body { margin: 0; padding: 0; }
+        *,
+        *::before,
+        *::after {
+          box-sizing: border-box;
+        }
+        :root {
+          color-scheme: light;
+        }
+        html,
+        body,
+        #__next {
+          height: 100%;
+        }
+        html,
+        body {
+          margin: 0;
+          padding: 0;
+        }
         body {
           background: #ffffff;
           padding-top: env(safe-area-inset-top);
@@ -154,9 +182,9 @@ export default function AllFoodListPage() {
 
       <Header title="เมนูของคุณ" cartoonImage="/8.png" />
 
-      <div style={{ padding: 16, maxWidth: 560, margin: "0 auto" }}>
+      <div style={{ padding: 16, maxWidth: 560, margin: '0 auto' }}>
         {loading && (
-          <div style={{ padding: 8, textAlign: "center", color: "#888" }}>
+          <div style={{ padding: 8, textAlign: 'center', color: '#888' }}>
             กำลังโหลดเมนู...
           </div>
         )}
@@ -164,12 +192,12 @@ export default function AllFoodListPage() {
         {!loading && foods.length === 0 && (
           <div
             style={{
-              minHeight: "60vh",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#888",
+              minHeight: '60vh',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#888',
             }}
           >
             <Image src="/bear.png" alt="เมนูของคุณ" width={190} height={240} />
@@ -182,13 +210,13 @@ export default function AllFoodListPage() {
             <div
               key={food.id}
               style={{
-                display: "flex",
-                alignItems: "center",
-                background: "#F3FAF4",
+                display: 'flex',
+                alignItems: 'center',
+                background: '#F3FAF4',
                 borderRadius: 12,
                 padding: 10,
                 marginBottom: 10,
-                boxShadow: "0 1px 4px rgba(0,0,0,.08)",
+                boxShadow: '0 1px 4px rgba(0,0,0,.08)',
                 gap: 12,
               }}
             >
@@ -197,7 +225,7 @@ export default function AllFoodListPage() {
                 alt={food.item}
                 width={60}
                 height={60}
-                style={{ borderRadius: 8, objectFit: "cover" }}
+                style={{ borderRadius: 8, objectFit: 'cover' }}
                 unoptimized
               />
 
@@ -205,19 +233,21 @@ export default function AllFoodListPage() {
                 <div
                   style={{
                     fontWeight: 700,
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
                   }}
                 >
                   {food.item}
                 </div>
-                <div style={{ fontSize: 14, color: "#555" }}>
+                <div style={{ fontSize: 14, color: '#555' }}>
                   {food.calories} แคลอรี่
                 </div>
               </div>
 
-              <div style={{ fontWeight: 700, minWidth: 24, textAlign: "right" }}>
+              <div
+                style={{ fontWeight: 700, minWidth: 24, textAlign: 'right' }}
+              >
                 {food.qty}
               </div>
 
@@ -227,19 +257,19 @@ export default function AllFoodListPage() {
                 title="ลบ"
                 style={{
                   marginLeft: 8,
-                  border: "none",
-                  background: "#fff",
+                  border: 'none',
+                  background: '#fff',
                   width: 32,
                   height: 32,
-                  borderRadius: "50%",
-                  boxShadow: "0 1px 4px rgba(0,0,0,.08)",
-                  display: "grid",
-                  placeItems: "center",
-                  cursor: "pointer",
+                  borderRadius: '50%',
+                  boxShadow: '0 1px 4px rgba(0,0,0,.08)',
+                  display: 'grid',
+                  placeItems: 'center',
+                  cursor: 'pointer',
                 }}
               >
                 {deletingId === food.id ? (
-                  <span style={{ fontSize: 12, color: "#999" }}>…</span>
+                  <span style={{ fontSize: 12, color: '#999' }}>…</span>
                 ) : (
                   <Image src="/trash.png" alt="ลบ" width={16} height={16} />
                 )}

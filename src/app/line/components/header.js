@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import React from "react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
+import React from 'react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
-const Header = ({ title, cartoonImage, backIcon = "/back-button.png" }) => {
+const Header = ({ title, cartoonImage, backIcon = '/back-button.png' }) => {
   const router = useRouter();
 
   return (
@@ -20,7 +20,7 @@ const Header = ({ title, cartoonImage, backIcon = "/back-button.png" }) => {
             alt="ย้อนกลับ"
             width={28}
             height={28}
-            style={{ objectFit: "contain" }}
+            style={{ objectFit: 'contain' }}
           />
         </button>
       </div>
@@ -36,7 +36,7 @@ const Header = ({ title, cartoonImage, backIcon = "/back-button.png" }) => {
             alt="การ์ตูน"
             width={52}
             height={52}
-            style={{ objectFit: "contain" }}
+            style={{ objectFit: 'contain' }}
           />
         )}
       </div>

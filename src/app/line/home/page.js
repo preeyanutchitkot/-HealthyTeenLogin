@@ -1,37 +1,31 @@
 'use client';
-import React, { useEffect, useState, useRef } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import BottomMenu from "../components/menu";
-import CalorieSummary from "../components/CalorieSummary";
-import MenuPopup from "../components/MenuPopup";
+import React, { useEffect, useState, useRef } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import BottomMenu from '../components/menu';
+import CalorieSummary from '../components/CalorieSummary';
+import MenuPopup from '../components/MenuPopup';
 
-import { auth, db } from "../lib/firebase";
-import {
-  collection,
-  query,
-  where,
-  doc,
-  onSnapshot,
-} from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth";
+import { auth, db } from '../lib/firebase';
+import { collection, query, where, doc, onSnapshot } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
 
-import styles from "./HomePage.module.css";
+import styles from './HomePage.module.css';
 
-const OA_URL = "https://line.me/R/ti/p/@696kpmzu";
+const OA_URL = 'https://line.me/R/ti/p/@696kpmzu';
 
 const toYMD = (d) => {
   const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
   return `${y}-${m}-${day}`;
 };
 
 const bellSrcByPercent = (percent) => {
-  if (percent == null) return "/b1.png"; // ไม่มีข้อมูล => เขียว
-  if (percent > 100) return "/b3.png";   // แดง
-  if (percent >= 80) return "/b2.png";   // เหลือง
-  return "/b1.png";                      // เขียว
+  if (percent == null) return '/b1.png'; // ไม่มีข้อมูล => เขียว
+  if (percent > 100) return '/b3.png'; // แดง
+  if (percent >= 80) return '/b2.png'; // เหลือง
+  return '/b1.png'; // เขียว
 };
 
 export default function HomePage() {
@@ -41,13 +35,13 @@ export default function HomePage() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const [bellSrc, setBellSrc] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("bellSrc") || null;
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('bellSrc') || null;
     }
     return null;
   });
   useEffect(() => {
-    if (bellSrc) localStorage.setItem("bellSrc", bellSrc);
+    if (bellSrc) localStorage.setItem('bellSrc', bellSrc);
   }, [bellSrc]);
 
   const bmrRef = useRef(null);
@@ -63,7 +57,6 @@ export default function HomePage() {
     const next = bellSrcByPercent(percent);
     setBellSrc((prev) => (prev === next ? prev : next));
   };
-
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -84,7 +77,7 @@ export default function HomePage() {
     const ymd = toYMD(new Date());
 
     // ฟัง BMR แบบเรียลไทม์
-    const unsubUser = onSnapshot(doc(db, "users", uid), (uSnap) => {
+    const unsubUser = onSnapshot(doc(db, 'users', uid), (uSnap) => {
       const uData = uSnap.exists() ? uSnap.data() : null;
       bmrRef.current = uData?.bmr ? Number(uData.bmr) : null;
       recomputeBell();
@@ -92,9 +85,9 @@ export default function HomePage() {
 
     // ฟังรายการอาหารวันนี้แบบเรียลไทม์
     const qRef = query(
-      collection(db, "food"),
-      where("uid", "==", uid),
-      where("ymd", "==", ymd)
+      collection(db, 'food'),
+      where('uid', '==', uid),
+      where('ymd', '==', ymd)
     );
 
     const unsubFood = onSnapshot(
@@ -107,8 +100,8 @@ export default function HomePage() {
           const qty = Number(x.qty || 1);
           sumCal += cal * qty;
           return {
-            name: x.name || x.item || "",
-            img: x.imageUrl || "/placeholder.png",
+            name: x.name || x.item || '',
+            img: x.imageUrl || '/placeholder.png',
             calText: qty > 1 ? `${cal}x${qty}` : `${cal}`,
           };
         });
@@ -118,7 +111,7 @@ export default function HomePage() {
         setLoading(false);
       },
       (err) => {
-        console.error("food onSnapshot error:", err);
+        console.error('food onSnapshot error:', err);
         setLoading(false);
       }
     );
@@ -132,7 +125,9 @@ export default function HomePage() {
   return (
     <div className={styles.page}>
       <style jsx global>{`
-        html, body, #__next {
+        html,
+        body,
+        #__next {
           height: 100%;
           margin: 0;
           padding: 0;
@@ -189,20 +184,50 @@ export default function HomePage() {
 
       <div className={styles.circleMenu}>
         {[
-          { label: "บันทึกอาหาร", href: "/line/foodn", img: "/enough.png", external: false },
-          { label: "แนะนำอาหาร", href: OA_URL,       img: "/ploy3.png",  external: true  },
-          { label: "สรุป",     href: "/line/summary",  img: "/mo.png",     external: false },
-          { label: "วิดีโอสุขภาพ", href: "/line/lookvideo", img: "/p4.png", external: false }
+          {
+            label: 'บันทึกอาหาร',
+            href: '/line/foodn',
+            img: '/enough.png',
+            external: false,
+          },
+          {
+            label: 'แนะนำอาหาร',
+            href: OA_URL,
+            img: '/ploy3.png',
+            external: true,
+          },
+          {
+            label: 'สรุป',
+            href: '/line/summary',
+            img: '/mo.png',
+            external: false,
+          },
+          {
+            label: 'วิดีโอสุขภาพ',
+            href: '/line/lookvideo',
+            img: '/p4.png',
+            external: false,
+          },
         ].map((item) =>
           item.external ? (
-            <a key={item.label} href={item.href} className={styles.circleMenuItem} target="_blank" rel="noopener noreferrer">
+            <a
+              key={item.label}
+              href={item.href}
+              className={styles.circleMenuItem}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <div className={styles.circleIcon}>
                 <Image src={item.img} alt={item.label} width={36} height={36} />
               </div>
               <div className={styles.circleLabel}>{item.label}</div>
             </a>
           ) : (
-            <Link href={item.href} key={item.label} className={styles.circleMenuItem}>
+            <Link
+              href={item.href}
+              key={item.label}
+              className={styles.circleMenuItem}
+            >
               <div className={styles.circleIcon}>
                 <Image src={item.img} alt={item.label} width={36} height={36} />
               </div>
@@ -222,9 +247,13 @@ export default function HomePage() {
           </div>
 
           {loading ? (
-            <div className={styles.menuRow}><div className={styles.empty}>กำลังโหลด...</div></div>
+            <div className={styles.menuRow}>
+              <div className={styles.empty}>กำลังโหลด...</div>
+            </div>
           ) : items.length === 0 ? (
-            <div className={styles.menuRow}><div className={styles.empty}>ยังไม่มีบันทึกในวันนี้</div></div>
+            <div className={styles.menuRow}>
+              <div className={styles.empty}>ยังไม่มีบันทึกในวันนี้</div>
+            </div>
           ) : (
             items.map((it, idx) => (
               <div className={styles.menuRow} key={`${it.name}-${idx}`}>
@@ -246,7 +275,11 @@ export default function HomePage() {
         </div>
       </div>
 
-      <MenuPopup isOpen={menuOpen} onClose={() => setMenuOpen(false)} size="compact" />
+      <MenuPopup
+        isOpen={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        size="compact"
+      />
       <BottomMenu />
     </div>
   );

@@ -1,5 +1,5 @@
-import BottomMenu from "../components/menu";
-import styles from "./faq.module.css";
+import BottomMenu from '../components/menu';
+import styles from './faq.module.css';
 
 export default function AgreementPage() {
   const privacyText = `1. จะเริ่มใช้งานระบบบันทึกอาหารได้อย่างไร?
@@ -27,9 +27,7 @@ export default function AgreementPage() {
     <div className={styles.wrapper}>
       <header className={styles.header}>คำถามที่พบบ่อย (FAQ)</header>
 
-      <main className={styles.content}>
-        {privacyText}
-      </main>
+      <main className={styles.content}>{privacyText}</main>
 
       <div className={styles.menuDock}>
         <BottomMenu />

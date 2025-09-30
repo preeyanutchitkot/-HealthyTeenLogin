@@ -1,22 +1,22 @@
 // app/summary/page.jsx
-"use client";
+'use client';
 
-import React from "react";
-import dayjs from "dayjs";
-import "dayjs/locale/th";
+import React from 'react';
+import dayjs from 'dayjs';
+import 'dayjs/locale/th';
 
-import "./summary.css";
-import ActivityRing from "../components/ActivityRing";      // ← เวอร์ชันที่ดึง Firestore เอง (baseDate)
-import BottomMenu from "../components/menu";
-import Header from "../components/header";
-import TodayCalCard from "../components/TodayCalCard";
-import WeekCalories from "../components/WeekCalories";
-import DateWeekBar from "../components/DateWeekBar";
-import WeekTopFoods from "../components/WeekTopFoods";
-import CalendarModal from "../components/CalendarModal";
-import { useSummaryData } from "../hooks/useSummaryData";   // สำหรับกราฟ/สรุปรายสัปดาห์เท่านั้น
+import './summary.css';
+import ActivityRing from '../components/ActivityRing'; // ← เวอร์ชันที่ดึง Firestore เอง (baseDate)
+import BottomMenu from '../components/menu';
+import Header from '../components/header';
+import TodayCalCard from '../components/TodayCalCard';
+import WeekCalories from '../components/WeekCalories';
+import DateWeekBar from '../components/DateWeekBar';
+import WeekTopFoods from '../components/WeekTopFoods';
+import CalendarModal from '../components/CalendarModal';
+import { useSummaryData } from '../hooks/useSummaryData'; // สำหรับกราฟ/สรุปรายสัปดาห์เท่านั้น
 
-dayjs.locale("th");
+dayjs.locale('th');
 
 export default function SummaryPage() {
   const [selectedDate, setSelectedDate] = React.useState(dayjs());
@@ -26,21 +26,24 @@ export default function SummaryPage() {
   const { weekData, goal, ymdStart, ymdEnd } = useSummaryData({
     defaultGoal: 2000,
     weekStartMonday: true,
-    tz: "Asia/Bangkok",
+    tz: 'Asia/Bangkok',
     baseDate: selectedDate.toDate(),
   });
 
-  const weekTotal = (weekData || []).reduce((s, d) => s + (Number(d?.cal) || 0), 0);
+  const weekTotal = (weekData || []).reduce(
+    (s, d) => s + (Number(d?.cal) || 0),
+    0
+  );
 
   // ===== วันที่แบบไทย/พุทธ (แสดงบนการ์ด/ป้าย) =====
-  const fmtThaiSlash = new Intl.DateTimeFormat("th-TH-u-ca-buddhist", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
+  const fmtThaiSlash = new Intl.DateTimeFormat('th-TH-u-ca-buddhist', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
   });
   const selectedThai = fmtThaiSlash.format(selectedDate.toDate());
-  const selectedYMD = selectedDate.format("YYYY-MM-DD");
-  const todayYMD = dayjs().format("YYYY-MM-DD");
+  const selectedYMD = selectedDate.format('YYYY-MM-DD');
+  const todayYMD = dayjs().format('YYYY-MM-DD');
 
   const handleConfirmDate = (d) => {
     setSelectedDate(d);
@@ -56,8 +59,7 @@ export default function SummaryPage() {
       <main className="summary-main">
         {/* ===== วงแหวน: ดึง Firestore เองจาก baseDate ===== */}
         <div className="ring-wrapper">
-        <ActivityRing dateYMD={selectedYMD} tz="Asia/Bangkok" />
-
+          <ActivityRing dateYMD={selectedYMD} tz="Asia/Bangkok" />
         </div>
 
         {/* ===== แถบวันที่: แสดงวันเลือก + เปิดปฏิทิน ===== */}
@@ -71,7 +73,7 @@ export default function SummaryPage() {
         <TodayCalCard
           autoFetch
           dateYMD={selectedYMD}
-          label={selectedYMD === todayYMD ? "วันนี้" : selectedThai}
+          label={selectedYMD === todayYMD ? 'วันนี้' : selectedThai}
         />
 
         {/* ===== กราฟสัปดาห์ ===== */}
@@ -84,7 +86,7 @@ export default function SummaryPage() {
           <div className="wt-left">
             <div className="wt-title">สรุปรายสัปดาห์</div>
             <div className="wt-sub">
-              รวมแคลอรี่สัปดาห์นี้ • เฉลี่ย{" "}
+              รวมแคลอรี่สัปดาห์นี้ • เฉลี่ย{' '}
               {(Math.round(weekTotal / 7) || 0).toLocaleString()} CAL/วัน
             </div>
           </div>
@@ -95,7 +97,12 @@ export default function SummaryPage() {
         </section>
 
         {/* ===== Top foods ในช่วงสัปดาห์ที่เลือก ===== */}
-        <WeekTopFoods ymdStart={ymdStart} ymdEnd={ymdEnd} maxItems={4} countMode="qty" />
+        <WeekTopFoods
+          ymdStart={ymdStart}
+          ymdEnd={ymdEnd}
+          maxItems={4}
+          countMode="qty"
+        />
 
         {/* ===== ภาพ footer ===== */}
         <div className="bear-footer">

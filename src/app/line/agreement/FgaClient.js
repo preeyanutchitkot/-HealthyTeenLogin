@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 
 export default function FgaClient({ styles }) {
-  const [tab, setTab] = useState("privacy");
+  const [tab, setTab] = useState('privacy');
 
   const privacyText = `
 1. ข้อมูลที่เก็บรวบรวม
@@ -75,15 +75,15 @@ export default function FgaClient({ styles }) {
     <>
       <div className={styles.tabs}>
         <button
-          className={`${styles.tab} ${tab === "privacy" ? styles.active : styles.inactive}`}
-          onClick={() => setTab("privacy")}
+          className={`${styles.tab} ${tab === 'privacy' ? styles.active : styles.inactive}`}
+          onClick={() => setTab('privacy')}
           type="button"
         >
           นโยบายความเป็นส่วนตัว
         </button>
         <button
-          className={`${styles.tab} ${tab === "terms" ? styles.active : styles.inactive}`}
-          onClick={() => setTab("terms")}
+          className={`${styles.tab} ${tab === 'terms' ? styles.active : styles.inactive}`}
+          onClick={() => setTab('terms')}
           type="button"
         >
           ข้อกำหนดและเงื่อนไขการใช้งาน
@@ -91,7 +91,7 @@ export default function FgaClient({ styles }) {
       </div>
 
       <main className={styles.content}>
-        {tab === "privacy" ? privacyText : termsText}
+        {tab === 'privacy' ? privacyText : termsText}
       </main>
     </>
   );

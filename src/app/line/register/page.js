@@ -1,10 +1,18 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { createUserWithEmailAndPassword, fetchSignInMethodsForEmail } from 'firebase/auth';
+import {
+  createUserWithEmailAndPassword,
+  fetchSignInMethodsForEmail,
+} from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { db, auth } from '../lib/firebase';
-import { doc, setDoc, runTransaction, serverTimestamp } from 'firebase/firestore';
+import {
+  doc,
+  setDoc,
+  runTransaction,
+  serverTimestamp,
+} from 'firebase/firestore';
 import styles from './Register.module.css';
 
 export default function Register() {
@@ -37,9 +45,9 @@ export default function Register() {
       let bmrResult = '';
       if (gender && !isNaN(a)) {
         if (gender === 'male') {
-          bmrResult = 66.47 + (13.75 * w) + (5.003 * h) - (6.755 * a);
+          bmrResult = 66.47 + 13.75 * w + 5.003 * h - 6.755 * a;
         } else if (gender === 'female') {
-          bmrResult = 655.1 + (9.563 * w) + (1.850 * h) - (4.676 * a);
+          bmrResult = 655.1 + 9.563 * w + 1.85 * h - 4.676 * a;
         }
         setBmr(bmrResult.toFixed(0));
         if (!isNaN(af)) {
@@ -76,13 +84,18 @@ export default function Register() {
     const emailNorm = email.trim().toLowerCase();
 
     if (password !== confirmPassword) return setErrorMsg('รหัสผ่านไม่ตรงกัน');
-    if (password.length < 8) return setErrorMsg('รหัสผ่านควรยาวอย่างน้อย 8 ตัวอักษร');
+    if (password.length < 8)
+      return setErrorMsg('รหัสผ่านควรยาวอย่างน้อย 8 ตัวอักษร');
 
     try {
       const methods = await fetchSignInMethodsForEmail(auth, emailNorm);
       if (methods.length > 0) return setErrorMsg('อีเมลนี้มีบัญชีอยู่แล้ว');
 
-      const userCredential = await createUserWithEmailAndPassword(auth, emailNorm, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        emailNorm,
+        password
+      );
       const user = userCredential.user;
       const seqId = await getNextUserSeqId();
 
@@ -104,7 +117,8 @@ export default function Register() {
       router.push('/line/agreement?from=register');
     } catch (error) {
       console.error(error);
-      if (error.code === 'auth/email-already-in-use') setErrorMsg('อีเมลนี้มีบัญชีอยู่แล้ว');
+      if (error.code === 'auth/email-already-in-use')
+        setErrorMsg('อีเมลนี้มีบัญชีอยู่แล้ว');
       else setErrorMsg('เกิดข้อผิดพลาด: ' + (error.message || 'ไม่ทราบสาเหตุ'));
     }
   };
@@ -121,13 +135,31 @@ export default function Register() {
         <form onSubmit={handleRegister}>
           {/* Email */}
           <div className={styles.field}>
-            <input className={styles.input} type="email" placeholder="อีเมล" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            <input
+              className={styles.input}
+              type="email"
+              placeholder="อีเมล"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
           </div>
 
           {/* Password */}
           <div className={styles.field}>
-            <input className={styles.input} type={showPw ? 'text' : 'password'} placeholder="รหัสผ่าน" value={password} onChange={(e) => setPassword(e.target.value)} required />
-            <button type="button" className={styles.pwToggle} onClick={() => setShowPw(!showPw)}>
+            <input
+              className={styles.input}
+              type={showPw ? 'text' : 'password'}
+              placeholder="รหัสผ่าน"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <button
+              type="button"
+              className={styles.pwToggle}
+              onClick={() => setShowPw(!showPw)}
+            >
               <img src="/eye2.png" alt="toggle password" />
             </button>
           </div>
@@ -139,14 +171,25 @@ export default function Register() {
 
           {/* Confirm Password */}
           <div className={styles.field}>
-            <input className={styles.input} type={showPw ? 'text' : 'password'} placeholder="ยืนยันรหัสผ่าน" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
+            <input
+              className={styles.input}
+              type={showPw ? 'text' : 'password'}
+              placeholder="ยืนยันรหัสผ่าน"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
           </div>
 
           {/* Gender + Age */}
           <div className={styles.row}>
             <div>
               <div className={styles.label}>เพศ</div>
-              <select value={gender} onChange={(e) => setGender(e.target.value)} required>
+              <select
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+                required
+              >
                 <option value="">เลือกเพศ</option>
                 <option value="male">ชาย</option>
                 <option value="female">หญิง</option>
@@ -154,7 +197,13 @@ export default function Register() {
             </div>
             <div>
               <div className={styles.label}>อายุ</div>
-              <input type="number" placeholder="อายุ" value={age} onChange={(e) => setAge(e.target.value)} required />
+              <input
+                type="number"
+                placeholder="อายุ"
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+                required
+              />
             </div>
           </div>
 
@@ -162,20 +211,35 @@ export default function Register() {
           <div className={styles.row}>
             <div>
               <div className={styles.label}>ส่วนสูง (ซม.)</div>
-              <input type="number" placeholder="ส่วนสูง" value={height} onChange={(e) => setHeight(e.target.value)} required />
+              <input
+                type="number"
+                placeholder="ส่วนสูง"
+                value={height}
+                onChange={(e) => setHeight(e.target.value)}
+                required
+              />
             </div>
             <div>
               <div className={styles.label}>น้ำหนัก (กก.)</div>
-              <input type="number" placeholder="น้ำหนัก" value={weight} onChange={(e) => setWeight(e.target.value)} required />
+              <input
+                type="number"
+                placeholder="น้ำหนัก"
+                value={weight}
+                onChange={(e) => setWeight(e.target.value)}
+                required
+              />
             </div>
           </div>
 
           <div className={styles.bmiText}>
-            BMI ของคุณ: {bmi || 'ยังไม่คำนวณ'}<br />
+            BMI ของคุณ: {bmi || 'ยังไม่คำนวณ'}
+            <br />
             BMR ของคุณ: {bmr || 'ยังไม่คำนวณ'}
           </div>
 
-          <button type="submit" className={styles.btn}>ยืนยัน</button>
+          <button type="submit" className={styles.btn}>
+            ยืนยัน
+          </button>
         </form>
 
         <div className={styles.footerLink}>

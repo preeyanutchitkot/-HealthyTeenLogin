@@ -1,11 +1,11 @@
-import Image from "next/image";
-import styles from "./contact.module.css";
-import Header from "../components/header";
+import Image from 'next/image';
+import styles from './contact.module.css';
+import Header from '../components/header';
 
 export default function ContactPage() {
   return (
-      <div className="header-container">
-        <Header title="ติดต่อเรา" cartoonImage="/9.png" />
+    <div className="header-container">
+      <Header title="ติดต่อเรา" cartoonImage="/9.png" />
 
       <div className={styles.content}>
         หากคุณต้องการความช่วยเหลือ ติดต่อเราได้ที่
@@ -18,7 +18,7 @@ export default function ContactPage() {
           width={180}
           height={180}
           priority
-          style={{ width: "180px", height: "auto", display: "block" }}
+          style={{ width: '180px', height: 'auto', display: 'block' }}
         />
       </div>
 
@@ -36,7 +36,7 @@ export default function ContactPage() {
               width={22}
               height={22}
               priority
-              style={{ width: "22px", height: "auto" }}
+              style={{ width: '22px', height: 'auto' }}
             />
           </span>
           LINE @696kpmzu
@@ -54,7 +54,7 @@ export default function ContactPage() {
               alt="Facebook"
               width={22}
               height={22}
-              style={{ width: "22px", height: "auto" }}
+              style={{ width: '22px', height: 'auto' }}
             />
           </span>
           Facebook Nursing SUT

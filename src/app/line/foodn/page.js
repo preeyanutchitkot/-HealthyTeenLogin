@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import Link from "next/link";
-import BottomMenu from "../components/menu";
-import CartIcon from "../components/CartIcon";
-import CategoryBar from "../components/CategoryBar";
-import Header from "../components/header";
-import FoodGrid from "../components/FoodGrid";
-import CartSheet from "../components/CartSheet";
-import { saveCartToFirestore } from "../lib/saveCart";
-import "./FoodsPage.module.css";
+import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import BottomMenu from '../components/menu';
+import CartIcon from '../components/CartIcon';
+import CategoryBar from '../components/CategoryBar';
+import Header from '../components/header';
+import FoodGrid from '../components/FoodGrid';
+import CartSheet from '../components/CartSheet';
+import { saveCartToFirestore } from '../lib/saveCart';
+import styles from './FoodsPage.module.css';
 
 const savoryFoods = [
   { name: "ข้าวกะเพราไก่ไข่ดาว", calories: 630, image: "/foods/khao-krapao-kai-kai-dao.png" },
@@ -52,94 +52,58 @@ const snackFoods = [
 ];
 
 export default function FoodsPage() {
-  const [savory, setSavory] = useState(savoryFoods);
-  const [sweets, setSweets] = useState(sweetFoods);
-  const [snacks, setSnacks] = useState(snackFoods);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [cartCount, setCartCount] = useState(0);
   const [cartItems, setCartItems] = useState([]);
   const [showSheet, setShowSheet] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-
   const router = useRouter();
 
   useEffect(() => {
-    try {
-      const storedCart = localStorage.getItem("cartItems");
-      if (storedCart) setCartItems(JSON.parse(storedCart));
-    } catch (e) {
-      console.error("Failed to load cart from localStorage", e);
-    }
+    const stored = localStorage.getItem('cartItems');
+    if (stored) setCartItems(JSON.parse(stored));
   }, []);
 
   useEffect(() => {
-    const totalQty = cartItems.reduce((sum, it) => sum + (Number(it.qty) || 0), 0);
-    setCartCount(Math.floor(totalQty));
+    setCartCount(cartItems.reduce((sum, it) => sum + (Number(it.qty) || 0), 0));
   }, [cartItems]);
 
   const persist = (next) => {
     setCartItems(next);
-    try {
-      localStorage.setItem("cartItems", JSON.stringify(next));
-    } catch (e) {
-      console.error("Failed to persist cart", e);
-    }
+    localStorage.setItem('cartItems', JSON.stringify(next));
   };
 
   const filteredSavory = useMemo(
-    () => savory.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())),
-    [savory, searchQuery]
+    () => savoryFoods.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())),
+    [searchQuery]
   );
   const filteredSweets = useMemo(
-    () => sweets.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())),
-    [sweets, searchQuery]
+    () => sweetFoods.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())),
+    [searchQuery]
   );
   const filteredSnacks = useMemo(
-    () => snacks.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())),
-    [snacks, searchQuery]
+    () => snackFoods.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())),
+    [searchQuery]
   );
-
-  const roundHalf = (n) => Math.round(n * 2) / 2;
 
   const addToCart = (food) => {
     setCartItems((prev) => {
       const idx = prev.findIndex((item) => item.name === food.name);
       const updated =
         idx === -1
-          ? [...prev, { ...food, qty: 1 }] // ครั้งแรก = 1
-          : prev.map((it, i) =>
-              i === idx ? { ...it, qty: roundHalf(it.qty + 0.5) } : it
-            );
-      try { localStorage.setItem("cartItems", JSON.stringify(updated)); } catch {}
+          ? [...prev, { ...food, qty: 1 }]
+          : prev.map((it, i) => (i === idx ? { ...it, qty: it.qty + 1 } : it));
+      persist(updated);
       return updated;
     });
   };
 
-  const removeFromCart = (name) =>
-    setCartItems((prev) => prev.filter((it) => it.name !== name));
-
-  const handleSaveCart = async () => {
-    try {
-      if (!cartItems.length) return;
-      setIsSaving(true);
-      await saveCartToFirestore(cartItems);
-      persist([]);
-      setShowSheet(false);
-      router.replace("/line/food/cart");
-    } catch (err) {
-      console.error(err);
-      alert(err?.message || "บันทึกล้มเหลว");
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
   return (
-    <div className="page foods-page" data-scope="food">
+    <div className={styles.page}>
       <Header title="บันทึกอาหาร" cartoonImage="/8.png" />
 
-      <div className="search-wrap">
-        <div className="search-pill" role="search">
+      {/* Search */}
+      <div className={styles.searchWrap}>
+        <div className={styles.searchPill}>
           <Image src="/search.png" alt="ค้นหา" width={23} height={23} />
           <input
             type="text"
@@ -148,112 +112,98 @@ export default function FoodsPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
           <Link href="/line/food/cart">
-            <Image
-              src="/character.png"
-              alt="ตัวการ์ตูน"
-              width={26}
-              height={26}
-              style={{ cursor: "pointer" }}
-            />
+            <Image src="/character.png" alt="ตัวการ์ตูน" width={26} height={26} />
           </Link>
         </div>
       </div>
 
       <CategoryBar
+        backgroundColor="#ffffff"
         categories={[
-          { name: "อาหารคาว", icon: "/food1.png" },
-          { name: "อาหารหวาน", icon: "/food2.png" },
-          { name: "ของว่าง", icon: "/food4.png" },
-          { name: "อาหารเจ", icon: "/jfood7.png" },
-          { name: "อาหารต่างประเทศ", icon: "/food5.png" },
-          { name: "เครื่องดื่ม", icon: "/food3.png" },
-          { name: "ผักและผลไม้", icon: "/food6.png" },
+          { name: 'อาหารคาว', icon: '/food1.png' },
+          { name: 'อาหารหวาน', icon: '/food2.png' },
+          { name: 'ของว่าง', icon: '/food4.png' },
+          { name: 'อาหารเจ', icon: '/jfood7.png' },
+          { name: 'อาหารต่างประเทศ', icon: '/food5.png' },
+          { name: 'เครื่องดื่ม', icon: '/food3.png' },
+          { name: 'ผักและผลไม้', icon: '/food6.png' },
         ]}
         categoryPathMap={{
-          อาหารคาว: "/line/food/savory",
-          อาหารหวาน: "/line/food/sweet",
-          ของว่าง: "/line/food/snack",
-          อาหารเจ: "/line/food/J",
-          อาหารต่างประเทศ: "/line/food/Foreign",
-          เครื่องดื่ม: "/line/food/drink",
-          ผักและผลไม้: "/line/food/fruit",
+          อาหารคาว: '/line/food/savory',
+          อาหารหวาน: '/line/food/sweet',
+          ของว่าง: '/line/food/snack',
+          อาหารเจ: '/line/food/J',
+          อาหารต่างประเทศ: '/line/food/Foreign',
+          เครื่องดื่ม: '/line/food/drink',
+          ผักและผลไม้: '/line/food/fruit',
         }}
       />
 
-      <div className="food-banner-scroll">
-        <div className="food-banner-track">
-          <Image
-            src="/banner2.jpg"
-            alt="อาหารโปรตีน"
-            width={320}
-            height={160}
-            className="food-banner-img"
-          />
-          <Image
-            src="/banner1.jpg"
-            alt="ตารางดื่มน้ำ"
-            width={320}
-            height={160}
-            className="food-banner-img"
-          />
+      {/* Banner */}
+      <div className={styles.foodBannerScroll}>
+        <div className={styles.foodBannerTrack}>
+          <Image src="/banner2.jpg" alt="banner" width={320} height={160} className={styles.foodBannerImg} />
+          <Image src="/banner1.jpg" alt="banner" width={320} height={160} className={styles.foodBannerImg} />
         </div>
       </div>
 
-      <div className="tabs">
-        <div className="tab-left">
-          <button className="active">อาหารคาว</button>
+      {/* หมวดอาหาร */}
+      <div className={styles.tabs}>
+        <div className={styles.tabLeft}>
+          <h3 className={styles.sectionTitle}>อาหารคาว</h3>
         </div>
-        <CartIcon count={cartCount} onClick={() => setShowSheet(true)} />
+          <CartIcon count={cartCount} onClick={() => setShowSheet(true)} />
       </div>
-      <FoodGrid foods={filteredSavory} onAdd={addToCart} />
+      <FoodGrid foods={filteredSavory} onAdd={addToCart} layout="horizontal" />
 
-      <div className="tabs" style={{ marginTop: 8 }}>
-        <div className="tab-left">
-          <button className="active">อาหารหวาน</button>
-        </div>
-      </div>
-      <FoodGrid foods={filteredSweets} onAdd={addToCart} />
-
-      <div className="tabs" style={{ marginTop: 8 }}>
-        <div className="tab-left">
-          <button className="active">ของว่าง</button>
+      <div className={styles.tabs}>
+        <div className={styles.tabLeft}>
+          <h3 className={styles.sectionTitle}>อาหารหวาน</h3>
         </div>
       </div>
-      <FoodGrid foods={filteredSnacks} onAdd={addToCart} />
+      <FoodGrid foods={filteredSweets} onAdd={addToCart} layout="horizontal" />
 
-      {showSheet && (
-        <>
-          <div className="overlay" onClick={() => setShowSheet(false)} />
-          <CartSheet
-            cartItems={cartItems}
-            onClose={() => setShowSheet(false)}
-            onIncrease={(name, step = 0.5) => {
-              const updated = cartItems.map((it) =>
-                it.name === name
-                  ? { ...it, qty: Math.round((it.qty + step) * 2) / 2 }
-                  : it
-              );
-              persist(updated);
-            }}
-            onDecrease={(name, step = 0.5) => {
-              const updated = cartItems
-                .map((it) =>
-                  it.name === name
-                    ? { ...it, qty: Math.max(0, Math.round((it.qty - step) * 2) / 2) }
-                    : it
-                )
-                .filter((it) => it.qty > 0);
-              persist(updated);
-            }}
-            onRemove={(name) => {
-              const updated = cartItems.filter((it) => it.name !== name);
-              persist(updated);
-            }}
-            onSave={handleSaveCart}
-            isSaving={isSaving}
-          />
-        </>
-      )}
+      <div className={styles.tabs}>
+        <div className={styles.tabLeft}>
+          <h3 className={styles.sectionTitle}>ของว่าง</h3>
+        </div>
+      </div>
+      <FoodGrid foods={filteredSnacks} onAdd={addToCart} layout="horizontal" />
+      
+          {showSheet && (
+            <CartSheet
+              cartItems={cartItems}
+              onClose={() => setShowSheet(false)}
+              onIncrease={(name, step = 1) => {
+                const updated = cartItems.map((it) =>
+                  it.name === name ? { ...it, qty: it.qty + step } : it
+                );
+                persist(updated);
+              }}
+              onDecrease={(name, step = 1) => {
+                const updated = cartItems
+                  .map((it) =>
+                    it.name === name ? { ...it, qty: it.qty - step } : it
+                  )
+                  .filter((it) => it.qty > 0);
+                persist(updated);
+              }}
+              onRemove={(name) => {
+                const updated = cartItems.filter((it) => it.name !== name);
+                persist(updated);
+              }}
+              onSave={async () => {
+                try {
+                  await saveCartToFirestore(cartItems);
+                  persist([]);
+                  setShowSheet(false);
+                } catch (err) {
+                  console.error(err);
+                  alert('บันทึกล้มเหลว');
+                }
+              }}
+            />
+          )}
 
       <BottomMenu />
     </div>

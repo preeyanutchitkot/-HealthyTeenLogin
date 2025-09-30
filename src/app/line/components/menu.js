@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-const OA_URL    = 'https://line.me/R/ti/p/@696kpmzu';
+const OA_URL = 'https://line.me/R/ti/p/@696kpmzu';
 
 export default function BottomMenu() {
   const pathname = usePathname();
@@ -13,11 +13,37 @@ export default function BottomMenu() {
   const safeSrc = (p) => encodeURI(p);
 
   const menuItems = [
-    { label: 'หน้าหลัก',   type: 'internal', href: '/line/home', icon: '/home 3.png' },
-    { label: 'บันทึกอาหาร', type: 'internal', href: '/line/foodn', icon: '/savefood.png' },
-    { label: 'แชทบอท',     type: 'external', url: OA_URL,          icon: '/55.png', center: true },
-    { label: 'สรุป',      type: 'internal', href: '/line/summary',       icon: '/Group 230 (1).png' },
-    { label: 'ฉัน',         type: 'internal', href: '/line/me',     icon: '/Group 230 (2).png' },
+    {
+      label: 'หน้าหลัก',
+      type: 'internal',
+      href: '/line/home',
+      icon: '/home 3.png',
+    },
+    {
+      label: 'บันทึกอาหาร',
+      type: 'internal',
+      href: '/line/foodn',
+      icon: '/savefood.png',
+    },
+    {
+      label: 'แชทบอท',
+      type: 'external',
+      url: OA_URL,
+      icon: '/55.png',
+      center: true,
+    },
+    {
+      label: 'สรุป',
+      type: 'internal',
+      href: '/line/summary',
+      icon: '/Group 230 (1).png',
+    },
+    {
+      label: 'ฉัน',
+      type: 'internal',
+      href: '/line/me',
+      icon: '/Group 230 (2).png',
+    },
   ];
 
   const openExternal = (url) => (e) => {
@@ -37,7 +63,10 @@ export default function BottomMenu() {
     const nav = document.getElementById('bottom-menu');
     if (!nav) return;
     const apply = () => {
-      document.documentElement.style.setProperty('--menu-h', `${nav.offsetHeight}px`);
+      document.documentElement.style.setProperty(
+        '--menu-h',
+        `${nav.offsetHeight}px`
+      );
     };
     apply();
     const ro = new ResizeObserver(apply);
@@ -51,7 +80,12 @@ export default function BottomMenu() {
 
   return (
     <>
-      <nav id="bottom-menu" className="bottom-menu" role="navigation" aria-label="Main tabs">
+      <nav
+        id="bottom-menu"
+        className="bottom-menu"
+        role="navigation"
+        aria-label="Main tabs"
+      >
         {menuItems.map((item) => {
           const isActive =
             item.type === 'internal' &&
@@ -79,7 +113,9 @@ export default function BottomMenu() {
                   className={`icon ${isActive ? 'icon-active' : 'icon-inactive'}`}
                 />
               )}
-              <span className={`label ${isActive ? 'label-active' : 'label-inactive'}`}>
+              <span
+                className={`label ${isActive ? 'label-active' : 'label-inactive'}`}
+              >
                 {item.label}
               </span>
             </>

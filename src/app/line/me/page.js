@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import BottomMenu from "../components/menu";
-import CalorieSummary from "../components/CalorieSummary";
-import MenuPopup from "../components/MenuPopup";
-import { Noto_Sans_Thai } from "next/font/google";
+import { useEffect, useMemo, useRef, useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import BottomMenu from '../components/menu';
+import CalorieSummary from '../components/CalorieSummary';
+import MenuPopup from '../components/MenuPopup';
+import { Noto_Sans_Thai } from 'next/font/google';
 
-import { auth, db } from "../lib/firebase";
-import { onAuthStateChanged } from "firebase/auth";
+import { auth, db } from '../lib/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 import {
   doc,
   getDoc,
@@ -18,36 +18,36 @@ import {
   where,
   getDocs,
   onSnapshot,
-} from "firebase/firestore";
+} from 'firebase/firestore';
 
-import styles from "./MePage.module.css";
+import styles from './MePage.module.css';
 
 const notoSansThai = Noto_Sans_Thai({
-  weight: ["300", "400", "500", "700"],
-  subsets: ["thai", "latin"],
-  display: "swap",
+  weight: ['300', '400', '500', '700'],
+  subsets: ['thai', 'latin'],
+  display: 'swap',
 });
 
 const toYMD = (d) => {
   const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
   return `${y}-${m}-${day}`;
 };
 
 const bellSrcByPercent = (percent) => {
-  if (percent == null) return "/b1.png";
-  if (percent > 100) return "/b3.png";
-  if (percent >= 80) return "/b2.png";
-  return "/b1.png";
+  if (percent == null) return '/b1.png';
+  if (percent > 100) return '/b3.png';
+  if (percent >= 80) return '/b2.png';
+  return '/b1.png';
 };
 
 export default function MePage() {
   const fmtTh = (date) =>
-    new Date(date).toLocaleDateString("th-TH", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "2-digit",
+    new Date(date).toLocaleDateString('th-TH', {
+      day: '2-digit',
+      month: '2-digit',
+      year: '2-digit',
     });
 
   const today = useMemo(() => fmtTh(new Date()), []);
@@ -62,13 +62,13 @@ export default function MePage() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const [bellSrc, setBellSrc] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("bellSrc") || null;
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('bellSrc') || null;
     }
     return null;
   });
   useEffect(() => {
-    if (bellSrc) localStorage.setItem("bellSrc", bellSrc);
+    if (bellSrc) localStorage.setItem('bellSrc', bellSrc);
   }, [bellSrc]);
 
   const bmrRef = useRef(null);
@@ -100,7 +100,7 @@ export default function MePage() {
 
     const ymd = toYMD(new Date());
 
-    const unsubUser = onSnapshot(doc(db, "users", uid), (uSnap) => {
+    const unsubUser = onSnapshot(doc(db, 'users', uid), (uSnap) => {
       const u = uSnap.exists() ? uSnap.data() : null;
       const bmrVal = u?.bmr != null ? Number(u.bmr) : null;
       bmrRef.current = bmrVal;
@@ -110,9 +110,9 @@ export default function MePage() {
     });
 
     const qToday = query(
-      collection(db, "food"),
-      where("uid", "==", uid),
-      where("ymd", "==", ymd)
+      collection(db, 'food'),
+      where('uid', '==', uid),
+      where('ymd', '==', ymd)
     );
     const unsubFoodToday = onSnapshot(
       qToday,
@@ -128,7 +128,7 @@ export default function MePage() {
         recomputeBell();
       },
       (e) => {
-        console.error("today food snapshot error:", e);
+        console.error('today food snapshot error:', e);
       }
     );
 
@@ -141,14 +141,14 @@ export default function MePage() {
   useEffect(() => {
     let cancelled = false;
     const ymdToTh = (ymd) => {
-      const [y, m, d] = String(ymd).split("-").map(Number);
+      const [y, m, d] = String(ymd).split('-').map(Number);
       return fmtTh(new Date(y, m - 1, d));
     };
 
     const run = async () => {
       if (!uid) return;
       try {
-        const qy = query(collection(db, "food"), where("uid", "==", uid));
+        const qy = query(collection(db, 'food'), where('uid', '==', uid));
         const snap = await getDocs(qy);
 
         const byDate = {};
@@ -157,26 +157,29 @@ export default function MePage() {
           const dateStr = d?.ymd
             ? ymdToTh(d.ymd)
             : d?.date?.toDate
-            ? fmtTh(d.date.toDate())
-            : today;
+              ? fmtTh(d.date.toDate())
+              : today;
 
           if (!byDate[dateStr]) byDate[dateStr] = [];
 
-          const itemName = d.item ?? d.name ?? d.menu ?? d.title ?? "ไม่ระบุเมนู";
+          const itemName =
+            d.item ?? d.name ?? d.menu ?? d.title ?? 'ไม่ระบุเมนู';
           byDate[dateStr].push({
             name: itemName,
             cal:
               d.calories != null && d.qty != null
                 ? `${Number(d.calories)}x${Number(d.qty)}`
-                : String(d.calories ?? "-"),
-            img: d.imageUrl || d.imgUrl || d.img || "/placeholder.png",
+                : String(d.calories ?? '-'),
+            img: d.imageUrl || d.imgUrl || d.img || '/placeholder.png',
           });
         });
 
         const orderedDates = Object.keys(byDate).sort((a, b) => {
-          const [da, ma, ya] = a.split("/").map(Number);
-          const [dbb, mb, yb] = b.split("/").map(Number);
-          return new Date(2000 + yb, mb - 1, dbb) - new Date(2000 + ya, ma - 1, da);
+          const [da, ma, ya] = a.split('/').map(Number);
+          const [dbb, mb, yb] = b.split('/').map(Number);
+          return (
+            new Date(2000 + yb, mb - 1, dbb) - new Date(2000 + ya, ma - 1, da)
+          );
         });
 
         const logs =
@@ -189,7 +192,7 @@ export default function MePage() {
           setOpenDates({ [logs[0].date]: true });
         }
       } catch (e) {
-        console.error("load food logs error:", e);
+        console.error('load food logs error:', e);
         if (!cancelled) {
           const fallback = [{ date: today, items: [] }];
           setDailyLogs(fallback);
@@ -210,14 +213,27 @@ export default function MePage() {
   return (
     <div className={`${notoSansThai.className} ${styles.page}`}>
       <style jsx global>{`
-        html, body, #__next { height: 100%; margin: 0; padding: 0; background-color: #f3faee; }
-        * { box-sizing: border-box; }
+        html,
+        body,
+        #__next {
+          height: 100%;
+          margin: 0;
+          padding: 0;
+          background-color: #f3faee;
+        }
+        * {
+          box-sizing: border-box;
+        }
       `}</style>
 
       {/* Header */}
       <div className={styles.header}>
         <div className={styles.headerTop}>
-          <Link href="/line/home" aria-label="ย้อนกลับ" className={styles.back} />
+          <Link
+            href="/line/home"
+            aria-label="ย้อนกลับ"
+            className={styles.back}
+          />
           <div className={styles.title} />
           <div className={styles.headerIcons}>
             <Link
@@ -257,8 +273,10 @@ export default function MePage() {
         <div className={styles.metrics}>
           <div>
             BMI
-            {bmi != null && !isNaN(bmi) ? `: ${Number(bmi).toFixed(1)}` : "..........................................."}
-            {bmr != null && !isNaN(bmr) ? ` | BMR: ${Number(bmr)}` : ""}
+            {bmi != null && !isNaN(bmi)
+              ? `: ${Number(bmi).toFixed(1)}`
+              : '...........................................'}
+            {bmr != null && !isNaN(bmr) ? ` | BMR: ${Number(bmr)}` : ''}
           </div>
         </div>
       </div>
@@ -280,7 +298,10 @@ export default function MePage() {
         {dailyLogs.map((d) => {
           const open = !!openDates[d.date];
           return (
-            <div className={`${styles.dayCard} ${open ? styles.open : ""}`} key={d.date}>
+            <div
+              className={`${styles.dayCard} ${open ? styles.open : ''}`}
+              key={d.date}
+            >
               <button
                 className={styles.dayHeader}
                 onClick={() => toggleDate(d.date)}
@@ -288,13 +309,15 @@ export default function MePage() {
                 aria-controls={`panel-${d.date}`}
               >
                 <span className={styles.dayLabel}>{d.date}</span>
-                <span className={`${styles.chev} ${open ? styles.rot : ""}`}>▾</span>
+                <span className={`${styles.chev} ${open ? styles.rot : ''}`}>
+                  ▾
+                </span>
               </button>
 
               <div
                 id={`panel-${d.date}`}
                 className={styles.dayBody}
-                style={{ maxHeight: open ? "560px" : "0px" }}
+                style={{ maxHeight: open ? '560px' : '0px' }}
               >
                 {d.items && d.items.length > 0 ? (
                   <div className={styles.menuTable}>
@@ -305,7 +328,10 @@ export default function MePage() {
                     </div>
 
                     {d.items.map((item, idx) => (
-                      <div className={styles.menuRow} key={`${item.name}-${idx}`}>
+                      <div
+                        className={styles.menuRow}
+                        key={`${item.name}-${idx}`}
+                      >
                         <div className={styles.menuColImg}>
                           <Image
                             src={item.img}

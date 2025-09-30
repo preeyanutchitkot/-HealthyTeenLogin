@@ -1,42 +1,45 @@
 // app/components/CalorieSummary.jsx
-"use client";
-import { useEffect, useMemo, useState } from "react";
-import { auth, db, signInIfNeeded } from "../lib/firebase";
-import { collection, getDocs, query, where } from "firebase/firestore";
+'use client';
+import { useEffect, useMemo, useState } from 'react';
+import { auth, db, signInIfNeeded } from '../lib/firebase';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 
 /* ===== helpers (TZ-safe) ===== */
-const getLocalYMD_TZ = (d, tz="Asia/Bangkok") =>
-  new Intl.DateTimeFormat("en-CA", { timeZone: tz }).format(d); // YYYY-MM-DD
+const getLocalYMD_TZ = (d, tz = 'Asia/Bangkok') =>
+  new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(d); // YYYY-MM-DD
 
-const ymdToUTCDate = (ymd) => new Date(`${ymd.slice(0,10)}T00:00:00Z`);
+const ymdToUTCDate = (ymd) => new Date(`${ymd.slice(0, 10)}T00:00:00Z`);
 const addDaysYMD = (ymd, days) => {
   const dt = ymdToUTCDate(ymd);
   dt.setUTCDate(dt.getUTCDate() + days);
-  return dt.toISOString().slice(0,10);
+  return dt.toISOString().slice(0, 10);
 };
-const formatDateTH = (ymd, tz="Asia/Bangkok") =>
-  new Intl.DateTimeFormat("th-TH-u-ca-buddhist", {
-    day:"2-digit", month:"2-digit", year:"2-digit", timeZone: tz,
+const formatDateTH = (ymd, tz = 'Asia/Bangkok') =>
+  new Intl.DateTimeFormat('th-TH-u-ca-buddhist', {
+    day: '2-digit',
+    month: '2-digit',
+    year: '2-digit',
+    timeZone: tz,
   }).format(ymdToUTCDate(ymd));
 
 export default function CalorieSummary({
-  variant = "floating",
+  variant = 'floating',
   uid,
-  tz = "Asia/Bangkok",
+  tz = 'Asia/Bangkok',
   weekStartMonday = true,
-  baseYMD,             // ส่ง YYYY-MM-DD เข้ามาได้ (ถ้าไม่ส่ง จะใช้วันนี้ใน tz)
+  baseYMD, // ส่ง YYYY-MM-DD เข้ามาได้ (ถ้าไม่ส่ง จะใช้วันนี้ใน tz)
 }) {
   const anchorYMD = useMemo(
-    () => (baseYMD?.slice(0,10)) || getLocalYMD_TZ(new Date(), tz),
+    () => baseYMD?.slice(0, 10) || getLocalYMD_TZ(new Date(), tz),
     [baseYMD, tz]
   );
 
   // คำนวณช่วงสัปดาห์เดียวกับ WeekCalories
   const { ymdStart, ymdEnd } = useMemo(() => {
     const dow = ymdToUTCDate(anchorYMD).getUTCDay(); // 0=อา..6=ส
-    const offset = weekStartMonday ? ((dow + 6) % 7) : dow;
+    const offset = weekStartMonday ? (dow + 6) % 7 : dow;
     const start = addDaysYMD(anchorYMD, -offset);
-    const end   = addDaysYMD(start, 6);
+    const end = addDaysYMD(start, 6);
     return { ymdStart: start, ymdEnd: end };
   }, [anchorYMD, weekStartMonday]);
 
@@ -47,21 +50,22 @@ export default function CalorieSummary({
 
   useEffect(() => {
     (async () => {
-      setLoading(true); setErr(null);
+      setLoading(true);
+      setErr(null);
       try {
         const user = await signInIfNeeded();
         const userId = uid || user?.uid;
-        if (!userId) throw new Error("ยังไม่ได้ล็อกอิน");
+        if (!userId) throw new Error('ยังไม่ได้ล็อกอิน');
 
         // รวมของ "วันนั้น" (ยึด anchorYMD)
         const qDay = query(
-          collection(db, "food"),
-          where("uid", "==", userId),
-          where("ymd", "==", anchorYMD)
+          collection(db, 'food'),
+          where('uid', '==', userId),
+          where('ymd', '==', anchorYMD)
         );
         const daySnap = await getDocs(qDay);
-        const daySum = daySnap.docs.reduce((s,doc)=>{
-          const d=doc.data();
+        const daySum = daySnap.docs.reduce((s, doc) => {
+          const d = doc.data();
           const calEach = Number(d.calories ?? d.cal ?? 0) || 0;
           const qty = Number(d.qty ?? 1) || 1;
           return s + calEach * qty;
@@ -70,21 +74,21 @@ export default function CalorieSummary({
 
         // รวมของ "สัปดาห์" (ยึด start–end)
         const qWeek = query(
-          collection(db, "food"),
-          where("uid", "==", userId),
-          where("ymd", ">=", ymdStart),
-          where("ymd", "<=", ymdEnd)
+          collection(db, 'food'),
+          where('uid', '==', userId),
+          where('ymd', '>=', ymdStart),
+          where('ymd', '<=', ymdEnd)
         );
         const weekSnap = await getDocs(qWeek);
-        const weekSum = weekSnap.docs.reduce((s,doc)=>{
-          const d=doc.data();
+        const weekSum = weekSnap.docs.reduce((s, doc) => {
+          const d = doc.data();
           const calEach = Number(d.calories ?? d.cal ?? 0) || 0;
           const qty = Number(d.qty ?? 1) || 1;
           return s + calEach * qty;
         }, 0);
         setWeeklyCalorie(weekSum);
-      } catch(e) {
-        setErr(e?.message || "เกิดข้อผิดพลาดในการดึงข้อมูล");
+      } catch (e) {
+        setErr(e?.message || 'เกิดข้อผิดพลาดในการดึงข้อมูล');
       } finally {
         setLoading(false);
       }
@@ -92,7 +96,9 @@ export default function CalorieSummary({
   }, [uid, anchorYMD, ymdStart, ymdEnd]);
 
   return (
-    <div className={`summary-container ${variant==="inline" ? "inline" : "floating"}`}>
+    <div
+      className={`summary-container ${variant === 'inline' ? 'inline' : 'floating'}`}
+    >
       <p className="summary-title">สรุปแคลอรี่</p>
 
       {loading ? (
@@ -114,36 +120,81 @@ export default function CalorieSummary({
           </div>
         </div>
       )}
-      
+
       <style jsx>{`
-        .summary-container{
+        .summary-container {
           position: relative;
           width: 90vw;
           max-width: 300px;
           background: #fff;
           border-radius: 16px;
-          box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
           padding: 20px 16px;
           text-align: center;
           z-index: 10;
         }
-        .summary-container.floating{
+        .summary-container.floating {
           position: absolute;
           top: 140px;
           left: 50%;
           transform: translateX(-50%);
         }
-        .summary-container.inline{ position: static; transform:none; margin:16px auto; }
+        .summary-container.inline {
+          position: static;
+          transform: none;
+          margin: 16px auto;
+        }
 
-        .summary-title{ font-weight:700; font-size:18px; margin:4px 0 10px; color:#111827; }
-        .summary-box{ background:#f8fafc; border-radius:12px; padding:12px 8px; display:flex; justify-content:space-between; margin-top:10px; box-shadow:0 1px 4px rgba(0,0,0,.04); }
-        .summary-item{ flex:1; text-align:center; }
-        .summary-date{ margin:0; font-weight:600; color:#000000; font-size:15px; }
-        .summary-value{ margin:4px 0; font-size:20px; font-weight:700; color:#222; }
-        .summary-unit{ margin:0; font-size:13px; color:#888; }
-        .divider{ width:1px; background:#e5e7eb; margin:0 8px; }
-        .loading,.error{ font-size:14px; color:#6b7280; padding:8px 0; }
-        .error{ color:#dc2626; }
+        .summary-title {
+          font-weight: 700;
+          font-size: 18px;
+          margin: 4px 0 10px;
+          color: #111827;
+        }
+        .summary-box {
+          background: #f8fafc;
+          border-radius: 12px;
+          padding: 12px 8px;
+          display: flex;
+          justify-content: space-between;
+          margin-top: 10px;
+          box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+        }
+        .summary-item {
+          flex: 1;
+          text-align: center;
+        }
+        .summary-date {
+          margin: 0;
+          font-weight: 600;
+          color: #000000;
+          font-size: 15px;
+        }
+        .summary-value {
+          margin: 4px 0;
+          font-size: 20px;
+          font-weight: 700;
+          color: #222;
+        }
+        .summary-unit {
+          margin: 0;
+          font-size: 13px;
+          color: #888;
+        }
+        .divider {
+          width: 1px;
+          background: #e5e7eb;
+          margin: 0 8px;
+        }
+        .loading,
+        .error {
+          font-size: 14px;
+          color: #6b7280;
+          padding: 8px 0;
+        }
+        .error {
+          color: #dc2626;
+        }
       `}</style>
     </div>
   );

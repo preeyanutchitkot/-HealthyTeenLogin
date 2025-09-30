@@ -1,0 +1,49 @@
+.category-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  overflow-x: auto;
+  padding: 10px 12px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  background-color: inherit; /* รับสีจาก prop */
+}
+
+.category-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.category-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: #111;
+  min-width: 68px;
+}
+
+.category-thumb {
+  background: transparent;
+  border-radius: 0;
+  width: auto;
+  height: auto;
+  box-shadow: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.category-thumb img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+}
+
+.category-label {
+  font-size: 13px;
+  margin-top: 6px;
+  text-align: center;
+  color: #333;
+  white-space: nowrap;
+  font-weight: 400;
+}

@@ -24,7 +24,7 @@
 
 /* หัวข้อ */
 .container h2 {
-  color: #3ABB47;
+  color: #3abb47;
   font-size: 24px;
   font-weight: 700;
   margin-bottom: 4px;
@@ -104,13 +104,13 @@
 .label {
   font-size: 14px;
   font-weight: bold;
-  color: #3ABB47;
+  color: #3abb47;
   margin-bottom: 4px;
 }
 
 /* Select และ Number Input */
 .container select,
-.container input[type="number"] {
+.container input[type='number'] {
   width: 100%;
   height: 44px;
   padding: 0 12px;
@@ -129,7 +129,7 @@
 }
 
 .note a {
-  color: #84AA81;
+  color: #84aa81;
   font-weight: bold;
   text-decoration: underline;
 }
@@ -144,7 +144,7 @@
 
 /* ปุ่มหลัก */
 .btn {
-  background-color: #3ABB47;
+  background-color: #3abb47;
   color: white;
   height: 46px;
   border: none;

@@ -1,4 +1,4 @@
-.page { 
+.page {
   background-color: #f3faee;
   min-height: 100vh;
   padding-bottom: 100px;
@@ -6,15 +6,15 @@
 
 /* Header */
 .header {
-  background-color: #3ABB47;
+  background-color: #3abb47;
   position: relative;
   height: 240px;
 }
 
 .headerIcons {
   position: absolute;
-  top: 16px;      /* ⭐ เดิม 10px */
-  right: 16px;    /* ⭐ เดิม 20px */
+  top: 16px; /* ⭐ เดิม 10px */
+  right: 16px; /* ⭐ เดิม 20px */
   display: flex;
   gap: 16px;
   z-index: 20;
@@ -23,7 +23,7 @@
 /* โปรไฟล์ */
 .profile {
   position: absolute;
-  top: 56px;      /* ⭐ เดิม 16px ให้เท่าหน้า Me */
+  top: 56px; /* ⭐ เดิม 16px ให้เท่าหน้า Me */
   left: 50%;
   transform: translateX(-50%);
   background: #fff;
@@ -31,7 +31,7 @@
   overflow: hidden;
   width: 72px;
   height: 72px;
-  box-shadow: 0 2px 6px rgba(0,0,0,.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   z-index: 20;
 }
 .profileImg {
@@ -57,7 +57,7 @@
 .notifWrap {
   position: relative;
   display: inline-block;
-  top: 0;         /* ⭐ เดิม 6px */
+  top: 0; /* ⭐ เดิม 6px */
 }
 .notifWrap :global(img) {
   display: block;
@@ -72,14 +72,20 @@
   border: 1.5px solid #fff;
   z-index: 2;
 }
-.dotGreen { background: #4CAF50; }
-.dotYellow { background: #FFD600; }
-.dotRed { background: #F44336; }
+.dotGreen {
+  background: #4caf50;
+}
+.dotYellow {
+  background: #ffd600;
+}
+.dotRed {
+  background: #f44336;
+}
 
 /* กระต่ายลอยด้านขวา */
 .bunnyOverlay {
   position: absolute;
-  top: 80px;         /* จัดตำแหน่งตามการ์ดสรุป */
+  top: 80px; /* จัดตำแหน่งตามการ์ดสรุป */
   right: 16px;
   width: 72px;
   height: auto;
@@ -101,20 +107,15 @@
   text-decoration: none;
 }
 
-:root {
-  --circle-size: 60px;  /* เส้นผ่านศูนย์กลางปุ่ม */
-  --icon-size: 44px; 
-}
-
 .circleIcon {
   width: var(--circle-size);
   height: var(--circle-size);
   background: #fff;
   border-radius: 50%;
-  box-shadow: 0 4px 10px rgba(0,0,0,.15);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
   display: grid;
   place-items: center;
-  overflow: hidden;     /* กันรูปทะลุ */
+  overflow: hidden;
 }
 
 .circleIcon :global(img) {
@@ -124,12 +125,19 @@
   display: block;
 }
 
-.circleLabel { font-size: 12px; color: #333; margin-top: 4px; }
-.menuToday { margin-top: 24px; padding: 0 16px; }
+.circleLabel {
+  font-size: 12px;
+  color: #333;
+  margin-top: 4px;
+}
+.menuToday {
+  margin-top: 24px;
+  padding: 0 16px;
+}
 .menuTable {
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,.05);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   overflow: hidden;
   margin-top: 16px;
 }
@@ -142,9 +150,18 @@
   color: #333;
   border-bottom: 1px solid #ddd;
 }
-.menuHeaderImg { width: 80px; text-align: center; }
-.menuHeaderName { flex: 1; text-align: center; }
-.menuHeaderCal { width: 80px; text-align: center; }
+.menuHeaderImg {
+  width: 80px;
+  text-align: center;
+}
+.menuHeaderName {
+  flex: 1;
+  text-align: center;
+}
+.menuHeaderCal {
+  width: 80px;
+  text-align: center;
+}
 
 .menuRow {
   display: flex;
@@ -159,7 +176,10 @@
   justify-content: center;
   align-items: center;
 }
-.menuThumb { border-radius: 8px; object-fit: cover; }
+.menuThumb {
+  border-radius: 8px;
+  object-fit: cover;
+}
 .menuColName {
   flex: 1;
   font-size: 14px;
@@ -178,6 +198,12 @@
   justify-content: center;
   align-items: center;
 }
-.menuRow:last-child { border-bottom: none; }
+.menuRow:last-child {
+  border-bottom: none;
+}
 
-.empty { width: 100%; text-align: center; color: #6b7280; }
+.empty {
+  width: 100%;
+  text-align: center;
+  color: #6b7280;
+}

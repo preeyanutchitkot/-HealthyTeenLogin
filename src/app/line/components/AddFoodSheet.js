@@ -1,16 +1,15 @@
-import { useState } from "react";
-import Image from "next/image";
-import { pickImageByName } from "../lib/pickImageByName";
+import { useState } from 'react';
+import Image from 'next/image';
+import { pickImageByName } from '../lib/pickImageByName';
 
 export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
-
-  const [foodInputs, setFoodInputs] = useState([{ name: "", calories: "" }]);
-  const [apiResults, setApiResults] = useState([""]);
+  const [foodInputs, setFoodInputs] = useState([{ name: '', calories: '' }]);
+  const [apiResults, setApiResults] = useState(['']);
   const [loadingRows, setLoadingRows] = useState([false]);
 
   const handleAddInput = () => {
-    setFoodInputs((prev) => [...prev, { name: "", calories: "" }]);
-    setApiResults((prev) => [...prev, ""]);
+    setFoodInputs((prev) => [...prev, { name: '', calories: '' }]);
+    setApiResults((prev) => [...prev, '']);
     setLoadingRows((prev) => [...prev, false]);
   };
 
@@ -31,11 +30,11 @@ export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
     });
 
     try {
-      const n8nApiUrl = "/api/calories";
+      const n8nApiUrl = '/api/calories';
 
       const res = await fetch(n8nApiUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ foodName: v }),
       });
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
@@ -43,14 +42,14 @@ export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
       const data = await res.json();
 
       // รองรับหลายชื่อฟิลด์ที่ Make/n8n อาจส่งมา (calories / kcal / output)
-      const caloriesRaw = data.calories ?? data.kcal ?? data.output ?? "";
+      const caloriesRaw = data.calories ?? data.kcal ?? data.output ?? '';
       const newCalories =
-        parseInt(String(caloriesRaw).replace(/[^\d]/g, ""), 10) || "";
+        parseInt(String(caloriesRaw).replace(/[^\d]/g, ''), 10) || '';
 
       // โชว์เฉพาะตัวเลขที่อ่านง่ายบน UI
       setApiResults((prev) => {
         const next = [...prev];
-        next[index] = newCalories ? `${newCalories} kcal` : "ไม่พบข้อมูล";
+        next[index] = newCalories ? `${newCalories} kcal` : 'ไม่พบข้อมูล';
         return next;
       });
 
@@ -61,7 +60,7 @@ export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
         return next;
       });
     } catch (err) {
-      console.error("Failed to fetch calories from n8n:", err);
+      console.error('Failed to fetch calories from n8n:', err);
       setApiResults((prev) => {
         const next = [...prev];
         next[index] = `Error: ${err.message}`;
@@ -121,7 +120,9 @@ export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
                     type="text"
                     placeholder="เพิ่มเมนูของคุณ (เช่น ต้มยำ, ผัดกะเพรา, ข้าวราดแกง, ก๋วยเตี๋ยวหมู)"
                     value={food.name}
-                    onChange={(e) => handleInputChange(index, "name", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange(index, 'name', e.target.value)
+                    }
                     onBlur={(e) => handleInputBlur(index, e.target.value)}
                     className="food-input"
                   />
@@ -129,15 +130,22 @@ export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
                     type="number"
                     placeholder="แคลอรี่"
                     value={food.calories}
-                    onChange={(e) => handleInputChange(index, "calories", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange(index, 'calories', e.target.value)
+                    }
                     className="cal-input"
                   />
                 </div>
 
                 {index === foodInputs.length - 1 ? (
-                  <button className="add-btn" onClick={handleAddInput}>+</button>
+                  <button className="add-btn" onClick={handleAddInput}>
+                    +
+                  </button>
                 ) : (
-                  <button className="trash-btn" onClick={() => handleRemoveInput(index)}>
+                  <button
+                    className="trash-btn"
+                    onClick={() => handleRemoveInput(index)}
+                  >
                     <Image src="/trash.png" alt="ลบ" width={16} height={16} />
                   </button>
                 )}
@@ -145,7 +153,9 @@ export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
 
               {loadingRows[index] ? (
                 <div className="result-display">
-                  <span className="api-result-text">กำลังวิเคราะห์แคลอรี่…</span>
+                  <span className="api-result-text">
+                    กำลังวิเคราะห์แคลอรี่…
+                  </span>
                 </div>
               ) : apiResults[index] ? (
                 <div className="result-display">
@@ -159,24 +169,97 @@ export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
         </div>
 
         <div className="sheet-footer">
-          <button className="save" onClick={handleSave} disabled={foodInputs.length === 0}>
+          <button
+            className="save"
+            onClick={handleSave}
+            disabled={foodInputs.length === 0}
+          >
             บันทึก
           </button>
         </div>
 
         {/* ✅ สไตล์เดิมทั้งหมด — ไม่เปลี่ยนใดๆ */}
         <style jsx>{`
-          .item-wrapper { display:flex; flex-direction:column; align-items:flex-start; gap:6px; margin:8px 12px 14px; }
-          .input-with-button-wrapper { display:flex; align-items:center; width:100%; gap:10px; }
-          .input-field-wrapper { display:flex; flex:1; gap:8px; }
-          .input-field-wrapper input { padding:12px; border:1px solid #e5e7eb; border-radius:12px; font-size:14px; background:#fff; box-sizing:border-box; }
-          .food-input { flex:3; width:100%; }
-          .cal-input { flex:1; width:100px; text-align:center; }
-          .add-btn { width:36px; height:36px; border-radius:50%; border:none; background:#3abb47; color:#fff; font-size:22px; display:grid; place-items:center; cursor:pointer; flex-shrink:0; }
-          .trash-btn { width:28px; height:28px; border-radius:50%; background:#fff; border:none; box-shadow:0 1px 4px rgba(0,0,0,.08); display:grid; place-items:center; flex-shrink:0; }
-          .save { width:100%; padding:12px; background:#3abb47; border:none; color:#fff; font-size:16px; border-radius:12px; cursor:pointer; }
-          .result-display { margin:0 4px 0 4px; text-align:left; }
-          .api-result-text { font-size:13px; color:#000; font-weight:bold; white-space:pre-wrap; word-break:break-word; }
+          .item-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px;
+            margin: 8px 12px 14px;
+          }
+          .input-with-button-wrapper {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            gap: 10px;
+          }
+          .input-field-wrapper {
+            display: flex;
+            flex: 1;
+            gap: 8px;
+          }
+          .input-field-wrapper input {
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 14px;
+            background: #fff;
+            box-sizing: border-box;
+          }
+          .food-input {
+            flex: 3;
+            width: 100%;
+          }
+          .cal-input {
+            flex: 1;
+            width: 100px;
+            text-align: center;
+          }
+          .add-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: #3abb47;
+            color: #fff;
+            font-size: 22px;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            flex-shrink: 0;
+          }
+          .trash-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #fff;
+            border: none;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+          }
+          .save {
+            width: 100%;
+            padding: 12px;
+            background: #3abb47;
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            border-radius: 12px;
+            cursor: pointer;
+          }
+          .result-display {
+            margin: 0 4px 0 4px;
+            text-align: left;
+          }
+          .api-result-text {
+            font-size: 13px;
+            color: #000;
+            font-weight: bold;
+            white-space: pre-wrap;
+            word-break: break-word;
+          }
         `}</style>
       </div>
     </div>

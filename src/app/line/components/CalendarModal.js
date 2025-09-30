@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import dayjs from "dayjs";
-import "dayjs/locale/th";
-import { Dialog, DialogContent, DialogActions, Button } from "@mui/material";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { StaticDatePicker } from "@mui/x-date-pickers/StaticDatePicker";
+import * as React from 'react';
+import dayjs from 'dayjs';
+import 'dayjs/locale/th';
+import { Dialog, DialogContent, DialogActions, Button } from '@mui/material';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
 
-dayjs.locale("th");
+dayjs.locale('th');
 
 export default function CalendarModal({
   open,
@@ -30,9 +30,9 @@ export default function CalendarModal({
       PaperProps={{
         sx: {
           borderRadius: 3,
-          overflow: "hidden",
+          overflow: 'hidden',
           // เงานุ่ม ๆ คล้ายรูป
-          boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
+          boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
         },
       }}
     >
@@ -49,7 +49,9 @@ export default function CalendarModal({
         </DialogContent>
 
         <DialogActions sx={{ px: 2, pb: 1.5 }}>
-          <Button onClick={onClose} variant="text">Cancel</Button>
+          <Button onClick={onClose} variant="text">
+            Cancel
+          </Button>
           <Button
             onClick={() => {
               onChange?.(temp);

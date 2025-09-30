@@ -1,5 +1,5 @@
-import Image from "next/image";
-import React from "react";
+import Image from 'next/image';
+import React from 'react';
 
 export default function CartSheet({
   cartItems,
@@ -17,7 +17,9 @@ export default function CartSheet({
         <div className="sheet-head">
           <div className="dragbar" />
           <div className="title">เมนูของคุณ</div>
-          <button className="close" onClick={onClose}>×</button>
+          <button className="close" onClick={onClose}>
+            ×
+          </button>
         </div>
 
         <div className="sheet-list">
@@ -25,7 +27,7 @@ export default function CartSheet({
             <div key={it.name} className="row">
               <div className="left">
                 <Image
-                  src={it.image || "/placeholder.png"}
+                  src={it.image || '/placeholder.png'}
                   alt={it.name}
                   width={56}
                   height={56}
@@ -34,16 +36,30 @@ export default function CartSheet({
                 <div className="meta">
                   <div className="r-name">{it.name}</div>
                   <div className="r-cal">
-                    {it.calories} × {it.qty} = <b>{it.calories * it.qty}</b> แคลอรี่
+                    {it.calories} × {it.qty} = <b>{it.calories * it.qty}</b>{' '}
+                    แคลอรี่
                   </div>
                 </div>
               </div>
 
               <div className="right">
-                  <button className="qtybtn" onClick={() => onDecrease(it.name, 0.5)}>−</button>
-                  <span className="qty">{it.qty}</span>
-                  <button className="qtybtn" onClick={() => onIncrease(it.name, 0.5)}>+</button>
-                <button className="icon-btn trash-btn" onClick={() => onRemove(it.name)}>
+                <button
+                  className="qtybtn"
+                  onClick={() => onDecrease(it.name, 0.5)}
+                >
+                  −
+                </button>
+                <span className="qty">{it.qty}</span>
+                <button
+                  className="qtybtn"
+                  onClick={() => onIncrease(it.name, 0.5)}
+                >
+                  +
+                </button>
+                <button
+                  className="icon-btn trash-btn"
+                  onClick={() => onRemove(it.name)}
+                >
                   <img src="/trash.png" alt="ลบ" className="trash-icon" />
                 </button>
               </div>
@@ -61,7 +77,7 @@ export default function CartSheet({
             disabled={cartItems.length === 0 || isSaving}
             onClick={onSave}
           >
-            {isSaving ? "กำลังบันทึก..." : "บันทึก"}
+            {isSaving ? 'กำลังบันทึก...' : 'บันทึก'}
           </button>
         </div>
       </div>

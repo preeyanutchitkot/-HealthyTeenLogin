@@ -1,24 +1,20 @@
-/* ❗ ถ้าใช้ next/font อยู่แล้ว ให้ลบบรรทัดนี้ทิ้งเพื่อเลี่ยงโหลดซ้ำ  */
-/* @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai&display=swap'); */
-
-/* Tailwind ต้องมาก่อน */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 /* ===== Global resets / UX tweaks ===== */
 
-/* รีเซ็ตขอบขาว + ให้พื้นหลังเต็มหน้าจอ */
-html, body, #__next {
+html,
+body,
+#__next {
   height: 100%;
   margin: 0;
   padding: 0;
-  /* ให้สีพื้นหลังกลืนกับหน้า Summary ทั้งจอ */
-  background-color: #E8F5E9; /* ถ้าอยากขาวล้วน เปลี่ยนเป็น #FFFFFF ได้ */
+  background-color: #e8f5e9; /* เขียวอ่อนแบบภาพ */
 }
 
 /* กล่องทั้งหมดคำนวณขนาดจาก padding/Border */
-* { box-sizing: border-box; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
 html {
   -webkit-text-size-adjust: 100%;
@@ -28,30 +24,36 @@ html {
 }
 
 /* กัน iOS ซูมตอนโฟกัส input โดยกำหนด font-size >= 16px */
-input, select, textarea {
+input,
+select,
+textarea {
   font-size: 16px;
   line-height: 1.2;
 }
 
 /* ลดโอกาส double-tap zoom บนปุ่ม/ลิงก์ (ยังลาก/แตะได้ปกติ) */
-button, a {
+button,
+a {
   touch-action: manipulation;
 }
 
-/* ตัดแถบไฮไลต์แตะบน iOS ให้ดูเนียนขึ้น (เลือกได้ตามชอบ) */
-a, button {
+/* ตัดแถบไฮไลต์แตะบน iOS */
+a,
+button {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* ลิงก์ไม่ขีดเส้นใต้ทั้งแอป */
-a, a:visited, a:active, a:focus, a:hover {
+/* ลิงก์ไม่ขีดเส้นใต้ */
+a,
+a:visited,
+a:active,
+a:focus,
+a:hover {
   text-decoration: none !important;
 }
 
-/* ฟอนต์หลัก + สีธีม */
+/* ฟอนต์หลัก */
 body {
-  /* ถ้าใช้ next/font แล้ว ไม่ต้องตั้ง family ซ้ำก็ได้
-     แต่ตั้งไว้ก็ไม่เป็นไร เพราะเป็น fallback */
   font-family: 'Noto Sans Thai', sans-serif;
   background: var(--background);
   color: var(--foreground);
@@ -59,20 +61,27 @@ body {
 
 /* ตัวแปรสีธีม */
 :root {
+  color-scheme: light;
   --background: #ffffff;
   --foreground: #171717;
+  --circle-size: 60px;
+  --icon-size: 44px;
 }
 
-/* Dark mode */
 @media (prefers-color-scheme: dark) {
   :root {
+    color-scheme: dark;
     --background: #0a0a0a;
     --foreground: #ededed;
   }
 }
 
-/* ภาพ/วิดีโอไม่ทะลุกรอบ + responsive */
-img, picture, video, canvas, svg {
+/* Responsive media */
+img,
+picture,
+video,
+canvas,
+svg {
   max-width: 100%;
   height: auto;
   display: block;

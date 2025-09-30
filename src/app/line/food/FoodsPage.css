@@ -1,113 +1,120 @@
-*, *::before, *::after { box-sizing: border-box; }
-:root { color-scheme: light; }
-html, body, #__next { height: 100%; }
-html, body { margin: 0; padding: 0; }
-
-body {
-  background: #ffffff;
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
 .page {
-  background: #f3fdf1;
+  background: #ffffff;
   min-height: 100vh;
   font-family: 'Noto Sans Thai', sans-serif;
   padding-bottom: 80px;
-  margin: 0;
 }
 
-.search-wrap { position: relative; height: 0; }
+/* Search Bar */
+.search-wrap {
+  position: relative;
+  height: 0;
+}
 .search-pill {
-  position: absolute; top: -45px; left: 50%; transform: translateX(-50%);
-  background: #fff; border-radius: 16px; padding: 10px 12px;
-  display: flex; align-items: center; gap: 10px;
-  box-shadow: 0 6px 14px rgba(0, 0, 0, .12);
+  position: absolute;
+  top: -45px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  border-radius: 16px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
   width: 85%;
 }
 .search-pill input {
-  border: none; outline: none; flex: 1;
-  background: transparent; font-size: 16px;
+  border: none;
+  outline: none;
+  flex: 1;
+  background: transparent;
+  font-size: 16px;
 }
-.search-pill input::placeholder { color: #1f2937; opacity: .85; }
 
+/* Tabs */
 .tabs {
-  display: flex; justify-content: space-between; align-items: center;
-  background: #fff; padding: 10px 16px; margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  padding: 10px 16px;
+  margin-top: 20px;
 }
-.tab-left { display: flex; gap: 8px; align-items: center; }
+.tab-left {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
 .tabs button {
-  background: #fff; border: 1px solid #e5e7eb; border-radius: 12px;
-  padding: 6px 16px; color: #3abb47; font-weight: 700;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 6px 16px;
+  color: #3abb47;
+  font-weight: 700;
 }
-.tabs .active { background: #3abb47; border: 2px solid #3abb47; color: #fff; }
-
+.tabs .active {
+  background: #3abb47;
+  border: 2px solid #3abb47;
+  color: #fff;
+}
 .add-new {
-  background: #fff; border: 1px dashed #3abb47; color: #000;
-  border-radius: 12px; padding: 10px 16px; font-weight: 700;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-.add-new:active { transform: scale(0.96); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); }
-
-.food-grid{
-  --card-w: 120px;
-  --card-h: 160px;    /* เพิ่มความสูงขึ้นนิดหน่อย */
-  --gap: 8px;
-  --pad: 8px;
-  --img: 70px;        /* เดิม 60px → เพิ่มขนาดรูป */
-  --btn: 30px;        /* ขยายปุ่ม + อีกนิด */
+  background: #fff;
+  border: 1px dashed #3abb47;
+  color: #000;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-weight: 700;
 }
 
-.food-grid{
+/* ✅ พื้นหลังส่วนแสดงอาหาร */
+.food-grid-wrapper {
+  background: #f3fdf1; /* สีเขียวอ่อน */
+  padding: 12px 0;
+}
+
+/* Grid 3 คอลัมน์ */
+.food-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 คอลัมน์เท่ากัน */
-  gap: var(--gap);
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
   padding: 12px;
   width: 100%;
-  max-width: 400px;   /* กำหนดความกว้างสูงสุดถ้าต้องการ */
-  margin: 0 auto;     /* จัดกลาง */
-  background: #fff;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  max-width: 400px;
+  margin: 0 auto;
 }
 
-/* ซ่อนสกรอลบาร์ใน WebKit */
-.food-grid::-webkit-scrollbar{ display: none; }
-
-.food-item{
-  flex: 0 0 var(--card-w);
-  min-height: var(--card-h);
+/* Card */
+.food-item {
   background: #fff;
   border-radius: 12px;
   text-align: center;
-  padding: var(--pad) var(--pad) calc(var(--pad) + var(--btn) + 6px);
+  padding: 8px 8px 36px;
   position: relative;
-  box-shadow: 0 1px 4px rgba(0,0,0,.1);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
-
-/* รูปในการ์ด (ถ้าใช้ <Image> ให้ใส่ className="thumb" ที่ wrapper หรือรูป) */
-.food-item img,
-.food-item .thumb{
-  width: var(--img);
-  height: var(--img);
+.food-item img {
+  width: 70px;
+  height: 70px;
   object-fit: contain;
   margin: 0 auto 6px;
-  display: block;
 }
-
-.name{ font-size: 14px; font-weight: 700; }
-.calories{ font-size: 13px; color: #555; }
-
-/* ปุ่ม + มุมล่างขวา */
-.add{
+.name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111;
+}
+.calories {
+  font-size: 13px;
+  color: #555;
+}
+.add {
   position: absolute;
   right: 8px;
   bottom: 8px;
-  width: var(--btn);
-  height: var(--btn);
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   border: none;
   background: #3abb47;
@@ -115,7 +122,6 @@ body {
   font-size: 16px;
   line-height: 1;
 }
-
 /* Sheet & overlay */
 .overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, .35); z-index: 1000; animation: fadeIn .15s ease-out; }
 .sheet {

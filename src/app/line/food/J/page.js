@@ -1,45 +1,117 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import BottomMenu from "../../components/menu";
-import CartIcon from "../../components/CartIcon";
-import CategoryBar from "../../components/CategoryBar";
-import Header from "../../components/header";
-import FoodGrid from "../../components/FoodGrid";
-import CartSheet from "../../components/CartSheet";
-import AddFoodSheet from "../../components/AddFoodSheet";
-import { saveCartToFirestore } from "../../lib/saveCart";
-import "../FoodsPage.css";
+import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import BottomMenu from '../../components/menu';
+import CartIcon from '../../components/CartIcon';
+import CategoryBar from '../../components/CategoryBar';
+import Header from '../../components/header';
+import FoodGrid from '../../components/FoodGrid';
+import CartSheet from '../../components/CartSheet';
+import AddFoodSheet from '../../components/AddFoodSheet';
+import { saveCartToFirestore } from '../../lib/saveCart';
+import '../FoodsPage.css';
 
 const JFoods = [
   { name: 'เต้าหู้ทอด', calories: 100, image: '/foods/fried-tofu.png' },
-  { name: 'ผัดหมี่เจ', calories: 250, image: '/foods/vegetarian-fried-noodle.png' },
-  { name: 'ข้าวผัดเจ', calories: 300, image: '/foods/vegetarian-fried-rice.png' },
-  { name: 'แกงเขียวหวานเจ', calories: 180, image: '/foods/vegetarian-green-curry.png' },
-  { name: 'ซาลาเปาไส้เผือก', calories: 180, image: '/foods/taro-steamed-bun.png' },
-  { name: 'ปอเปี๊ยะสดเจ', calories: 120, image: '/foods/vegetarian-fresh-spring-roll.png' },
-  { name: 'ต้มจับฉ่ายเจ', calories: 90, image: '/foods/vegetarian-mixed-vegetable-soup.png' },
-  { name: 'เห็ดทอดเจ', calories: 150, image: '/foods/vegetarian-fried-mushroom.png' },
-  { name: 'แกงส้มผักรวมเจ', calories: 100, image: '/foods/vegetarian-sour-curry.png' },
-  { name: 'เต้าหู้ยัดไส้เจ', calories: 130, image: '/foods/vegetarian-stuffed-tofu.png' },
-  { name: 'กะหล่ำปลีผัดเจ', calories: 110, image: '/foods/vegetarian-fried-cabbage.png' },
-  { name: 'แกงจืดวุ้นเส้นเจ', calories: 80, image: '/foods/vegetarian-clear-soup-vermicelli.png' },
-  { name: 'ยำวุ้นเส้นเจ', calories: 140, image: '/foods/vegetarian-vermicelli-salad.png' },
-  { name: 'ฟักทองผัดเจ', calories: 120, image: '/foods/vegetarian-fried-pumpkin.png' },
-  { name: 'เต้าหู้ต้มซีอิ๊วเจ', calories: 90, image: '/foods/vegetarian-braised-tofu-soy-sauce.png' },
-  { name: 'ข้าวเหนียวเปียกเจ', calories: 200, image: '/foods/vegetarian-sticky-rice-dessert.png' },
-  { name: 'เผือกทอดเจ', calories: 180, image: '/foods/vegetarian-fried-taro.png' },
-  { name: 'หมี่ซั่วผัดเจ', calories: 220, image: '/foods/vegetarian-fried-mee-sua.png' },
+  {
+    name: 'ผัดหมี่เจ',
+    calories: 250,
+    image: '/foods/vegetarian-fried-noodle.png',
+  },
+  {
+    name: 'ข้าวผัดเจ',
+    calories: 300,
+    image: '/foods/vegetarian-fried-rice.png',
+  },
+  {
+    name: 'แกงเขียวหวานเจ',
+    calories: 180,
+    image: '/foods/vegetarian-green-curry.png',
+  },
+  {
+    name: 'ซาลาเปาไส้เผือก',
+    calories: 180,
+    image: '/foods/taro-steamed-bun.png',
+  },
+  {
+    name: 'ปอเปี๊ยะสดเจ',
+    calories: 120,
+    image: '/foods/vegetarian-fresh-spring-roll.png',
+  },
+  {
+    name: 'ต้มจับฉ่ายเจ',
+    calories: 90,
+    image: '/foods/vegetarian-mixed-vegetable-soup.png',
+  },
+  {
+    name: 'เห็ดทอดเจ',
+    calories: 150,
+    image: '/foods/vegetarian-fried-mushroom.png',
+  },
+  {
+    name: 'แกงส้มผักรวมเจ',
+    calories: 100,
+    image: '/foods/vegetarian-sour-curry.png',
+  },
+  {
+    name: 'เต้าหู้ยัดไส้เจ',
+    calories: 130,
+    image: '/foods/vegetarian-stuffed-tofu.png',
+  },
+  {
+    name: 'กะหล่ำปลีผัดเจ',
+    calories: 110,
+    image: '/foods/vegetarian-fried-cabbage.png',
+  },
+  {
+    name: 'แกงจืดวุ้นเส้นเจ',
+    calories: 80,
+    image: '/foods/vegetarian-clear-soup-vermicelli.png',
+  },
+  {
+    name: 'ยำวุ้นเส้นเจ',
+    calories: 140,
+    image: '/foods/vegetarian-vermicelli-salad.png',
+  },
+  {
+    name: 'ฟักทองผัดเจ',
+    calories: 120,
+    image: '/foods/vegetarian-fried-pumpkin.png',
+  },
+  {
+    name: 'เต้าหู้ต้มซีอิ๊วเจ',
+    calories: 90,
+    image: '/foods/vegetarian-braised-tofu-soy-sauce.png',
+  },
+  {
+    name: 'ข้าวเหนียวเปียกเจ',
+    calories: 200,
+    image: '/foods/vegetarian-sticky-rice-dessert.png',
+  },
+  {
+    name: 'เผือกทอดเจ',
+    calories: 180,
+    image: '/foods/vegetarian-fried-taro.png',
+  },
+  {
+    name: 'หมี่ซั่วผัดเจ',
+    calories: 220,
+    image: '/foods/vegetarian-fried-mee-sua.png',
+  },
   { name: 'แกงกะหรี่เจ', calories: 200, image: '/foods/vegetarian-curry.png' },
-  { name: 'ก๋วยเตี๋ยวหลอดเจ', calories: 150, image: '/foods/vegetarian-steamed-rice-noodle-roll.png' }
+  {
+    name: 'ก๋วยเตี๋ยวหลอดเจ',
+    calories: 150,
+    image: '/foods/vegetarian-steamed-rice-noodle-roll.png',
+  },
 ];
 
 export default function JFoodsPage() {
   const [foods, setFoods] = useState(JFoods);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [cartCount, setCartCount] = useState(0);
   const [cartItems, setCartItems] = useState([]);
   const [showSheet, setShowSheet] = useState(false);
@@ -50,16 +122,19 @@ export default function JFoodsPage() {
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem("cartItems");
+      const raw = localStorage.getItem('cartItems');
       if (raw) setCartItems(JSON.parse(raw));
     } catch (_) {}
   }, []);
 
   useEffect(() => {
-    const totalQty = cartItems.reduce((sum, it) => sum + (Number(it.qty) || 0), 0);
+    const totalQty = cartItems.reduce(
+      (sum, it) => sum + (Number(it.qty) || 0),
+      0
+    );
     setCartCount(Math.floor(totalQty));
   }, [cartItems]);
-  
+
   const filteredFoods = useMemo(
     () =>
       [...foods, ...customFoods].filter((f) =>
@@ -70,7 +145,7 @@ export default function JFoodsPage() {
 
   const persist = (items) => {
     setCartItems(items);
-    localStorage.setItem("cartItems", JSON.stringify(items));
+    localStorage.setItem('cartItems', JSON.stringify(items));
   };
 
   const addToCart = (food) => {
@@ -83,7 +158,7 @@ export default function JFoodsPage() {
         updated = [...prev];
         updated[idx].qty += 1;
       }
-      localStorage.setItem("cartItems", JSON.stringify(updated));
+      localStorage.setItem('cartItems', JSON.stringify(updated));
       return updated;
     });
   };
@@ -101,10 +176,10 @@ export default function JFoodsPage() {
       await saveCartToFirestore(cartItems);
       persist([]);
       setShowSheet(false);
-      router.replace("/line/food/cart");
+      router.replace('/line/food/cart');
     } catch (err) {
       console.error(err);
-      alert(err?.message || "บันทึกล้มเหลว");
+      alert(err?.message || 'บันทึกล้มเหลว');
     } finally {
       setIsSaving(false);
     }
@@ -129,30 +204,31 @@ export default function JFoodsPage() {
               alt="ตัวการ์ตูน"
               width={26}
               height={26}
-              style={{ cursor: "pointer" }}
+              style={{ cursor: 'pointer' }}
             />
           </Link>
         </div>
       </div>
 
-      <CategoryBar
+    <CategoryBar
+      backgroundColor="#f3fdf1"
         categories={[
-          { name: "อาหารคาว", icon: "/food1.png" },
-          { name: "อาหารหวาน", icon: "/food2.png" },
-          { name: "ของว่าง", icon: "/food4.png" },
-          { name: "อาหารเจ", icon: "/jfood7.png" },
-          { name: "อาหารต่างประเทศ", icon: "/food5.png" },
-          { name: "เครื่องดื่ม", icon: "/food3.png" },
-          { name: "ผักและผลไม้", icon: "/food6.png" },
+          { name: 'อาหารคาว', icon: '/food1.png' },
+          { name: 'อาหารหวาน', icon: '/food2.png' },
+          { name: 'ของว่าง', icon: '/food4.png' },
+          { name: 'อาหารเจ', icon: '/jfood7.png' },
+          { name: 'อาหารต่างประเทศ', icon: '/food5.png' },
+          { name: 'เครื่องดื่ม', icon: '/food3.png' },
+          { name: 'ผักและผลไม้', icon: '/food6.png' },
         ]}
         categoryPathMap={{
-          อาหารคาว: "/line/food/savory",
-          อาหารหวาน: "/line/food/sweet",
-          ของว่าง: "/line/food/snack",
-          อาหารเจ: "/line/food/J",
-          อาหารต่างประเทศ: "/line/food/Foreign",
-          เครื่องดื่ม: "/line/food/drink",
-          ผักและผลไม้: "/line/food/fruit",
+          อาหารคาว: '/line/food/savory',
+          อาหารหวาน: '/line/food/sweet',
+          ของว่าง: '/line/food/snack',
+          อาหารเจ: '/line/food/J',
+          อาหารต่างประเทศ: '/line/food/Foreign',
+          เครื่องดื่ม: '/line/food/drink',
+          ผักและผลไม้: '/line/food/fruit',
         }}
       />
 
@@ -166,10 +242,10 @@ export default function JFoodsPage() {
         <CartIcon count={cartCount} onClick={() => setShowSheet(true)} />
       </div>
 
-      <FoodGrid foods={filteredFoods} onAdd={addToCart} />
+       <FoodGrid foods={filteredFoods} onAdd={addToCart} layout="grid" />
 
       {showSheet && (
-       <CartSheet
+        <CartSheet
           cartItems={cartItems}
           onClose={() => setShowSheet(false)}
           onIncrease={(name, step = 1) => {
@@ -183,7 +259,7 @@ export default function JFoodsPage() {
               .map((it) =>
                 it.name === name ? { ...it, qty: it.qty - step } : it
               )
-              .filter((it) => it.qty > 0); // กรองออกถ้าต่ำกว่า 0
+              .filter((it) => it.qty > 0);
             persist(updated);
           }}
           onRemove={(name) => {

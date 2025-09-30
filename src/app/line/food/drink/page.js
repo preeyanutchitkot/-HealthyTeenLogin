@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import BottomMenu from "../../components/menu";
-import CartIcon from "../../components/CartIcon";
-import CategoryBar from "../../components/CategoryBar";
-import Header from "../../components/header";
-import FoodGrid from "../../components/FoodGrid";
-import CartSheet from "../../components/CartSheet";
-import AddFoodSheet from "../../components/AddFoodSheet";
-import { saveCartToFirestore } from "../../lib/saveCart";
-import "../FoodsPage.css";
+import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import BottomMenu from '../../components/menu';
+import CartIcon from '../../components/CartIcon';
+import CategoryBar from '../../components/CategoryBar';
+import Header from '../../components/header';
+import FoodGrid from '../../components/FoodGrid';
+import CartSheet from '../../components/CartSheet';
+import AddFoodSheet from '../../components/AddFoodSheet';
+import { saveCartToFirestore } from '../../lib/saveCart';
+import '../FoodsPage.css';
 
 const drinkMenus = [
   { name: 'น้ำส้มคั้น', calories: 100, image: '/foods/orange-juice.png' },
@@ -21,7 +21,11 @@ const drinkMenus = [
   { name: 'อเมริกาโน่', calories: 10, image: '/foods/americano.png' },
   { name: 'ลาเต้ร้อน', calories: 150, image: '/foods/hot-latte.png' },
   { name: 'น้ำมะนาว', calories: 90, image: '/foods/lemonade.png' },
-  { name: 'น้ำแตงโมปั่น', calories: 250, image: '/foods/watermelon-smoothie.png' },
+  {
+    name: 'น้ำแตงโมปั่น',
+    calories: 250,
+    image: '/foods/watermelon-smoothie.png',
+  },
   { name: 'นมสดเย็น', calories: 370, image: '/foods/cold-milk.png' },
   { name: 'ชานมไข่มุก', calories: 450, image: '/foods/bubble-tea.png' },
   { name: 'ชาเขียวเย็น', calories: 200, image: '/foods/iced-green-tea.png' },
@@ -33,13 +37,16 @@ const drinkMenus = [
   { name: 'น้ำแอปเปิ้ล', calories: 95, image: '/foods/apple-juice.png' },
   { name: 'ชาเย็น', calories: 250, image: '/foods/thai-iced-tea.png' },
   { name: 'โกโก้เย็น', calories: 300, image: '/foods/iced-cocoa.png' },
-  { name: 'สมูทตี้สตรอเบอร์รี่', calories: 200, image: '/foods/strawberry-smoothie.png' },
-
-  ];
+  {
+    name: 'สมูทตี้สตรอเบอร์รี่',
+    calories: 200,
+    image: '/foods/strawberry-smoothie.png',
+  },
+];
 
 export default function drinkMenusPage() {
   const [foods, setFoods] = useState(drinkMenus);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [cartCount, setCartCount] = useState(0);
   const [cartItems, setCartItems] = useState([]);
   const [showSheet, setShowSheet] = useState(false);
@@ -50,16 +57,19 @@ export default function drinkMenusPage() {
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem("cartItems");
+      const raw = localStorage.getItem('cartItems');
       if (raw) setCartItems(JSON.parse(raw));
     } catch (_) {}
   }, []);
 
   useEffect(() => {
-    const totalQty = cartItems.reduce((sum, it) => sum + (Number(it.qty) || 0), 0);
+    const totalQty = cartItems.reduce(
+      (sum, it) => sum + (Number(it.qty) || 0),
+      0
+    );
     setCartCount(Math.floor(totalQty));
   }, [cartItems]);
-  
+
   const filteredFoods = useMemo(
     () =>
       [...foods, ...customFoods].filter((f) =>
@@ -70,7 +80,7 @@ export default function drinkMenusPage() {
 
   const persist = (items) => {
     setCartItems(items);
-    localStorage.setItem("cartItems", JSON.stringify(items));
+    localStorage.setItem('cartItems', JSON.stringify(items));
   };
 
   const addToCart = (food) => {
@@ -83,7 +93,7 @@ export default function drinkMenusPage() {
         updated = [...prev];
         updated[idx].qty += 1;
       }
-      localStorage.setItem("cartItems", JSON.stringify(updated));
+      localStorage.setItem('cartItems', JSON.stringify(updated));
       return updated;
     });
   };
@@ -101,10 +111,10 @@ export default function drinkMenusPage() {
       await saveCartToFirestore(cartItems);
       persist([]);
       setShowSheet(false);
-      router.replace("/line/food/cart");
+      router.replace('/line/food/cart');
     } catch (err) {
       console.error(err);
-      alert(err?.message || "บันทึกล้มเหลว");
+      alert(err?.message || 'บันทึกล้มเหลว');
     } finally {
       setIsSaving(false);
     }
@@ -129,7 +139,7 @@ export default function drinkMenusPage() {
               alt="ตัวการ์ตูน"
               width={26}
               height={26}
-              style={{ cursor: "pointer" }}
+              style={{ cursor: 'pointer' }}
             />
           </Link>
         </div>
@@ -137,22 +147,22 @@ export default function drinkMenusPage() {
 
       <CategoryBar
         categories={[
-          { name: "อาหารคาว", icon: "/food1.png" },
-          { name: "อาหารหวาน", icon: "/food2.png" },
-          { name: "ของว่าง", icon: "/food4.png" },
-          { name: "อาหารเจ", icon: "/jfood7.png" },
-          { name: "อาหารต่างประเทศ", icon: "/food5.png" },
-          { name: "เครื่องดื่ม", icon: "/food3.png" },
-          { name: "ผักและผลไม้", icon: "/food6.png" },
+          { name: 'อาหารคาว', icon: '/food1.png' },
+          { name: 'อาหารหวาน', icon: '/food2.png' },
+          { name: 'ของว่าง', icon: '/food4.png' },
+          { name: 'อาหารเจ', icon: '/jfood7.png' },
+          { name: 'อาหารต่างประเทศ', icon: '/food5.png' },
+          { name: 'เครื่องดื่ม', icon: '/food3.png' },
+          { name: 'ผักและผลไม้', icon: '/food6.png' },
         ]}
         categoryPathMap={{
-          อาหารคาว: "/line/food/savory",
-          อาหารหวาน: "/line/food/sweet",
-          ของว่าง: "/line/food/snack",
-          อาหารเจ: "/line/food/J",
-          อาหารต่างประเทศ: "/line/food/Foreign",
-          เครื่องดื่ม: "/line/food/drink",
-          ผักและผลไม้: "/line/food/fruit",
+          อาหารคาว: '/line/food/savory',
+          อาหารหวาน: '/line/food/sweet',
+          ของว่าง: '/line/food/snack',
+          อาหารเจ: '/line/food/J',
+          อาหารต่างประเทศ: '/line/food/Foreign',
+          เครื่องดื่ม: '/line/food/drink',
+          ผักและผลไม้: '/line/food/fruit',
         }}
       />
 
@@ -166,10 +176,10 @@ export default function drinkMenusPage() {
         <CartIcon count={cartCount} onClick={() => setShowSheet(true)} />
       </div>
 
-      <FoodGrid foods={filteredFoods} onAdd={addToCart} />
+       <FoodGrid foods={filteredFoods} onAdd={addToCart} layout="grid" />
 
       {showSheet && (
-       <CartSheet
+        <CartSheet
           cartItems={cartItems}
           onClose={() => setShowSheet(false)}
           onIncrease={(name, step = 1) => {

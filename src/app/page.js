@@ -10,23 +10,23 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState('');
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      router.push("/line/home");
+      router.push('/line/home');
     } catch (error) {
       console.error(error);
-      if (error.code === "auth/invalid-credential") {
-        setErrorMsg("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
-      } else if (error.code === "auth/user-not-found") {
-        setErrorMsg("ไม่พบบัญชีผู้ใช้");
-      } else if (error.code === "auth/invalid-email") {
-        setErrorMsg("รูปแบบอีเมลไม่ถูกต้อง");
+      if (error.code === 'auth/invalid-credential') {
+        setErrorMsg('อีเมลหรือรหัสผ่านไม่ถูกต้อง');
+      } else if (error.code === 'auth/user-not-found') {
+        setErrorMsg('ไม่พบบัญชีผู้ใช้');
+      } else if (error.code === 'auth/invalid-email') {
+        setErrorMsg('รูปแบบอีเมลไม่ถูกต้อง');
       } else {
-        setErrorMsg("เกิดข้อผิดพลาด");
+        setErrorMsg('เกิดข้อผิดพลาด');
       }
     }
   };
@@ -163,7 +163,14 @@ export default function Login() {
         <h2>เข้าสู่ระบบ</h2>
 
         {errorMsg && (
-          <p style={{ color: "red", textAlign: "center", fontSize: "14px", marginBottom: "10px" }}>
+          <p
+            style={{
+              color: 'red',
+              textAlign: 'center',
+              fontSize: '14px',
+              marginBottom: '10px',
+            }}
+          >
             {errorMsg}
           </p>
         )}
@@ -201,9 +208,13 @@ export default function Login() {
             </button>
           </div>
 
-          <a className="link-small" href="/line/request-otp">ลืมรหัสผ่าน</a>
+          <a className="link-small" href="/line/request-otp">
+            ลืมรหัสผ่าน
+          </a>
 
-          <button type="submit" className="btn">เข้าสู่ระบบ</button>
+          <button type="submit" className="btn">
+            เข้าสู่ระบบ
+          </button>
 
           <div className="divider">หรือ</div>
 

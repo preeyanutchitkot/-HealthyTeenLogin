@@ -1,45 +1,53 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import BottomMenu from "../../components/menu";
-import CartIcon from "../../components/CartIcon";
-import CategoryBar from "../../components/CategoryBar";
-import Header from "../../components/header";
-import FoodGrid from "../../components/FoodGrid";
-import CartSheet from "../../components/CartSheet";
-import AddFoodSheet from "../../components/AddFoodSheet";
-import { saveCartToFirestore } from "../../lib/saveCart";
-import "../FoodsPage.css";
+import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import BottomMenu from '../../components/menu';
+import CartIcon from '../../components/CartIcon';
+import CategoryBar from '../../components/CategoryBar';
+import Header from '../../components/header';
+import FoodGrid from '../../components/FoodGrid';
+import CartSheet from '../../components/CartSheet';
+import AddFoodSheet from '../../components/AddFoodSheet';
+import { saveCartToFirestore } from '../../lib/saveCart';
+import '../FoodsPage.css';
 
 const sweetFoods = [
-  { name: "ทับทิมกรอบ", calories: 200, image: "/foods/tub-tim-krob.png" },
-  { name: "ขนมชั้น", calories: 220, image: "/foods/khanom-chan.png" },
-  { name: "บัวลอย", calories: 240, image: "/foods/bua-loi.png" },
-  { name: "ข้าวเหนียวมะม่วง", calories: 330, image: "/foods/khao-niew-mamuang.png" },
-  { name: "ลูกชุบ", calories: 150, image: "/foods/look-chup.png" },
-  { name: "เครปเค้ก", calories: 350, image: "/foods/crepe-cake.png" },
-  { name: "พายสัปปะรด", calories: 270, image: "/foods/pineapple-pie.png" },
-  { name: "ชีสเค้ก", calories: 400, image: "/foods/cheesecake.png" },
-  { name: "ทองหยิบ", calories: 210, image: "/foods/thong-yip.png" },
-  { name: "ฝอยทอง", calories: 180, image: "/foods/foi-thong.png" },
-  { name: "วุ้นกะทิ", calories: 150, image: "/foods/woon-kati.png" },
-  { name: "เค้กช็อกโกแลต", calories: 450, image: "/foods/chocolate-cake.png" },
-  { name: "บราวนี่", calories: 400, image: "/foods/brownie.png" },
-  { name: "ขนมปังสังขยา", calories: 250, image: "/foods/khanom-pang-sangkaya.png" },
-  { name: "โรตีใส่นม", calories: 350, image: "/foods/roti-sai-nom.png" },
-  { name: "โรตีโอวัลติน", calories: 370, image: "/foods/roti-ovaltine.png" },
-  { name: "เค้กกล้วยหอม", calories: 280, image: "/foods/banana-cake.png" },
-  { name: "ขนมต้ม", calories: 200, image: "/foods/khanom-tom.png" },
-  { name: "ขนมกล้วย", calories: 220, image: "/foods/khanom-kluai.png" },
-  { name: "ขนมถ้วย", calories: 150, image: "/foods/khanom-tuay.png" },
+  { name: 'ทับทิมกรอบ', calories: 200, image: '/foods/tub-tim-krob.png' },
+  { name: 'ขนมชั้น', calories: 220, image: '/foods/khanom-chan.png' },
+  { name: 'บัวลอย', calories: 240, image: '/foods/bua-loi.png' },
+  {
+    name: 'ข้าวเหนียวมะม่วง',
+    calories: 330,
+    image: '/foods/khao-niew-mamuang.png',
+  },
+  { name: 'ลูกชุบ', calories: 150, image: '/foods/look-chup.png' },
+  { name: 'เครปเค้ก', calories: 350, image: '/foods/crepe-cake.png' },
+  { name: 'พายสัปปะรด', calories: 270, image: '/foods/pineapple-pie.png' },
+  { name: 'ชีสเค้ก', calories: 400, image: '/foods/cheesecake.png' },
+  { name: 'ทองหยิบ', calories: 210, image: '/foods/thong-yip.png' },
+  { name: 'ฝอยทอง', calories: 180, image: '/foods/foi-thong.png' },
+  { name: 'วุ้นกะทิ', calories: 150, image: '/foods/woon-kati.png' },
+  { name: 'เค้กช็อกโกแลต', calories: 450, image: '/foods/chocolate-cake.png' },
+  { name: 'บราวนี่', calories: 400, image: '/foods/brownie.png' },
+  {
+    name: 'ขนมปังสังขยา',
+    calories: 250,
+    image: '/foods/khanom-pang-sangkaya.png',
+  },
+  { name: 'โรตีใส่นม', calories: 350, image: '/foods/roti-sai-nom.png' },
+  { name: 'โรตีโอวัลติน', calories: 370, image: '/foods/roti-ovaltine.png' },
+  { name: 'เค้กกล้วยหอม', calories: 280, image: '/foods/banana-cake.png' },
+  { name: 'ขนมต้ม', calories: 200, image: '/foods/khanom-tom.png' },
+  { name: 'ขนมกล้วย', calories: 220, image: '/foods/khanom-kluai.png' },
+  { name: 'ขนมถ้วย', calories: 150, image: '/foods/khanom-tuay.png' },
 ];
 
 export default function SweetFoodsPage() {
   const [foods, setFoods] = useState(sweetFoods);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [cartCount, setCartCount] = useState(0);
   const [cartItems, setCartItems] = useState([]);
   const [showSheet, setShowSheet] = useState(false);
@@ -50,16 +58,18 @@ export default function SweetFoodsPage() {
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem("cartItems");
+      const raw = localStorage.getItem('cartItems');
       if (raw) setCartItems(JSON.parse(raw));
     } catch (_) {}
   }, []);
 
   useEffect(() => {
-    const totalQty = cartItems.reduce((sum, it) => sum + (Number(it.qty) || 0), 0);
+    const totalQty = cartItems.reduce(
+      (sum, it) => sum + (Number(it.qty) || 0),
+      0
+    );
     setCartCount(Math.floor(totalQty));
   }, [cartItems]);
-
 
   const filteredFoods = useMemo(
     () =>
@@ -71,7 +81,7 @@ export default function SweetFoodsPage() {
 
   const persist = (items) => {
     setCartItems(items);
-    localStorage.setItem("cartItems", JSON.stringify(items));
+    localStorage.setItem('cartItems', JSON.stringify(items));
   };
 
   const addToCart = (food) => {
@@ -84,7 +94,7 @@ export default function SweetFoodsPage() {
         updated = [...prev];
         updated[idx].qty += 1;
       }
-      localStorage.setItem("cartItems", JSON.stringify(updated));
+      localStorage.setItem('cartItems', JSON.stringify(updated));
       return updated;
     });
   };
@@ -102,10 +112,10 @@ export default function SweetFoodsPage() {
       await saveCartToFirestore(cartItems);
       persist([]);
       setShowSheet(false);
-      router.replace("/line/food/cart");
+      router.replace('/line/food/cart');
     } catch (err) {
       console.error(err);
-      alert(err?.message || "บันทึกล้มเหลว");
+      alert(err?.message || 'บันทึกล้มเหลว');
     } finally {
       setIsSaving(false);
     }
@@ -130,30 +140,31 @@ export default function SweetFoodsPage() {
               alt="ตัวการ์ตูน"
               width={26}
               height={26}
-              style={{ cursor: "pointer" }}
+              style={{ cursor: 'pointer' }}
             />
           </Link>
         </div>
       </div>
 
       <CategoryBar
+      backgroundColor="#f3fdf1"
         categories={[
-          { name: "อาหารคาว", icon: "/food1.png" },
-          { name: "อาหารหวาน", icon: "/food2.png" },
-          { name: "ของว่าง", icon: "/food4.png" },
-          { name: "อาหารเจ", icon: "/jfood7.png" },
-          { name: "อาหารต่างประเทศ", icon: "/food5.png" },
-          { name: "เครื่องดื่ม", icon: "/food3.png" },
-          { name: "ผักและผลไม้", icon: "/food6.png" },
+          { name: 'อาหารคาว', icon: '/food1.png' },
+          { name: 'อาหารหวาน', icon: '/food2.png' },
+          { name: 'ของว่าง', icon: '/food4.png' },
+          { name: 'อาหารเจ', icon: '/jfood7.png' },
+          { name: 'อาหารต่างประเทศ', icon: '/food5.png' },
+          { name: 'เครื่องดื่ม', icon: '/food3.png' },
+          { name: 'ผักและผลไม้', icon: '/food6.png' },
         ]}
         categoryPathMap={{
-          อาหารคาว: "/line/food/savory",
-          อาหารหวาน: "/line/food/sweet",
-          ของว่าง: "/line/food/snack",
-          อาหารเจ: "/line/food/J",
-          อาหารต่างประเทศ: "/line/food/Foreign",
-          เครื่องดื่ม: "/line/food/drink",
-          ผักและผลไม้: "/line/food/fruit",
+          อาหารคาว: '/line/food/savory',
+          อาหารหวาน: '/line/food/sweet',
+          ของว่าง: '/line/food/snack',
+          อาหารเจ: '/line/food/J',
+          อาหารต่างประเทศ: '/line/food/Foreign',
+          เครื่องดื่ม: '/line/food/drink',
+          ผักและผลไม้: '/line/food/fruit',
         }}
       />
 
@@ -167,11 +178,11 @@ export default function SweetFoodsPage() {
         <CartIcon count={cartCount} onClick={() => setShowSheet(true)} />
       </div>
 
-      <FoodGrid foods={filteredFoods} onAdd={addToCart} />
+      <FoodGrid foods={filteredFoods} onAdd={addToCart} layout="grid" />
 
 
       {showSheet && (
-       <CartSheet
+        <CartSheet
           cartItems={cartItems}
           onClose={() => setShowSheet(false)}
           onIncrease={(name, step = 1) => {

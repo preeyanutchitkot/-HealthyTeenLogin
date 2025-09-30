@@ -1,9 +1,3 @@
-:global(:root) { color-scheme: light; }
-:global(html) { height: 100%; }
-:global(body) { height: 100%; margin: 0; padding: 0; background: #ffffff; }
-:global(#__next) { height: 100%; }
-:global(*), :global(*::before), :global(*::after) { box-sizing: border-box; }
-
 .wrapper {
   min-height: 100vh;
   display: flex;
@@ -11,11 +5,16 @@
   align-items: center;
   justify-content: center;
   background: #ffffff;
-  font-family: 'Noto Sans Thai', system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family:
+    'Noto Sans Thai',
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
   padding-top: 0;
   padding-bottom: 0;
 }
-
 
 .content {
   margin-top: 24px;
@@ -37,7 +36,6 @@
   padding: 32px 0 16px;
 }
 
-
 .social {
   display: flex;
   flex-direction: column;
@@ -53,10 +51,10 @@
   gap: 10px;
   padding: 12px;
   background: #fff;
-  border: 1.5px solid #3ABB47;
+  border: 1.5px solid #3abb47;
   border-radius: 12px;
   font-weight: 700;
-  color: #3ABB47;
+  color: #3abb47;
   text-decoration: none;
   font-size: 16px;
   min-height: 48px;

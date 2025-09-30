@@ -1,26 +1,26 @@
 // components/WeekCalories.jsx
-"use client";
-import React from "react";
-import { useRouter } from "next/navigation";
+'use client';
+import React from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function WeekCalories({
   data = [],
   goal = 2000,
-  todayYMD,                  // ส่งจาก useSummaryData
-  tz = "Asia/Bangkok",
+  todayYMD, // ส่งจาก useSummaryData
+  tz = 'Asia/Bangkok',
 }) {
   const router = useRouter();
 
   const getLocalYMD = (d = new Date(), timeZone = tz) =>
-    new Intl.DateTimeFormat("en-CA", { timeZone }).format(d);
+    new Intl.DateTimeFormat('en-CA', { timeZone }).format(d);
 
   const _todayYMD = todayYMD || getLocalYMD(new Date(), tz); // fallback
 
   const level = (cal) => {
     const pct = goal > 0 ? (cal / goal) * 100 : 0;
-    if (pct <= 79) return "green";
-    if (pct < 100) return "yellow";
-    return "red";
+    if (pct <= 79) return 'green';
+    if (pct < 100) return 'yellow';
+    return 'red';
   };
 
   // กรอง “วันนี้” โดยเทียบกับ field date โดยตรง
@@ -42,7 +42,9 @@ export default function WeekCalories({
               <span className="pill-day">{d.label}</span>
             </div>
             <div className="pill-body">
-              <strong className="pill-num">{(d.cal || 0).toLocaleString()}</strong>
+              <strong className="pill-num">
+                {(d.cal || 0).toLocaleString()}
+              </strong>
               <span className="pill-unit">CAL</span>
             </div>
           </button>

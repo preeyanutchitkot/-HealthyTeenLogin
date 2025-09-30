@@ -43,7 +43,7 @@ export default function ActivityRing({
   const [title, setTitle] = useState('สรุปแคลอรี่วันนี้');
   const [todayCal, setTodayCal] = useState(0);
   const [targetCal, setTargetCal] = useState(2000);
-  const [diff, setDiff] = useState(0); // ✅ เปรียบเทียบเมื่อวาน
+  const [diff, setDiff] = useState(0);
 
   const ymd = useMemo(() => {
     if (dateYMD) return dateYMD.slice(0, 10);
@@ -65,7 +65,6 @@ export default function ActivityRing({
         const uid = user?.uid;
         if (!uid) return;
 
-        // 🔹 ดึง BMR
         let snap = await getDoc(doc(db, 'users', uid));
         if (!snap.exists()) {
           const qs = await getDocs(
@@ -76,7 +75,6 @@ export default function ActivityRing({
         const bmr = Number(snap?.data()?.bmr) || 2000;
         setTargetCal(bmr);
 
-        // 🔹 โหลดข้อมูลวันนี้
         const qFoodToday = query(
           collection(db, 'food'),
           where('uid', '==', uid),
@@ -155,11 +153,9 @@ export default function ActivityRing({
     };
   }, [ymd, tz, capAt100, showDebug, todayYMD]);
 
-  // ✅ สีวงหลักตามระดับ
   const ringColor = percent > 100 ? RED : percent >= 80 ? YELLOW : GREEN;
   const trackColor = hexToRgba(ringColor, 0.18);
 
-  // 🟢 คำนวณวง
   const radius = (size - thickness) / 2;
   const circumference = 2 * Math.PI * radius;
 
@@ -171,7 +167,6 @@ export default function ActivityRing({
       <div className="ring-card-title">{title}</div>
 
       <div className="ring-row">
-        {/* 🔹 วงแหวนทางซ้าย */}
         <div className="ring-left">
           <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
             {/* Track */}

@@ -40,12 +40,10 @@ export default function VerifyOtpContent() {
         const docRef = snapshot.docs[0].ref;
         const data = snapshot.docs[0].data();
 
-        // ✅ ตรวจเวลา (หมดอายุใน 5 นาที)
         const created = data.createdAt?.toDate?.() || new Date();
         if (dayjs().diff(dayjs(created), 'minute') > 5) {
           setMsg('รหัสหมดอายุแล้ว');
         } else {
-          // ✅ อัปเดตสถานะ
           await updateDoc(docRef, { used: true });
           setMsg('ยืนยันสำเร็จ กำลังเข้าสู่ระบบ...');
           setTimeout(() => router.replace('/line/home'), 1500);

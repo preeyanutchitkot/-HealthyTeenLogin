@@ -1,4 +1,3 @@
-// app/components/useSummaryData.ts
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
@@ -14,7 +13,6 @@ import {
 } from 'firebase/firestore';
 import { db, signInIfNeeded } from '../lib/firebase';
 
-/* ===== types ===== */
 export type WeekItem = { date: string; label: string; cal: number };
 
 type Opts = {
@@ -22,10 +20,9 @@ type Opts = {
   defaultGoal?: number;
   weekStartMonday?: boolean;
   tz?: string;
-  baseDate?: Date; // ✅ วัน anchor (ถ้าไม่ส่ง = วันนี้)
+  baseDate?: Date; 
 };
 
-/* ===== helpers ===== */
 const getLocalYMD_TZ = (d: Date, tz = 'Asia/Bangkok') =>
   new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(d); // YYYY-MM-DD
 
@@ -37,7 +34,7 @@ const addDaysYMD = (ymd: string, days: number) => {
   return dt.toISOString().slice(0, 10);
 };
 
-const dowFromYMD = (ymd: string) => dateFromYMD_UTC(ymd).getUTCDay(); // 0=อา..6=ส
+const dowFromYMD = (ymd: string) => dateFromYMD_UTC(ymd).getUTCDay();
 const TH_DAY_SUN_FIRST = [
   'อาทิตย์',
   'จันทร์',
@@ -48,36 +45,30 @@ const TH_DAY_SUN_FIRST = [
   'เสาร์',
 ];
 
-/* =======================================================
-   ✅ useSummaryData — hook ดึงข้อมูลสรุปสัปดาห์
-   ======================================================= */
 export function useSummaryData({
   uid,
   defaultGoal = 2000,
   weekStartMonday = true,
   tz = 'Asia/Bangkok',
-  baseDate, // ✅ วันที่เลือก (anchor day)
+  baseDate, 
 }: Opts) {
   const [weekData, setWeekData] = useState<WeekItem[]>([]);
   const [todayCalories, setTodayCalories] = useState(0);
   const [goal, setGoal] = useState<number>(defaultGoal);
 
-  /* ✅ anchor = วันที่เลือก (หรือวันนี้) */
   const anchorYMD = useMemo(
     () => getLocalYMD_TZ(baseDate ?? new Date(), tz),
     [baseDate, tz]
   );
 
-  /* ✅ คำนวณช่วงสัปดาห์จาก anchor */
   const { ymdStart, ymdEnd, startYMD } = useMemo(() => {
-    const dow = dowFromYMD(anchorYMD); // 0=อา..6=ส
-    const offset = weekStartMonday ? (dow + 6) % 7 : dow; // ถ้าเริ่มจันทร์
+    const dow = dowFromYMD(anchorYMD);
+    const offset = weekStartMonday ? (dow + 6) % 7 : dow;
     const start = addDaysYMD(anchorYMD, -offset);
     const end = addDaysYMD(start, 6);
     return { ymdStart: start, ymdEnd: end, startYMD: start };
   }, [anchorYMD, weekStartMonday]);
 
-  /* ✅ ดึงข้อมูลจาก Firestore */
   useEffect(() => {
     (async () => {
       const user = await signInIfNeeded();
@@ -107,7 +98,6 @@ export function useSummaryData({
       }
       setGoal(newGoal);
 
-      /* 2) รวมแคลอรี่ของแต่ละวันในสัปดาห์ */
       const cons: any[] = [
         where('ymd', '>=', ymdStart),
         where('ymd', '<=', ymdEnd),
@@ -139,19 +129,16 @@ export function useSummaryData({
         }
       });
 
-      /* 3) สร้างอาเรย์ 7 วันของสัปดาห์ */
       let arr: WeekItem[] = Array.from({ length: 7 }).map((_, i) => {
         const ymd = addDaysYMD(startYMD, i);
         const cal = byYmd[ymd] || 0;
         const label = TH_DAY_SUN_FIRST[dowFromYMD(ymd)];
         return { date: ymd, label, cal };
       });
-
-      /* ✅ 4) ตัดวัน anchor (วันนี้) ออก ไม่ให้ซ้ำกับการ์ด TodayCalCard */
       arr = arr.filter((day) => day.date !== anchorYMD);
 
       setWeekData(arr);
-      setTodayCalories(byYmd[anchorYMD] || 0); // ✅ วัน anchor
+      setTodayCalories(byYmd[anchorYMD] || 0); 
     })().catch(console.error);
   }, [
     uid,

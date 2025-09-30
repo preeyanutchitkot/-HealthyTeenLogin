@@ -5,14 +5,20 @@ import { useRouter } from 'next/navigation';
 export default function DateWeekBar({
   weekStartMonday = true,
   onCalendarClick,
-  baseDate, // <-- เพิ่ม
+  baseDate,
 }) {
   const router = useRouter();
-  const refDate = baseDate ? new Date(baseDate) : new Date(); // fallback เป็นวันนี้
+  const refDate = baseDate
+    ? new Date(
+        new Date(baseDate).toLocaleString('en-US', { timeZone: 'Asia/Bangkok' })
+      )
+    : new Date(
+        new Date().toLocaleString('en-US', { timeZone: 'Asia/Bangkok' })
+      );
 
   const { start, end } = useMemo(() => {
     const d = new Date(refDate);
-    const day = d.getDay(); // 0=อาทิตย์ … 6=เสาร์
+    const day = d.getDay();
     const offset = weekStartMonday ? (day + 6) % 7 : day;
 
     const start = new Date(d);
@@ -54,8 +60,6 @@ export default function DateWeekBar({
 
   const handleCalendar = () => {
     if (typeof onCalendarClick === 'function') return onCalendarClick();
-    // ถ้าไม่ได้ส่ง onCalendarClick มาก็ค่อยนำทางไปหน้าอื่น
-    // router.push("/components/calendar");
   };
 
   return (

@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/th';
 
 import './summary.css';
-import ActivityRing from '../components/ActivityRing'; // ← เวอร์ชันที่ดึง Firestore เอง (baseDate)
+import ActivityRing from '../components/ActivityRing'; 
 import BottomMenu from '../components/menu';
 import Header from '../components/header';
 import TodayCalCard from '../components/TodayCalCard';
@@ -14,7 +14,7 @@ import WeekCalories from '../components/WeekCalories';
 import DateWeekBar from '../components/DateWeekBar';
 import WeekTopFoods from '../components/WeekTopFoods';
 import CalendarModal from '../components/CalendarModal';
-import { useSummaryData } from '../hooks/useSummaryData'; // สำหรับกราฟ/สรุปรายสัปดาห์เท่านั้น
+import { useSummaryData } from '../hooks/useSummaryData';
 
 dayjs.locale('th');
 
@@ -22,20 +22,19 @@ export default function SummaryPage() {
   const [selectedDate, setSelectedDate] = React.useState(dayjs());
   const [openCal, setOpenCal] = React.useState(false);
 
-  // ===== ดึงข้อมูลสัปดาห์ตามวันเลือก (โค้ดเดิมของคุณ) =====
   const { weekData, goal, ymdStart, ymdEnd } = useSummaryData({
     defaultGoal: 2000,
-    weekStartMonday: true,
+    weekStartMonday: false,
     tz: 'Asia/Bangkok',
     baseDate: selectedDate.toDate(),
   });
+
 
   const weekTotal = (weekData || []).reduce(
     (s, d) => s + (Number(d?.cal) || 0),
     0
   );
 
-  // ===== วันที่แบบไทย/พุทธ (แสดงบนการ์ด/ป้าย) =====
   const fmtThaiSlash = new Intl.DateTimeFormat('th-TH-u-ca-buddhist', {
     day: '2-digit',
     month: '2-digit',
@@ -57,19 +56,19 @@ export default function SummaryPage() {
       </div>
 
       <main className="summary-main">
-        {/* ===== วงแหวน: ดึง Firestore เองจาก baseDate ===== */}
+        {/* ===== วงแหวน ===== */}
         <div className="ring-wrapper">
           <ActivityRing dateYMD={selectedYMD} tz="Asia/Bangkok" />
         </div>
 
         {/* ===== แถบวันที่: แสดงวันเลือก + เปิดปฏิทิน ===== */}
         <DateWeekBar
-          weekStartMonday
+          weekStartMonday={false} 
           baseDate={selectedDate.toDate()}
           onCalendarClick={() => setOpenCal(true)}
         />
 
-        {/* ===== การ์ดค่ารวมของวันเลือก (ดึงเองหรือจะส่งค่ามาก็ได้) ===== */}
+        {/* ===== การ์ดค่ารวมของวันเลือก ===== */}
         <TodayCalCard
           autoFetch
           dateYMD={selectedYMD}
@@ -104,7 +103,6 @@ export default function SummaryPage() {
           countMode="qty"
         />
 
-        {/* ===== ภาพ footer ===== */}
         <div className="bear-footer">
           <img src="/bear.png" alt="Chef Bear" className="bear-img" />
         </div>

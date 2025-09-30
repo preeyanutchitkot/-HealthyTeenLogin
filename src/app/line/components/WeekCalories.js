@@ -23,7 +23,6 @@ export default function WeekCalories({
     return 'red';
   };
 
-  // กรอง “วันนี้” โดยเทียบกับ field date โดยตรง
   const items = (data || []).filter((d) => d?.date && d.date !== _todayYMD);
 
   return (

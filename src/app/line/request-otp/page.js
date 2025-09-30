@@ -23,10 +23,8 @@ export default function RequestOTPPage() {
     setMsg('');
 
     try {
-      // ✅ สร้างรหัส 6 หลัก
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-      // ✅ บันทึกลง Firestore
       await addDoc(collection(db, 'email_otps'), {
         email,
         otp,
@@ -34,7 +32,6 @@ export default function RequestOTPPage() {
         used: false,
       });
 
-      // ✅ ส่งผ่าน EmailJS (Client)
       const res = await emailjs.send(
         process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID,
         process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID,

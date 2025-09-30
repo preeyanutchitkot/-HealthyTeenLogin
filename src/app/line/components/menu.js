@@ -14,9 +14,9 @@ export default function BottomMenu() {
 
   const menuItems = [
     { label: 'หน้าหลัก',   type: 'internal', href: '/line/home', icon: '/home 3.png' },
-    { label: 'บันทึกอาหาร', type: 'internal', href: '/line/food', icon: '/savefood.png' },
+    { label: 'บันทึกอาหาร', type: 'internal', href: '/line/foodn', icon: '/savefood.png' },
     { label: 'แชทบอท',     type: 'external', url: OA_URL,          icon: '/55.png', center: true },
-    { label: 'สรุป',      type: 'internal', href: '/line/food',       icon: '/Group 230 (1).png' },
+    { label: 'สรุป',      type: 'internal', href: '/line/summary',       icon: '/Group 230 (1).png' },
     { label: 'ฉัน',         type: 'internal', href: '/line/me',     icon: '/Group 230 (2).png' },
   ];
 

@@ -40,7 +40,6 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // ระฆัง: เริ่มจากค่าที่เคยเก็บไว้ เพื่อลดการกระพริบ
   const [bellSrc, setBellSrc] = useState(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("bellSrc") || null;
@@ -51,7 +50,6 @@ export default function HomePage() {
     if (bellSrc) localStorage.setItem("bellSrc", bellSrc);
   }, [bellSrc]);
 
-  // refs สำหรับคำนวณรวม
   const bmrRef = useRef(null);
   const sumRef = useRef(0);
 
@@ -66,7 +64,7 @@ export default function HomePage() {
     setBellSrc((prev) => (prev === next ? prev : next));
   };
 
-  // ตามสถานะการล็อกอิน
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) setUid(user.uid);
@@ -75,9 +73,7 @@ export default function HomePage() {
     return () => unsubscribe();
   }, []);
 
-  // realtime listeners
   useEffect(() => {
-    // ไม่มีผู้ใช้: ไม่รีเซ็ตเป็นเขียว ปล่อยให้ใช้ค่าก่อนหน้า
     if (!uid) {
       setItems([]);
       setLoading(false);
@@ -193,9 +189,9 @@ export default function HomePage() {
 
       <div className={styles.circleMenu}>
         {[
-          { label: "บันทึกอาหาร", href: "/line/food", img: "/enough.png", external: false },
+          { label: "บันทึกอาหาร", href: "/line/foodn", img: "/enough.png", external: false },
           { label: "แนะนำอาหาร", href: OA_URL,       img: "/ploy3.png",  external: true  },
-          { label: "พูดคุย",     href: "/line/food",  img: "/mo.png",     external: false },
+          { label: "สรุป",     href: "/line/summary",  img: "/mo.png",     external: false },
           { label: "วิดีโอสุขภาพ", href: "/line/lookvideo", img: "/p4.png", external: false }
         ].map((item) =>
           item.external ? (

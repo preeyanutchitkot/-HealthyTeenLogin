@@ -1,4 +1,3 @@
-// lib/saveCart.js
 import { writeBatch, collection, doc, serverTimestamp } from "firebase/firestore";
 import { db, signInIfNeeded } from "./firebase";
 
@@ -31,15 +30,15 @@ export async function saveCartToFirestore(items) {
     if (!Number.isFinite(qty) || qty < 1) return;
     if (!Number.isFinite(calories)) return;
 
-    const ref = doc(col); // random id
+    const ref = doc(col);
     batch.set(ref, {
-      uid,                     // ต้องตรงกับ request.auth.uid
-      ymd,                     // string
-      date: serverTimestamp(), // timestamp
-      item: itemName,          // string ชื่ออาหาร
-      qty,                     // number >= 1
-      calories,                // number
-      imageUrl: typeof it.image === "string" ? it.image : null, // optional
+      uid,
+      ymd, 
+      date: serverTimestamp(),
+      item: itemName,
+      qty,
+      calories,
+      imageUrl: typeof it.image === "string" ? it.image : null,
     });
   });
 

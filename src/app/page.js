@@ -1,4 +1,4 @@
-'use client';
+'use client'; // ต้องอยู่บรรทัดแรก
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -10,15 +10,24 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      alert('เข้าสู่ระบบสำเร็จ!');
-      router.push('/line/home');
+      router.push("/line/home");
     } catch (error) {
-      alert('เกิดข้อผิดพลาด: ' + error.message);
+      console.error(error);
+      if (error.code === "auth/invalid-credential") {
+        setErrorMsg("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
+      } else if (error.code === "auth/user-not-found") {
+        setErrorMsg("ไม่พบบัญชีผู้ใช้");
+      } else if (error.code === "auth/invalid-email") {
+        setErrorMsg("รูปแบบอีเมลไม่ถูกต้อง");
+      } else {
+        setErrorMsg("เกิดข้อผิดพลาด");
+      }
     }
   };
 
@@ -74,26 +83,15 @@ export default function Login() {
 
         .field { position: relative; }
 
-        /* กัน iOS auto-zoom: ทำให้ทุก input >= 16px */
-        input[type="text"],
-        input[type="email"],
-        input[type="password"],
-        input[type="number"],
-        select,
-        textarea {
-          font-size: 16px;     /* <<< สำคัญ */
-          -webkit-text-size-adjust: 100%;
-        }
-
         .input {
           width: 100%;
           height: 44px;
           padding: 0 14px;
-          padding-right: 44px;  /* เผื่อปุ่มตา */
+          padding-right: 44px;
           border-radius: 12px;
           border: 1.5px solid #cfd8dc;
           background: #fff;
-          font-size: 16px;      /* <<< สำคัญ */
+          font-size: 16px;
           color: #111827;
           outline: none;
           box-sizing: border-box;
@@ -132,7 +130,7 @@ export default function Login() {
           width: 100%;
           cursor: pointer;
           font-weight: bold;
-          font-size: 16px;   /* ให้ปุ่มดูสมส่วนกับ input */
+          font-size: 16px;
         }
 
         .divider {
@@ -163,6 +161,12 @@ export default function Login() {
       <div className="container">
         <img src="/Logo.png" alt="Login Logo" className="logo" />
         <h2>เข้าสู่ระบบ</h2>
+
+        {errorMsg && (
+          <p style={{ color: "red", textAlign: "center", fontSize: "14px", marginBottom: "10px" }}>
+            {errorMsg}
+          </p>
+        )}
 
         <form onSubmit={handleLogin}>
           <div className="field">
@@ -197,7 +201,7 @@ export default function Login() {
             </button>
           </div>
 
-          <a className="link-small" href="/line/forgotpassword">ลืมรหัสผ่าน</a>
+          <a className="link-small" href="/line/request-otp">ลืมรหัสผ่าน</a>
 
           <button type="submit" className="btn">เข้าสู่ระบบ</button>
 

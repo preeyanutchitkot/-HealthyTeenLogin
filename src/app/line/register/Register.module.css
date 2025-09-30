@@ -1,0 +1,194 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e9f8ea;
+  font-family: 'Noto Sans Thai', sans-serif;
+}
+
+.container {
+  width: 100%;
+  max-width: 420px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* โลโก้ */
+.logo {
+  width: 180px;
+  margin-bottom: 16px;
+}
+
+/* หัวข้อ */
+.container h2 {
+  color: #3ABB47;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  text-align: center;
+}
+
+.container h4 {
+  color: #555;
+  font-size: 16px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* ฟอร์ม */
+.container form {
+  width: 100%;
+  max-width: 360px;
+  display: grid;
+  gap: 12px;
+}
+
+/* กล่อง Input */
+.field {
+  position: relative;
+}
+
+.input {
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  padding-right: 44px;
+  border-radius: 12px;
+  border: 1.5px solid #cfd8dc;
+  background: #fff;
+  font-size: 15px;
+  color: #111827;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.input::placeholder {
+  color: #9ca3af;
+}
+
+/* ปุ่ม Toggle Password */
+.pwToggle {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+}
+
+.pwToggle img {
+  width: 20px;
+  height: 20px;
+}
+
+/* แถว Input หลายช่อง */
+.row {
+  display: flex;
+  gap: 10px;
+}
+
+.row div {
+  flex: 1;
+}
+
+/* Label */
+.label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #3ABB47;
+  margin-bottom: 4px;
+}
+
+/* Select และ Number Input */
+.container select,
+.container input[type="number"] {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+/* Note ด้านล่างรหัสผ่าน */
+.note {
+  font-size: 12px;
+  color: #999;
+  display: flex;
+  justify-content: space-between;
+}
+
+.note a {
+  color: #84AA81;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+/* ข้อความ BMI / BMR */
+.bmiText {
+  font-size: 14px;
+  color: red;
+  text-align: center;
+  margin-top: 4px;
+}
+
+/* ปุ่มหลัก */
+.btn {
+  background-color: #3ABB47;
+  color: white;
+  height: 46px;
+  border: none;
+  border-radius: 12px;
+  width: 100%;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 16px;
+  transition: background-color 0.2s ease;
+}
+
+.btn:hover {
+  background-color: #2c9e3c;
+}
+
+/* ข้อความ Error */
+.errorMsg {
+  color: red;
+  text-align: center;
+  font-size: 14px;
+  margin-bottom: 8px;
+  animation: fadeIn 0.3s ease;
+}
+
+/* ลิงก์ส่วนท้าย */
+.footerLink {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #6b7280;
+  text-align: center;
+}
+
+.footerLink a {
+  color: #24a43e;
+  text-decoration: underline;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -8,7 +8,18 @@
 
 /* ===== Global resets / UX tweaks ===== */
 
-/* กัน iOS ปรับขนาดอักษรเอง และทำให้ฟอนต์คมขึ้น */
+/* รีเซ็ตขอบขาว + ให้พื้นหลังเต็มหน้าจอ */
+html, body, #__next {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  /* ให้สีพื้นหลังกลืนกับหน้า Summary ทั้งจอ */
+  background-color: #E8F5E9; /* ถ้าอยากขาวล้วน เปลี่ยนเป็น #FFFFFF ได้ */
+}
+
+/* กล่องทั้งหมดคำนวณขนาดจาก padding/Border */
+* { box-sizing: border-box; }
+
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;

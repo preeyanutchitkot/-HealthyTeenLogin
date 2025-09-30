@@ -1,0 +1,457 @@
+/* =========================
+   SUMMARY PAGE — FULL CSS
+   ========================= */
+
+/* ---- Page layout ---- */
+.summary-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #E8F5E9;
+}
+.summary-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 14px 90px; /* เผื่อพื้นที่ BottomMenu */
+}
+
+/* ---- Date / Week Bar ---- */
+.datebar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  margin: 8px 0 14px;
+  min-height: 36px;
+}
+.datebar-left {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.datebar-today {
+  color: rgba(0, 0, 0, .45);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: .2px;
+  white-space: nowrap;
+}
+.datebar-center {
+  margin-top: 10px;
+  line-height: 1.25;
+  transform: translateY(24px);
+  font-weight: 900;
+  font-size: 18px;
+  color: #2e7d32;
+  text-align: center;
+  max-width: 70%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.datebar-right.calendar-btn {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 8px;
+  background: #2e7d32;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .12);
+  cursor: pointer;
+}
+.datebar-right.calendar-btn:active {
+  filter: brightness(.95);
+}
+
+/* ============================================
+   🔵 ACTIVITY RING CARD (กราฟสรุปแคลวันนี้)
+   ============================================ */
+.ring-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 6px;
+}
+.ring-card {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .1);
+  padding: 1.2rem 1.6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.ring-card-title {
+  font-weight: 1000;
+  color: #2e7d32;
+  margin-bottom: 10px;
+  text-align: center;
+  font-size: 18px;
+}
+
+/* 🔘 วงแหวน + ข้อมูล */
+.ring-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+.ring-left {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ring-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+  gap: 10px; /* ระยะห่างแต่ละส่วน */
+  min-width: 120px;
+  padding-top: 8px;
+}
+.ring-text {
+  font-weight: 800;
+  font-size: 2rem;
+  fill: #2e7d32;
+}
+
+/* 🔹 ข้อความ "เทียบกับเมื่อวาน" */
+.compare-label-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: -20px; /* ✅ ปรับขึ้นลงได้อิสระ */
+}
+.compare-label {
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0.7;
+  color: #2e7d32;
+  line-height: 1.2;
+}
+
+/* 🔹 เปอร์เซ็นต์ ▼ -42.9% */
+.compare-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-weight: 900;
+  font-size: 14px;
+  margin-top: -2px;
+}
+
+/* ลูกศร */
+.compare-box .arrow {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+}
+
+/* สี */
+.compare-box.up .arrow { border-bottom: 8px solid #d32f2f; }
+.compare-box.down .arrow { border-top: 8px solid #42d32f; }
+.compare-box.up .diff-text { color: #d32f2f; }
+.compare-box.down .diff-text { color: #42d32f; }
+
+/* 🔢 สรุปค่าแคล */
+.summary-box {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+  color: #2e7d32;
+  font-weight: 900;
+  margin-top: 70px;
+}
+.summary-box .today-cal {
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1;
+}
+.summary-box .slash {
+  font-size: 18px;
+  opacity: 0.7;
+}
+.summary-box .target-cal {
+  font-size: 16px;
+  opacity: 0.8;
+}
+.summary-box .cal-label {
+  display: inline-block;
+  margin-left: 2px;
+  font-size: 13px;
+}
+
+/* ============================================
+   🟢 TODAY CARD
+   ============================================ */
+.today-card {
+  margin-top: 6px;
+  background: #66bb6a;
+  color: #fff;
+  border-radius: 18px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, .08);
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+}
+.today-title {
+  font-weight: 900;
+  margin-bottom: 4px;
+  letter-spacing: .3px;
+}
+.today-title-strong {
+  font-size: 20px;
+  font-weight: 900;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, .12);
+}
+.today-value {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.today-number { font-size: 48px; line-height: 1; font-weight: 900; }
+.today-unit { font-weight: 800; }
+
+/* ============================================
+   🗓️ WEEKLY STRIP
+   ============================================ */
+.week-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.week-strip button {
+  appearance: none;
+  background: none;
+  padding: 0;
+  border: 0;
+  font: inherit;
+}
+.day-pill {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, .12);
+  transition: transform .08s ease, box-shadow .12s ease;
+}
+.day-pill:active { transform: scale(.98); }
+.pill-head {
+  padding: 6px 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.pill-day {
+  font-weight: 900;
+  font-size: 14px;
+  color: #fff;
+  letter-spacing: .2px;
+}
+.pill-body {
+  background: #fff;
+  padding: 10px 12px 8px;
+  text-align: center;
+  border-top: 1px solid rgba(0, 0, 0, .06);
+}
+.pill-num {
+  display: block;
+  font-weight: 900;
+  font-size: 20px;
+  line-height: 1.1;
+}
+.pill-unit { font-weight: 900; margin-left: 6px; color: #9e9e9e; }
+
+/* ระดับสี */
+.lv-green .pill-head { background: #2e7d32; }
+.lv-yellow .pill-head { background: #f6c400; }
+.lv-red .pill-head { background: #d32f2f; }
+.lv-green .pill-num, .lv-green .pill-unit { color: #2e7d32; }
+.lv-yellow .pill-num, .lv-yellow .pill-unit { color: #f6a000; }
+.lv-red .pill-num, .lv-red .pill-unit { color: #d32f2f; }
+.day-pill.is-today {
+  box-shadow: 0 6px 16px rgba(46, 125, 50, .25);
+  outline: 3px solid rgba(46, 125, 50, .18);
+}
+
+/* ============================================
+   📊 WEEK TOTAL CARD
+   ============================================ */
+.divider {
+  width: 100%;
+  height: 1px;
+  background: #e6e7ea;
+  margin: 16px 0 12px;
+  border-radius: 1px;
+}
+.week-total-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .06);
+  border: 1px solid #eef0f3;
+}
+.wt-left { display: flex; flex-direction: column; gap: 2px; }
+.wt-title { font-size: 16px; font-weight: 700; color: #1f4d2c; }
+.wt-sub { font-size: 12px; color: #6b7280; }
+.wt-right { display: flex; align-items: baseline; gap: 6px; }
+.wt-number { font-size: 28px; font-weight: 800; line-height: 1; }
+.wt-unit { font-size: 12px; opacity: .8; }
+
+/* ============================================
+   🧸 Bear footer
+   ============================================ */
+.bear-footer { display: flex; justify-content: center; padding: 14px 0 28px; }
+.bear-footer .bear-img { width: 160px; height: auto; object-fit: contain; }
+
+/* ============================================
+   🍱 WeekTopFoods
+   ============================================ */
+.tf2-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .08);
+}
+.tf2-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.tf2-head h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 900;
+  color: #2b5930;
+}
+.tf2-toggle {
+  background: none;
+  border: none;
+  color: #6b8e6b;
+  font-weight: 800;
+  cursor: pointer;
+  padding: 4px 6px;
+}
+.tf2-loading, .tf2-empty {
+  padding: 10px;
+  color: rgba(0, 0, 0, .55);
+  font-weight: 700;
+}
+.tf2-error { margin-top: 6px; color: #d32f2f; font-weight: 700; }
+.tf2-body {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 14px;
+ align-items: stretch;
+  grid-auto-rows: auto;
+  align-content: start; /* ✅ ให้ layout ขึ้นต้นด้านบน */
+}
+
+.tf2-hero {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.tf2-hero-img {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #f3f3f3;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .10);
+}
+.tf2-hero-name { font-weight: 900; font-size: 14px; }
+.tf2-hero-count { font-weight: 800; font-size: 13px; opacity: .9; }
+.tf2-right {
+  flex: 1;
+  overflow: hidden;
+  max-height: 220px;
+  transition: max-height 0.35s ease;
+}
+.tf2-morelist { display: flex; flex-direction: column; gap: 8px; }
+.tf2-row {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .06);
+}
+.tf2-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #f3f3f3;
+}
+.tf2-row-name { font-weight: 800; font-size: 13px; }
+.tf2-row-count { font-weight: 900; font-size: 12px; white-space: nowrap; }
+/* เมื่อ showAll: ให้เลื่อนในพื้นที่จำกัด */
+.tf2-right.showAll {
+  max-height: 400px; /* ปรับความสูงตามต้องการ */
+  overflow-y: auto;  /* ให้มี scrollbar แนวตั้ง */
+  padding-right: 6px; /* กัน scrollbar ชิดขอบเกินไป */
+}
+
+/* สไตล์ scrollbar (ให้ดูเนียนกับธีมสีเขียว) */
+.tf2-right.showAll::-webkit-scrollbar {
+  width: 6px;
+}
+.tf2-right.showAll::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+.tf2-right.showAll::-webkit-scrollbar-thumb {
+  background: #a5d6a7;
+  border-radius: 10px;
+}
+.tf2-right.showAll::-webkit-scrollbar-thumb:hover {
+  background: #81c784;
+}
+
+/* 📱 Responsive */
+@media (max-width: 380px) {
+  .tf2-body {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .tf2-left { flex: 0 0 160px; }
+  .tf2-hero-img { width: 136px; height: 136px; }
+  .tf2-hero-name { font-size: 13px; }
+  .tf2-hero-count { font-size: 12px; }
+  .tf2-row-name { font-size: 12.5px; }
+  .tf2-row-count { font-size: 11.5px; }
+}
+@media (max-width: 480px) {
+  .tf2-right.showAll .tf2-morelist {
+    grid-template-columns: 1fr;
+  }
+}
+@media (min-width: 640px) {
+  .week-strip { grid-template-columns: repeat(7, 1fr); }
+}

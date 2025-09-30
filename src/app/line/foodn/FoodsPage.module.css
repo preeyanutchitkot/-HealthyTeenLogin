@@ -1,19 +1,32 @@
-/* =========================
-   Base (ใช้กับ CSS Module)
-   ========================= */
-:global(html), :global(body), :global(#__next) { height: 100%; }
-:global(html), :global(body) { margin: 0; padding: 0; }
-:global(*), :global(*::before), :global(*::after) { box-sizing: border-box; }
+:global(html), 
+:global(body) {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: #ffffff; /* ทำให้พื้นหลังเขียวทั้งหน้า */
+}
 
-/* =========================
-   พื้นหลังหน้า FOOD (เขียว)
-   ========================= */
+:global(#__next) {
+  height: 100%;
+  background: #ffffff; /* กันกรณี wrapper ของ Next.js */
+}
+
 [data-scope="food"] .page {
-  background: #70be60; /* พื้นหลังเขียว */
   min-height: 100vh;
   font-family: 'Noto Sans Thai', sans-serif;
   padding-bottom: 80px;
   margin: 0;
+  background: transparent; /* ให้ใช้สีจาก body */
+}
+
+[data-scope="food"] .page {
+  background: #ffffff;
+  min-height: 100vh;
+  font-family: 'Noto Sans Thai', sans-serif;
+  padding-bottom: 80px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 /* =========================
@@ -181,6 +194,33 @@
 [data-scope="food"] :global(.sheet-footer){ padding:12px 16px 18px; display:flex; align-items:center; gap:12px; }
 [data-scope="food"] :global(.total){ font-weight:700; color:#111827; min-width:max-content; }
 [data-scope="food"] :global(.save){ flex:1; height:44px; border:none; border-radius:10px; background:#7CAD87; color:#fff; font-weight:700; }
+
+[data-scope="food"] :global(.food-banner-scroll) {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  margin: 12px 0;
+}
+
+[data-scope="food"] :global(.food-banner-scroll::-webkit-scrollbar) {
+  display: none; /* Chrome/Safari */
+}
+
+[data-scope="food"] :global(.food-banner-track) {
+  display: flex;
+  gap: 12px;
+  padding: 4px 12px;
+}
+
+[data-scope="food"] :global(.food-banner-img) {
+  flex: 0 0 auto;
+  width: 320px;     /* ความกว้างแต่ละแบนเนอร์ */
+  height: 160px;    /* ความสูงคงที่ */
+  border-radius: 14px;
+  object-fit: cover;
+  box-shadow: 0 2px 8px rgba(0,0,0,.12);
+}
 
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

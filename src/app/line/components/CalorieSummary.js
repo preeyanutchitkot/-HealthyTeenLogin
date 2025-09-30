@@ -1,56 +1,95 @@
+// app/components/CalorieSummary.jsx
+"use client";
 import { useEffect, useMemo, useState } from "react";
-import { auth, db } from "../lib/firebase";
-import { collection, getDocs, orderBy, query, where, Timestamp } from "firebase/firestore";
+import { auth, db, signInIfNeeded } from "../lib/firebase";
+import { collection, getDocs, query, where } from "firebase/firestore";
 
-const toYMD = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-const formatDateTH = (d) => `${String(d.getDate()).padStart(2,"0")}/${String(d.getMonth()+1).padStart(2,"0")}/${String(d.getFullYear()+543).slice(-2)}`;
+/* ===== helpers (TZ-safe) ===== */
+const getLocalYMD_TZ = (d, tz="Asia/Bangkok") =>
+  new Intl.DateTimeFormat("en-CA", { timeZone: tz }).format(d); // YYYY-MM-DD
+
+const ymdToUTCDate = (ymd) => new Date(`${ymd.slice(0,10)}T00:00:00Z`);
+const addDaysYMD = (ymd, days) => {
+  const dt = ymdToUTCDate(ymd);
+  dt.setUTCDate(dt.getUTCDate() + days);
+  return dt.toISOString().slice(0,10);
+};
+const formatDateTH = (ymd, tz="Asia/Bangkok") =>
+  new Intl.DateTimeFormat("th-TH-u-ca-buddhist", {
+    day:"2-digit", month:"2-digit", year:"2-digit", timeZone: tz,
+  }).format(ymdToUTCDate(ymd));
 
 export default function CalorieSummary({
   variant = "floating",
   uid,
-  daysRange = 7,
+  tz = "Asia/Bangkok",
+  weekStartMonday = true,
+  baseYMD,             // ส่ง YYYY-MM-DD เข้ามาได้ (ถ้าไม่ส่ง จะใช้วันนี้ใน tz)
 }) {
+  const anchorYMD = useMemo(
+    () => (baseYMD?.slice(0,10)) || getLocalYMD_TZ(new Date(), tz),
+    [baseYMD, tz]
+  );
+
+  // คำนวณช่วงสัปดาห์เดียวกับ WeekCalories
+  const { ymdStart, ymdEnd } = useMemo(() => {
+    const dow = ymdToUTCDate(anchorYMD).getUTCDay(); // 0=อา..6=ส
+    const offset = weekStartMonday ? ((dow + 6) % 7) : dow;
+    const start = addDaysYMD(anchorYMD, -offset);
+    const end   = addDaysYMD(start, 6);
+    return { ymdStart: start, ymdEnd: end };
+  }, [anchorYMD, weekStartMonday]);
+
   const [dailyCalorie, setDailyCalorie] = useState(0);
   const [weeklyCalorie, setWeeklyCalorie] = useState(0);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState(null);
 
-  const today = useMemo(() => new Date(), []);
-  const todayLabel = useMemo(() => formatDateTH(today), [today]);
-  const todayYMD = useMemo(() => toYMD(today), [today]);
-
   useEffect(() => {
-    const run = async () => {
-      const userId = uid || auth.currentUser?.uid;
-      if (!userId) { setErr("ยังไม่ได้ล็อกอิน"); setLoading(false); return; }
+    (async () => {
       setLoading(true); setErr(null);
       try {
-        const qDaily = query(collection(db,"food"), where("uid","==",userId), where("ymd","==",todayYMD));
-        const dailySnap = await getDocs(qDaily);
-        const dailySum = dailySnap.docs.reduce((s,doc)=> {
-          const d=doc.data(); return s + Number(d.calories||0) * Number(d.qty||1);
-        },0);
-        setDailyCalorie(dailySum);
+        const user = await signInIfNeeded();
+        const userId = uid || user?.uid;
+        if (!userId) throw new Error("ยังไม่ได้ล็อกอิน");
 
-        const start = new Date(today); start.setHours(0,0,0,0); start.setDate(start.getDate()-(daysRange-1));
-        const end = new Date(today);   end.setHours(23,59,59,999);
+        // รวมของ "วันนั้น" (ยึด anchorYMD)
+        const qDay = query(
+          collection(db, "food"),
+          where("uid", "==", userId),
+          where("ymd", "==", anchorYMD)
+        );
+        const daySnap = await getDocs(qDay);
+        const daySum = daySnap.docs.reduce((s,doc)=>{
+          const d=doc.data();
+          const calEach = Number(d.calories ?? d.cal ?? 0) || 0;
+          const qty = Number(d.qty ?? 1) || 1;
+          return s + calEach * qty;
+        }, 0);
+        setDailyCalorie(daySum);
+
+        // รวมของ "สัปดาห์" (ยึด start–end)
         const qWeek = query(
-          collection(db,"food"),
-          where("uid","==",userId),
-          where("date",">=",Timestamp.fromDate(start)),
-          where("date","<=",Timestamp.fromDate(end)),
-          orderBy("date")
+          collection(db, "food"),
+          where("uid", "==", userId),
+          where("ymd", ">=", ymdStart),
+          where("ymd", "<=", ymdEnd)
         );
         const weekSnap = await getDocs(qWeek);
-        const weekSum = weekSnap.docs.reduce((s,doc)=> {
-          const d=doc.data(); return s + Number(d.calories||0) * Number(d.qty||1);
-        },0);
+        const weekSum = weekSnap.docs.reduce((s,doc)=>{
+          const d=doc.data();
+          const calEach = Number(d.calories ?? d.cal ?? 0) || 0;
+          const qty = Number(d.qty ?? 1) || 1;
+          return s + calEach * qty;
+        }, 0);
         setWeeklyCalorie(weekSum);
-      } catch(e){ setErr(e?.message || "เกิดข้อผิดพลาดในการดึงข้อมูล"); }
-      finally{ setLoading(false); }
-    };
-    run();
-  }, [uid, todayYMD, daysRange, today]);
+      } catch(e) {
+        setErr(e?.message || "เกิดข้อผิดพลาดในการดึงข้อมูล");
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [uid, anchorYMD, ymdStart, ymdEnd]);
 
   return (
     <div className={`summary-container ${variant==="inline" ? "inline" : "floating"}`}>
@@ -63,19 +102,19 @@ export default function CalorieSummary({
       ) : (
         <div className="summary-box">
           <div className="summary-item">
-            <p className="summary-date">{todayLabel}</p>
-            <p className="summary-value">{dailyCalorie}</p>
+            <p className="summary-date">{formatDateTH(anchorYMD, tz)}</p>
+            <p className="summary-value">{dailyCalorie.toLocaleString()}</p>
             <p className="summary-unit">แคลอรี่</p>
           </div>
           <span className="divider" aria-hidden="true" />
           <div className="summary-item">
             <p className="summary-date">รายสัปดาห์</p>
-            <p className="summary-value">{weeklyCalorie}</p>
+            <p className="summary-value">{weeklyCalorie.toLocaleString()}</p>
             <p className="summary-unit">แคลอรี่</p>
           </div>
         </div>
       )}
-
+      
       <style jsx>{`
         .summary-container{
           position: relative;

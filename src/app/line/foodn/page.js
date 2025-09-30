@@ -180,6 +180,25 @@ export default function FoodsPage() {
         }}
       />
 
+      <div className="food-banner-scroll">
+        <div className="food-banner-track">
+          <Image
+            src="/banner2.jpg"
+            alt="อาหารโปรตีน"
+            width={320}
+            height={160}
+            className="food-banner-img"
+          />
+          <Image
+            src="/banner1.jpg"
+            alt="ตารางดื่มน้ำ"
+            width={320}
+            height={160}
+            className="food-banner-img"
+          />
+        </div>
+      </div>
+
       <div className="tabs">
         <div className="tab-left">
           <button className="active">อาหารคาว</button>

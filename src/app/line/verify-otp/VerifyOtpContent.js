@@ -45,8 +45,8 @@ export default function VerifyOtpContent() {
           setMsg('รหัสหมดอายุแล้ว');
         } else {
           await updateDoc(docRef, { used: true });
-          setMsg('ยืนยันสำเร็จ กำลังเข้าสู่ระบบ...');
-          setTimeout(() => router.replace('/line/home'), 1500);
+        setMsg('ยืนยันสำเร็จ กำลังไปหน้าตั้งรหัสผ่านใหม่...');
+        setTimeout(() => router.replace(`/line/reset-password?email=${email}`), 1500);
         }
       }
     } catch (err) {
@@ -104,7 +104,6 @@ export default function VerifyOtpContent() {
           {loading ? 'กำลังตรวจสอบ...' : 'ยืนยันรหัส'}
         </button>
 
-        {/* ✅ เพิ่มรูปและคำแนะนำตรงนี้ */}
         <div
           style={{
             display: 'flex',

@@ -118,7 +118,7 @@ export default function FoodsPage() {
       </div>
 
       <CategoryBar
-        backgroundColor="#ffffff"
+        backgroundColor="#f3fdf1"
         categories={[
           { name: 'อาหารคาว', icon: '/food1.png' },
           { name: 'อาหารหวาน', icon: '/food2.png' },
@@ -152,7 +152,7 @@ export default function FoodsPage() {
         <div className={styles.tabLeft}>
           <h3 className={styles.sectionTitle}>อาหารคาว</h3>
         </div>
-          <CartIcon count={cartCount} onClick={() => setShowSheet(true)} />
+        <CartIcon count={cartCount} onClick={() => setShowSheet(true)} />
       </div>
       <FoodGrid foods={filteredSavory} onAdd={addToCart} layout="horizontal" />
 
@@ -192,16 +192,17 @@ export default function FoodsPage() {
                 const updated = cartItems.filter((it) => it.name !== name);
                 persist(updated);
               }}
-              onSave={async () => {
+                onSave={async () => {
                 try {
-                  await saveCartToFirestore(cartItems);
-                  persist([]);
-                  setShowSheet(false);
+                    await saveCartToFirestore(cartItems);
+                    persist([]);
+                    setShowSheet(false);
+                    router.push('/line/food/cart');
                 } catch (err) {
-                  console.error(err);
-                  alert('บันทึกล้มเหลว');
+                    console.error(err);
+                    alert('บันทึกล้มเหลว');
                 }
-              }}
+                }}
             />
           )}
 

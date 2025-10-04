@@ -76,14 +76,12 @@ export default function HomePage() {
     setLoading(true);
     const ymd = toYMD(new Date());
 
-    // ฟัง BMR แบบเรียลไทม์
     const unsubUser = onSnapshot(doc(db, 'users', uid), (uSnap) => {
       const uData = uSnap.exists() ? uSnap.data() : null;
       bmrRef.current = uData?.bmr ? Number(uData.bmr) : null;
       recomputeBell();
     });
 
-    // ฟังรายการอาหารวันนี้แบบเรียลไทม์
     const qRef = query(
       collection(db, 'food'),
       where('uid', '==', uid),
@@ -156,7 +154,6 @@ export default function HomePage() {
             {bellSrc ? (
               <Image src={bellSrc} alt="doorbell" width={38} height={50} />
             ) : (
-              // placeholder กันกระโดดก่อนคำนวณเสร็จ
               <div style={{ width: 38, height: 50 }} />
             )}
           </Link>

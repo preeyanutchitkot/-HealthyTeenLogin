@@ -1,38 +1,45 @@
-/* แนวนอน (ใช้ในหน้าอาหารคาว) */
+/* แนวตั้ง (ใช้ในหน้าอาหารหวาน) */
+.foodGridVertical {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  justify-items: center;
+}
+
+/* แนวนอน (ใช้ในหน้า foodn) */
 .foodGridHorizontal {
   display: flex;
   flex-direction: row;
-  gap: 12px;
+  flex-wrap: nowrap;
+  gap: 10px;
   padding: 12px;
   width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
-  scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   scroll-snap-type: x mandatory;
 }
 
-.foodGridHorizontal::-webkit-scrollbar {
-  display: none;
+.foodGridHorizontal::-webkit-scrollbar { display: none; }
+
+/* Force each card to be an inline flex item when in horizontal layout */
+.foodGridHorizontal .foodItem {
+  width: 110px;
+  max-width: 110px;
+  flex: 0 0 auto;
+  scroll-snap-align: start;
 }
 
-/* แนวตั้ง (ใช้ในหน้าอาหารหวาน) */
-.foodGridVertical {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-  padding: 12px;
-  width: 100%;
-  justify-items: center;
-}
-
-/* การ์ดอาหาร */
+/* การ์ดแต่ละช่อง */
 .foodItem {
   background: #fff;
   border-radius: 16px;
   text-align: center;
-  padding: 14px 12px 46px;
+  padding: 10px 6px 50px;
   position: relative;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   display: flex;
@@ -40,49 +47,51 @@
   justify-content: flex-start;
   align-items: center;
   box-sizing: border-box;
-  width: 110px; 
-  min-width: 100px;
-  flex-shrink: 0;
-  scroll-snap-align: start;
+  width: 100%;           /* ✅ ขยายเต็มคอลัมน์ */
+  max-width: 110px;      /* ✅ จำกัดไม่ให้ใหญ่เกิน */
+  height: 180px;         /* ✅ ลดความสูง */
 }
 
-
+/* รูปภาพ */
 .foodImg {
-  width: 80px;
-  height: 80px;
+  width: 70px;
+  height: 70px;
   object-fit: contain;
   margin: 6px 0;
 }
 
+/* ชื่ออาหาร */
 .name {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   color: #111;
   margin-top: 4px;
-  min-height: 36px;
+  min-height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
 }
 
+/* แคลอรี่ */
 .calories {
-  font-size: 13px;
+  font-size: 12px;
   color: #555;
   margin-top: 2px;
 }
 
+/* ปุ่ม + */
 .add {
   position: absolute;
   right: 8px;
   bottom: 8px;
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   border: none;
   background: #3abb47;
   color: #fff;
-  font-size: 16px;
+  font-size: 14px;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -36,7 +36,7 @@ export default function BottomMenu() {
       label: 'สรุป',
       type: 'internal',
       href: '/line/summary',
-      icon: '/Group 230 (1).png',
+      icon: '/summary.png',
     },
     {
       label: 'ฉัน',

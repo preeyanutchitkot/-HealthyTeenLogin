@@ -3,7 +3,11 @@
 import { Noto_Sans_Thai } from 'next/font/google';
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { updatePassword } from 'firebase/auth';
+import {
+  updatePassword,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
+} from 'firebase/auth';
 import { auth } from '../lib/firebase';
 
 const notoSansThai = Noto_Sans_Thai({
@@ -13,10 +17,14 @@ const notoSansThai = Noto_Sans_Thai({
 });
 
 export default function ChangePasswordPage() {
+  const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
+  const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showCfm, setShowCfm] = useState(false);
+
   const [working, setWorking] = useState(false);
   const [err, setErr] = useState(null);
   const [ok, setOk] = useState(false);
@@ -24,6 +32,8 @@ export default function ChangePasswordPage() {
 
   const errText = (code) => {
     switch (code) {
+      case 'auth/wrong-password':
+        return 'รหัสผ่านเดิมไม่ถูกต้อง';
       case 'auth/weak-password':
         return 'รหัสผ่านใหม่ควรมีอย่างน้อย 6 ตัวอักษร';
       case 'auth/requires-recent-login':
@@ -39,8 +49,12 @@ export default function ChangePasswordPage() {
     setOk(false);
 
     const user = auth.currentUser;
-    if (!user) {
+    if (!user || !user.email) {
       setErr('กรุณาเข้าสู่ระบบก่อน');
+      return;
+    }
+    if (!currentPassword) {
+      setErr('กรุณากรอกรหัสผ่านเดิม');
       return;
     }
     if (!newPassword || newPassword.length < 6) {
@@ -54,8 +68,14 @@ export default function ChangePasswordPage() {
 
     try {
       setWorking(true);
+
+      const credential = EmailAuthProvider.credential(user.email, currentPassword);
+      await reauthenticateWithCredential(user, credential);
+
       await updatePassword(user, newPassword);
+
       setOk(true);
+      setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
     } catch (e) {
@@ -118,6 +138,7 @@ export default function ChangePasswordPage() {
           paddingBottom: 'calc(140px + env(safe-area-inset-bottom, 0px))',
         }}
       >
+        {/* 🔙 ปุ่มย้อนกลับ */}
         <div
           style={{
             display: 'flex',
@@ -143,14 +164,11 @@ export default function ChangePasswordPage() {
             }}
             aria-label="ย้อนกลับ"
           >
-            <img
-              src="/back2.png"
-              alt="back"
-              style={{ width: 22, height: 22 }}
-            />
+            <img src="/back2.png" alt="back" style={{ width: 22, height: 22 }} />
           </button>
         </div>
 
+        {/* 🔹 หัวข้อ */}
         <div
           style={{
             color: '#3ABB47',
@@ -163,11 +181,27 @@ export default function ChangePasswordPage() {
           ตั้งรหัสผ่านใหม่
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          style={{ maxWidth: formMaxW, margin: '0 auto' }}
-        >
+        <form onSubmit={handleSubmit} style={{ maxWidth: formMaxW, margin: '0 auto' }}>
           <div style={{ display: 'grid', gap: 12, marginBottom: 8 }}>
+            {/* รหัสผ่านเดิม */}
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showCurrent ? 'text' : 'password'}
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                placeholder="รหัสผ่านเดิม"
+                style={inputBase}
+              />
+              <button
+                type="button"
+                onClick={() => setShowCurrent((v) => !v)}
+                aria-label="แสดง/ซ่อนรหัสผ่านเดิม"
+                style={eyeBtn}
+              >
+                <img src="/eye2.png" alt="toggle" width={20} height={20} />
+              </button>
+            </div>
+
             <div style={{ position: 'relative' }}>
               <input
                 type={showNew ? 'text' : 'password'}
@@ -191,7 +225,7 @@ export default function ChangePasswordPage() {
                 type={showCfm ? 'text' : 'password'}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="ยืนยันรหัสผ่าน"
+                placeholder="ยืนยันรหัสผ่านใหม่"
                 style={inputBase}
               />
               <button
@@ -205,14 +239,8 @@ export default function ChangePasswordPage() {
             </div>
           </div>
 
-          {err && (
-            <div style={{ color: '#dc2626', marginBottom: 8 }}>{err}</div>
-          )}
-          {ok && (
-            <div style={{ color: '#16a34a', marginBottom: 8 }}>
-              เปลี่ยนรหัสสำเร็จ!
-            </div>
-          )}
+          {err && <div style={{ color: '#dc2626', marginBottom: 8 }}>{err}</div>}
+          {ok && <div style={{ color: '#16a34a', marginBottom: 8 }}>เปลี่ยนรหัสสำเร็จ!</div>}
 
           <button
             type="submit"
@@ -234,9 +262,7 @@ export default function ChangePasswordPage() {
             {working ? 'กำลังบันทึก…' : 'ยืนยัน'}
           </button>
 
-          <div
-            style={{ display: 'flex', justifyContent: 'center', marginTop: 40 }}
-          >
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 40 }}>
             <img
               src="/Rectangle.png"
               alt="Rectangle Icon"

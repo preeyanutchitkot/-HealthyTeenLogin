@@ -6,7 +6,7 @@
   padding: 10px 12px;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
-  background-color: inherit; /* รับสีจาก prop */
+  background-color: inherit;
 }
 
 .category-bar::-webkit-scrollbar {

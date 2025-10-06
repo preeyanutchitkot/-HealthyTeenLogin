@@ -23,6 +23,7 @@ export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
     const v = value.trim();
     if (!v) return;
 
+
     setLoadingRows((prev) => {
       const next = [...prev];
       next[index] = true;
@@ -37,30 +38,38 @@ export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ foodName: v }),
       });
+
+
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
 
       const data = await res.json();
 
-      // รองรับหลายชื่อฟิลด์ที่ Make/n8n อาจส่งมา (calories / kcal / output)
+      // ✅ อ่านค่าจาก API
       const caloriesRaw = data.calories ?? data.kcal ?? data.output ?? '';
-      const newCalories =
-        parseInt(String(caloriesRaw).replace(/[^\d]/g, ''), 10) || '';
+      const detailRaw = data.detail ?? '100 กรัม';
 
-      // โชว์เฉพาะตัวเลขที่อ่านง่ายบน UI
+
+      const newCalories = parseInt(String(caloriesRaw).replace(/[^\d]/g, ''), 10) || '';
+
+      // ✅ แสดงผลบน UI
       setApiResults((prev) => {
         const next = [...prev];
         next[index] = newCalories ? `${newCalories} kcal` : 'ไม่พบข้อมูล';
         return next;
       });
 
-      // กรอกค่าแคลอรี่ลงช่องให้ด้วย
+      // ✅ อัปเดตค่าใน foodInputs
       setFoodInputs((prev) => {
         const next = [...prev];
-        next[index].calories = newCalories;
+        next[index] = {
+          ...next[index],
+          calories: newCalories,
+          detail: detailRaw,
+        };
+
         return next;
       });
     } catch (err) {
-      console.error('Failed to fetch calories from n8n:', err);
       setApiResults((prev) => {
         const next = [...prev];
         next[index] = `Error: ${err.message}`;
@@ -78,6 +87,7 @@ export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
   const handleInputChange = (index, field, value) => {
     setFoodInputs((prev) => {
       const next = [...prev];
+      if (!next[index]) return prev;
       next[index][field] = value;
       return next;
     });
@@ -120,9 +130,7 @@ export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
                     type="text"
                     placeholder="เพิ่มเมนูของคุณ (เช่น ต้มยำ, ผัดกะเพรา, ข้าวราดแกง, ก๋วยเตี๋ยวหมู)"
                     value={food.name}
-                    onChange={(e) =>
-                      handleInputChange(index, 'name', e.target.value)
-                    }
+                    onChange={(e) => handleInputChange(index, 'name', e.target.value)}
                     onBlur={(e) => handleInputBlur(index, e.target.value)}
                     className="food-input"
                   />
@@ -130,9 +138,7 @@ export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
                     type="number"
                     placeholder="แคลอรี่"
                     value={food.calories}
-                    onChange={(e) =>
-                      handleInputChange(index, 'calories', e.target.value)
-                    }
+                    onChange={(e) => handleInputChange(index, 'calories', e.target.value)}
                     className="cal-input"
                   />
                 </div>
@@ -142,10 +148,7 @@ export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
                     +
                   </button>
                 ) : (
-                  <button
-                    className="trash-btn"
-                    onClick={() => handleRemoveInput(index)}
-                  >
+                  <button className="trash-btn" onClick={() => handleRemoveInput(index)}>
                     <Image src="/trash.png" alt="ลบ" width={16} height={16} />
                   </button>
                 )}
@@ -153,15 +156,13 @@ export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
 
               {loadingRows[index] ? (
                 <div className="result-display">
-                  <span className="api-result-text">
-                    กำลังวิเคราะห์แคลอรี่…
-                  </span>
+                  <span className="api-result-text">กำลังวิเคราะห์แคลอรี่…</span>
                 </div>
               ) : apiResults[index] ? (
                 <div className="result-display">
-                  <span className="api-result-text">
-                    อาหารของคุณมีจำนวนแคลอรี่ : {apiResults[index]}
-                  </span>
+                  <span className="api-result-text">อาหารของคุณมีจำนวนแคลอรี่: {apiResults[index]}</span>
+                  <br />
+                  <span className="api-result-text">ปริมาณที่ใช้คำนวณ: {food.detail || '100 กรัม'}</span>
                 </div>
               ) : null}
             </div>
@@ -169,11 +170,7 @@ export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
         </div>
 
         <div className="sheet-footer">
-          <button
-            className="save"
-            onClick={handleSave}
-            disabled={foodInputs.length === 0}
-          >
+          <button className="save" onClick={handleSave} disabled={foodInputs.length === 0}>
             บันทึก
           </button>
         </div>

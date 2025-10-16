@@ -125,16 +125,6 @@ export default function VerifyOtpContent() {
             กรุณาตรวจสอบอีเมลของคุณ <br />
             เราได้ส่งข้อมูลไปยังอีเมลของคุณแล้ว
           </p>
-          <p
-            style={{ margin: 0, color: '#666', fontSize: 13, lineHeight: 1.6 }}
-          >
-            ระบบจะพาคุณไปยังหน้า Home หลังจากนั้นให้คลิกที่เมนู <b>สามขีด</b>
-          </p>
-          <p
-            style={{ margin: 0, color: '#666', fontSize: 13, lineHeight: 1.6 }}
-          >
-            แล้วเลือก <b>“แก้ไข”</b> เพื่อดำเนินการต่อ
-          </p>
         </div>
       </form>
 

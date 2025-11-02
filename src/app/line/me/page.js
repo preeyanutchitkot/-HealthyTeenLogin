@@ -37,7 +37,7 @@ const toYMD = (d) => {
 
 const bellSrcByPercent = (percent) => {
   if (percent == null) return '/b1.png';
-  if (percent > 100) return '/b3.png';
+  if (percent >= 100) return '/b3.png';
   if (percent >= 80) return '/b2.png';
   return '/b1.png';
 };

@@ -153,7 +153,7 @@ export default function ActivityRing({
     };
   }, [ymd, tz, capAt100, showDebug, todayYMD]);
 
-  const ringColor = percent > 100 ? RED : percent >= 80 ? YELLOW : GREEN;
+  const ringColor = percent >= 100 ? RED : percent >= 80 ? YELLOW : GREEN;
   const trackColor = hexToRgba(ringColor, 0.18);
 
   const radius = (size - thickness) / 2;
@@ -199,7 +199,7 @@ export default function ActivityRing({
             />
 
             {/* 🔴 ส่วนเกิน >100% */}
-            {pctExtra > 0 && (
+            {pctExtra  > 0 && (
               <circle
                 cx={size / 2}
                 cy={size / 2}

@@ -62,19 +62,12 @@ body {
 /* ตัวแปรสีธีม */
 :root {
   color-scheme: light;
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #ffffff;   /* ขาวตลอด */
+  --foreground: #171717;   /* สีตัวอักษร */
   --circle-size: 60px;
   --icon-size: 44px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
 
 /* Responsive media */
 img,

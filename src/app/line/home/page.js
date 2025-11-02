@@ -23,7 +23,7 @@ const toYMD = (d) => {
 
 const bellSrcByPercent = (percent) => {
   if (percent == null) return '/b1.png'; // ไม่มีข้อมูล => เขียว
-  if (percent > 100) return '/b3.png'; // แดง
+  if (percent >= 100) return '/b3.png'; // แดง
   if (percent >= 80) return '/b2.png'; // เหลือง
   return '/b1.png'; // เขียว
 };

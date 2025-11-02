@@ -135,7 +135,7 @@ export function useSummaryData({
         const label = TH_DAY_SUN_FIRST[dowFromYMD(ymd)];
         return { date: ymd, label, cal };
       });
-      arr = arr.filter((day) => day.date !== anchorYMD);
+     
 
       setWeekData(arr);
       setTodayCalories(byYmd[anchorYMD] || 0); 

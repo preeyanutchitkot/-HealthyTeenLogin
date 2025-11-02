@@ -56,7 +56,7 @@ export default function NotificationPage() {
         let ic = <img src="/enough.png" alt="enough" style={{ width: 80 }} />;
 
         if (percent !== null) {
-          if (percent > 100) {
+          if (percent >= 100) {
             lv = 'over';
             ic = <img src="/full.png" alt="full" style={{ width: 80 }} />;
           } else if (percent >= 80) {

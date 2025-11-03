@@ -1,10 +1,8 @@
-// app/components/CalorieSummary.jsx
 'use client';
 import { useEffect, useMemo, useState } from 'react';
 import { auth, db, signInIfNeeded } from '../lib/firebase';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 
-/* ===== helpers (TZ-safe) ===== */
 const getLocalYMD_TZ = (d, tz = 'Asia/Bangkok') =>
   new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(d); // YYYY-MM-DD
 
@@ -26,17 +24,19 @@ export default function CalorieSummary({
   variant = 'floating',
   uid,
   tz = 'Asia/Bangkok',
-  weekStartMonday = true,
-  baseYMD, // ส่ง YYYY-MM-DD เข้ามาได้ (ถ้าไม่ส่ง จะใช้วันนี้ใน tz)
+
+  // ✅ แก้ตรงนี้: ให้เริ่มสัปดาห์ = วันอาทิตย์
+  weekStartMonday = false,
+
+  baseYMD,
 }) {
   const anchorYMD = useMemo(
     () => baseYMD?.slice(0, 10) || getLocalYMD_TZ(new Date(), tz),
     [baseYMD, tz]
   );
 
-  // คำนวณช่วงสัปดาห์เดียวกับ WeekCalories
   const { ymdStart, ymdEnd } = useMemo(() => {
-    const dow = ymdToUTCDate(anchorYMD).getUTCDay(); // 0=อา..6=ส
+    const dow = ymdToUTCDate(anchorYMD).getUTCDay(); // 0=อาทิตย์...6=เสาร์
     const offset = weekStartMonday ? (dow + 6) % 7 : dow;
     const start = addDaysYMD(anchorYMD, -offset);
     const end = addDaysYMD(start, 6);
@@ -57,7 +57,6 @@ export default function CalorieSummary({
         const userId = uid || user?.uid;
         if (!userId) throw new Error('ยังไม่ได้ล็อกอิน');
 
-        // รวมของ "วันนั้น" (ยึด anchorYMD)
         const qDay = query(
           collection(db, 'food'),
           where('uid', '==', userId),
@@ -72,7 +71,6 @@ export default function CalorieSummary({
         }, 0);
         setDailyCalorie(daySum);
 
-        // รวมของ "สัปดาห์" (ยึด start–end)
         const qWeek = query(
           collection(db, 'food'),
           where('uid', '==', userId),

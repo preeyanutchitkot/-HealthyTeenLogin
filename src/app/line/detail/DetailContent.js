@@ -107,7 +107,7 @@ export default function DetailContent() {
   }, [uid, pickedYMD]);
 
   const pct = useMemo(() => Math.round(((totalCal || 0) / (goal || 1)) * 100), [totalCal, goal]);
-  const level = pct <= 79 ? 'green' : pct < 100 ? 'yellow' : 'red';
+  const level = pct <= 79 ? 'green' : pct <= 100 ? 'yellow' : 'red';
 
   return (
     <div className={styles.page}>

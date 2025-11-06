@@ -19,7 +19,7 @@ export default function WeekCalories({
   const level = (cal) => {
     const pct = goal > 0 ? (cal / goal) * 100 : 0;
     if (pct <= 79) return 'green';
-    if (pct < 100) return 'yellow';
+    if (pct <= 100) return 'yellow';
     return 'red';
   };
 

@@ -84,15 +84,18 @@ export default function FoodsPage() {
     () => snackFoods.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())),
     [searchQuery]
   );
-
+  
   const addToCart = (food) => {
     setCartItems((prev) => {
       const idx = prev.findIndex((item) => item.name === food.name);
-      const updated =
-        idx === -1
-          ? [...prev, { ...food, qty: 1 }]
-          : prev.map((it, i) => (i === idx ? { ...it, qty: it.qty + 1 } : it));
-      persist(updated);
+      let updated;
+      if (idx === -1) {
+        updated = [...prev, { ...food, qty: 1 }];
+      } else {
+        updated = [...prev];
+        updated[idx].qty += 1;
+      }
+      localStorage.setItem('cartItems', JSON.stringify(updated));
       return updated;
     });
   };

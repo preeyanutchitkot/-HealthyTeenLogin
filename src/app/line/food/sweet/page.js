@@ -196,7 +196,7 @@ export default function SweetFoodsPage() {
               .map((it) =>
                 it.name === name ? { ...it, qty: it.qty - step } : it
               )
-              .filter((it) => it.qty > 0); // กรองออกถ้าต่ำกว่า 0
+              .filter((it) => it.qty > 0);
             persist(updated);
           }}
           onRemove={(name) => {

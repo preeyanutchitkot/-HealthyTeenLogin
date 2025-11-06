@@ -30,6 +30,7 @@ export default function Register() {
   const [bmr, setBmr] = useState('');
   const [tdee, setTdee] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [isLoading, setIsLoading] = useState(false); 
 
   useEffect(() => {
     const h = parseFloat(height);
@@ -81,15 +82,25 @@ export default function Register() {
   const handleRegister = async (e) => {
     e.preventDefault();
     setErrorMsg('');
+    setIsLoading(true);
+
     const emailNorm = email.trim().toLowerCase();
 
-    if (password !== confirmPassword) return setErrorMsg('รหัสผ่านไม่ตรงกัน');
-    if (password.length < 8)
+    if (password !== confirmPassword) {
+      setIsLoading(false);
+      return setErrorMsg('รหัสผ่านไม่ตรงกัน');
+    }
+    if (password.length < 8) {
+      setIsLoading(false);
       return setErrorMsg('รหัสผ่านควรยาวอย่างน้อย 8 ตัวอักษร');
+    }
 
     try {
       const methods = await fetchSignInMethodsForEmail(auth, emailNorm);
-      if (methods.length > 0) return setErrorMsg('อีเมลนี้มีบัญชีอยู่แล้ว');
+      if (methods.length > 0) {
+        setIsLoading(false);
+        return setErrorMsg('อีเมลนี้มีบัญชีอยู่แล้ว');
+      }
 
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -114,12 +125,18 @@ export default function Register() {
         createdAt: serverTimestamp(),
       });
 
+      localStorage.setItem("lastEmail", emailNorm);
+      localStorage.setItem("lastLoginAt", Date.now().toString());
+
       router.push('/line/agreement?from=register');
+
     } catch (error) {
       console.error(error);
       if (error.code === 'auth/email-already-in-use')
         setErrorMsg('อีเมลนี้มีบัญชีอยู่แล้ว');
       else setErrorMsg('เกิดข้อผิดพลาด: ' + (error.message || 'ไม่ทราบสาเหตุ'));
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -237,9 +254,9 @@ export default function Register() {
             BMR ของคุณ: {bmr || 'ยังไม่คำนวณ'}
           </div>
 
-          <button type="submit" className={styles.btn}>
-            ยืนยัน
-          </button>
+        <button type="submit" className={styles.btn} disabled={isLoading}>
+          {isLoading ? "กำลังบันทึก..." : "ยืนยัน"}
+        </button>
         </form>
 
         <div className={styles.footerLink}>

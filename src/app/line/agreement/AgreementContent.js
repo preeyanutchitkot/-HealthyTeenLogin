@@ -3,6 +3,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import styles from './fga.module.css';
+import { getAuth } from "firebase/auth";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "../lib/firebase";
 import FgaClient from './FgaClient';
 
 export default function AgreementContent() {
@@ -29,24 +32,41 @@ export default function AgreementContent() {
   useEffect(() => {
     if (!footerRef.current) return;
 
+    let isMounted = true;
+
     const setVar = () => {
+      if (!isMounted) return;
       const h = footerRef.current.offsetHeight || 84;
       document.documentElement.style.setProperty('--footer-h', `${h}px`);
     };
 
     setVar();
 
-    const ro = new ResizeObserver(setVar);
-    ro.observe(footerRef.current);
+    const ro = new ResizeObserver(() => {
+      if (isMounted) setVar();
+    });
 
+    ro.observe(footerRef.current);
     window.addEventListener('resize', setVar);
+
     return () => {
+      isMounted = false;
       ro.disconnect();
       window.removeEventListener('resize', setVar);
     };
   }, [showAgreement]);
 
-  const handleContinue = () => router.push('/line/home');
+const handleContinue = async () => {
+   const user = getAuth().currentUser;
+   if (user) {
+    try {
+      await updateDoc(doc(db, "users", user.uid), { agreed: true });
+     } catch (err) {
+      console.error("update agreement failed:", err);
+    }
+}
+router.push("/line/home");
+};
 
   return (
     <div className={styles.wrapper}>

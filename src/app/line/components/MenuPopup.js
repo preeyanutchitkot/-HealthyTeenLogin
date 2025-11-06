@@ -14,13 +14,17 @@ export default function MenuPopup({ isOpen, onClose }) {
   const handleSignOut = async () => {
     try {
       await signOut(auth);
-    } catch {}
-    try {
-      localStorage.clear();
-    } catch {}
+    } catch (err) {
+      console.log("signOut error:", err);
+    }
+
+    localStorage.removeItem("lastLoginAt");
+    localStorage.removeItem("lastEmail");
+
     onClose?.();
-    router.replace('/'); // ไปหน้าล็อกอิน
+    router.replace('/line/login');
   };
+
 
   const icons = {
     edit: (
@@ -259,9 +263,9 @@ export default function MenuPopup({ isOpen, onClose }) {
               color: '#fff',
               border: 'none',
               borderRadius: 16,
-              fontSize: FONT.button, // 14px
+              fontSize: FONT.button,
               fontWeight: 700,
-              padding: '8px 0', // ปุ่มเล็กลง
+              padding: '8px 0',
               cursor: 'pointer',
               boxShadow: '0 2px 8px rgba(58,187,71,0.08)',
             }}

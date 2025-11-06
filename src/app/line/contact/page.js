@@ -25,7 +25,7 @@ export default function ContactPage() {
       <div className={styles.social}>
         <a
           className={styles.btn}
-          href="https://line.me"
+          href="https://line.me/R/ti/p/@696kpmzu"
           target="_blank"
           rel="noopener noreferrer"
         >

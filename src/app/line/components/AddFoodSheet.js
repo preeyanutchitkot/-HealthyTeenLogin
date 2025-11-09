@@ -9,6 +9,7 @@ export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
 
   const handleAddInput = () => {
     setFoodInputs((prev) => [...prev, { name: '', calories: '' }]);
+    
     setApiResults((prev) => [...prev, '']);
     setLoadingRows((prev) => [...prev, false]);
   };
@@ -46,8 +47,8 @@ export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
 
       // ✅ อ่านค่าจาก API
       const caloriesRaw = data.calories ?? data.kcal ?? data.output ?? '';
-      const detailRaw = data.detail ?? '100 กรัม';
-
+      const detailRaw = data.detail ?? '';
+      const sourceRaw = data.source ?? '';
 
       const newCalories = parseInt(String(caloriesRaw).replace(/[^\d]/g, ''), 10) || '';
 
@@ -65,6 +66,7 @@ export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
           ...next[index],
           calories: newCalories,
           detail: detailRaw,
+          source: sourceRaw, 
         };
 
         return next;
@@ -162,7 +164,9 @@ export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
                 <div className="result-display">
                   <span className="api-result-text">อาหารของคุณมีจำนวนแคลอรี่: {apiResults[index]}</span>
                   <br />
-                  <span className="api-result-text">ปริมาณที่ใช้คำนวณ: {food.detail || '100 กรัม'}</span>
+                  <span className="api-result-text">ปริมาณที่ใช้คำนวณ: {food.detail || 'ไม่ระบุ'}</span>
+                  <br />
+                  <span className="api-result-text">แหล่งข้อมูล: {food.source || 'ไม่ระบุ'}</span>
                 </div>
               ) : null}
             </div>

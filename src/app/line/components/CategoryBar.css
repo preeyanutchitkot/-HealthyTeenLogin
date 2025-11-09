@@ -7,7 +7,9 @@
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
   background-color: inherit;
+  margin-top: 18px;
 }
+
 
 .category-bar::-webkit-scrollbar {
   display: none;

@@ -42,6 +42,9 @@ export default function DetailContent() {
   const [totalCal, setTotalCal] = useState(0);
   const [loading, setLoading] = useState(true);
 
+  const [foodLoaded, setFoodLoaded] = useState(false);
+  const [prevLevel, setPrevLevel] = useState('neutral');
+
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => setUid(user?.uid || null));
     return () => unsub();
@@ -53,10 +56,13 @@ export default function DetailContent() {
       setTotalCal(0);
       setGoal(2000);
       setLoading(false);
+      setFoodLoaded(false);
       return;
     }
 
     setLoading(true);
+    setFoodLoaded(false);
+
     (async () => {
       try {
         let snap = await getDoc(doc(db, 'users', uid));
@@ -96,18 +102,42 @@ export default function DetailContent() {
             cal: calTotal,
           };
         });
+
         setRows(list);
         setTotalCal(sum);
+        setFoodLoaded(true);
         setLoading(false);
       },
-      () => setLoading(false)
+      () => {
+        setFoodLoaded(true);
+        setLoading(false);
+      }
     );
 
     return () => unsubFood();
   }, [uid, pickedYMD]);
 
-  const pct = useMemo(() => Math.round(((totalCal || 0) / (goal || 1)) * 100), [totalCal, goal]);
-  const level = pct <= 79 ? 'green' : pct <= 100 ? 'yellow' : 'red';
+  const pct = useMemo(() => {
+    if (!foodLoaded) return null;
+    return Math.round(((totalCal || 0) / (goal || 1)) * 100);
+  }, [totalCal, goal, foodLoaded]);
+
+  const computedLevel =
+    pct === null
+      ? 'neutral'
+      : pct <= 80
+      ? 'green'
+      : pct <= 100
+      ? 'yellow'
+      : 'red';
+
+  useEffect(() => {
+    if (foodLoaded) {
+      setPrevLevel(computedLevel);
+    }
+  }, [computedLevel, foodLoaded]);
+
+  const level = foodLoaded ? computedLevel : prevLevel;
 
   return (
     <div className={styles.page}>

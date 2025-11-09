@@ -5,13 +5,14 @@
   padding-bottom: 80px;
 }
 
-/* Search Bar */
 .search-wrap {
   position: relative;
-  height: 0;
+  z-index: 20;
 }
+
 .search-pill {
   position: absolute;
+  z-index: 21;
   top: -45px;
   left: 50%;
   transform: translateX(-50%);

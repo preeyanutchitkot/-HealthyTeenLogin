@@ -12,6 +12,7 @@ import FoodGrid from '../../components/FoodGrid';
 import CartSheet from '../../components/CartSheet';
 import AddFoodSheet from '../../components/AddFoodSheet';
 import { saveCartToFirestore } from '../../lib/saveCart';
+import { auth } from "../../lib/firebase";
 import '../FoodsPage.css';
 
 const sweetFoods = [
@@ -105,21 +106,39 @@ export default function SweetFoodsPage() {
 
   const handleSaveNewFood = () => setShowAddSheet(false);
 
-  const handleSaveCart = async () => {
-    try {
-      if (!cartItems.length) return;
-      setIsSaving(true);
-      await saveCartToFirestore(cartItems);
-      persist([]);
-      setShowSheet(false);
-      router.replace('/line/food/cart');
-    } catch (err) {
-      console.error(err);
-      alert(err?.message || 'บันทึกล้มเหลว');
-    } finally {
-      setIsSaving(false);
+const handleSaveCart = async () => {
+  try {
+    if (!cartItems.length) return;
+    setIsSaving(true);
+
+    // 1) บันทึกลง Firestore
+    await saveCartToFirestore(cartItems);
+
+    // 2) ส่งข้อมูลให้ n8n
+    if (process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL) {
+      await fetch(process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          uid: auth.currentUser.uid,
+          source: "healthyteen-app"
+        }),
+      });
     }
-  };
+
+    // 3) ล้างตะกร้า + redirect
+    persist([]);
+    setShowSheet(false);
+    router.replace('/line/food/cart');
+
+  } catch (err) {
+    console.error(err);
+    alert(err?.message || 'บันทึกล้มเหลว');
+  } finally {
+    setIsSaving(false);
+  }
+};
+
 
   return (
     <div className="page">

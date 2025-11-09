@@ -128,7 +128,7 @@ export default function Register() {
       localStorage.setItem("lastEmail", emailNorm);
       localStorage.setItem("lastLoginAt", Date.now().toString());
 
-      router.push('/line/agreement?from=register');
+      router.push('/line/link-line');
 
     } catch (error) {
       console.error(error);

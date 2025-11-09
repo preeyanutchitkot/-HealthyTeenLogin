@@ -47,6 +47,14 @@
   background: #d32f2f;
 }
 
+.lv-neutral {
+  background: #e8f5e9;
+}
+
+.todayBadge {
+  transition: background 0.25s ease;
+}
+
 /* ===== ตารางแบบเดียวกับ HomePage ===== */
 .menuToday {
   margin-top: 4px;

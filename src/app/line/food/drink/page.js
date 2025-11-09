@@ -12,7 +12,9 @@ import FoodGrid from '../../components/FoodGrid';
 import CartSheet from '../../components/CartSheet';
 import AddFoodSheet from '../../components/AddFoodSheet';
 import { saveCartToFirestore } from '../../lib/saveCart';
+import { auth } from "../../lib/firebase";
 import '../FoodsPage.css';
+
 
 const drinkMenus = [
   { name: 'น้ำส้มคั้น', calories: 100, image: '/foods/orange-juice.png' },
@@ -104,21 +106,39 @@ export default function drinkMenusPage() {
 
   const handleSaveNewFood = () => setShowAddSheet(false);
 
-  const handleSaveCart = async () => {
-    try {
-      if (!cartItems.length) return;
-      setIsSaving(true);
-      await saveCartToFirestore(cartItems);
-      persist([]);
-      setShowSheet(false);
-      router.replace('/line/food/cart');
-    } catch (err) {
-      console.error(err);
-      alert(err?.message || 'บันทึกล้มเหลว');
-    } finally {
-      setIsSaving(false);
+const handleSaveCart = async () => {
+  try {
+    if (!cartItems.length) return;
+    setIsSaving(true);
+
+    // 1) บันทึกลง Firestore
+    await saveCartToFirestore(cartItems);
+
+    // 2) ส่งข้อมูลให้ n8n
+    if (process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL) {
+      await fetch(process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          uid: auth.currentUser.uid,
+          source: "healthyteen-app"
+        }),
+      });
     }
-  };
+
+    // 3) ล้างตะกร้า + redirect
+    persist([]);
+    setShowSheet(false);
+    router.replace('/line/food/cart');
+
+  } catch (err) {
+    console.error(err);
+    alert(err?.message || 'บันทึกล้มเหลว');
+  } finally {
+    setIsSaving(false);
+  }
+};
+
 
   return (
     <div className="page">
@@ -146,6 +166,7 @@ export default function drinkMenusPage() {
       </div>
 
       <CategoryBar
+      backgroundColor="#f3fdf1"
         categories={[
           { name: 'อาหารคาว', icon: '/food1.png' },
           { name: 'อาหารหวาน', icon: '/food2.png' },
@@ -176,7 +197,8 @@ export default function drinkMenusPage() {
         <CartIcon count={cartCount} onClick={() => setShowSheet(true)} />
       </div>
 
-       <FoodGrid foods={filteredFoods} onAdd={addToCart} layout="grid" />
+      <FoodGrid foods={filteredFoods} onAdd={addToCart} layout="grid" />
+
 
       {showSheet && (
         <CartSheet
@@ -193,7 +215,7 @@ export default function drinkMenusPage() {
               .map((it) =>
                 it.name === name ? { ...it, qty: it.qty - step } : it
               )
-              .filter((it) => it.qty > 0); // กรองออกถ้าต่ำกว่า 0
+              .filter((it) => it.qty > 0);
             persist(updated);
           }}
           onRemove={(name) => {

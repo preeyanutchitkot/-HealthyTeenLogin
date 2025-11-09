@@ -4,7 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
-const Header = ({ title, cartoonImage, backIcon = '/back-button.png' }) => {
+const Header = ({ title, cartoonImage, backIcon = '/back2.png' }) => {
   const router = useRouter();
 
   return (

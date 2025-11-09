@@ -11,6 +11,7 @@ import Header from '../../components/header';
 import FoodGrid from '../../components/FoodGrid';
 import CartSheet from '../../components/CartSheet';
 import AddFoodSheet from '../../components/AddFoodSheet';
+import FoodFooter from '../../components/FoodFooter';
 import { saveCartToFirestore } from '../../lib/saveCart';
 import { auth } from "../../lib/firebase";
 import '../FoodsPage.css';
@@ -256,6 +257,7 @@ const handleSaveCart = async () => {
         />
       )}
 
+      <FoodFooter />
       <BottomMenu />
     </div>
   );

@@ -10,6 +10,7 @@ import CategoryBar from '../components/CategoryBar';
 import Header from '../components/header';
 import FoodGrid from '../components/FoodGrid';
 import CartSheet from '../components/CartSheet';
+import FoodFooter from '../components/FoodFooter';
 import { saveCartToFirestore } from '../lib/saveCart';
 import styles from './FoodsPage.module.css';
 
@@ -285,6 +286,7 @@ export default function FoodsPage() {
         </div>
       )}
 
+      <FoodFooter />
       <BottomMenu />
     </div>
   );

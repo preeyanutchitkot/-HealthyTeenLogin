@@ -96,3 +96,37 @@
   align-items: center;
   justify-content: center;
 }
+
+/* แอนิเมชันตัวเลขบินไปตะกร้า */
+.flyingNumber {
+  position: fixed;
+  font-size: 28px;
+  font-weight: bold;
+  color: #3abb47;
+  text-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+  pointer-events: none;
+  z-index: 9999;
+  animation: flyToCart 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes flyToCart {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+  70% {
+    opacity: 1;
+    transform: translate(
+      calc(var(--end-x) - var(--start-x)), 
+      calc(var(--end-y) - var(--start-y))
+    ) scale(0.8);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(
+      calc(var(--end-x) - var(--start-x)), 
+      calc(var(--end-y) - var(--start-y))
+    ) scale(0.5);
+  }
+}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -56,7 +56,51 @@ export default function FoodsPage() {
   const [cartCount, setCartCount] = useState(0);
   const [cartItems, setCartItems] = useState([]);
   const [showSheet, setShowSheet] = useState(false);
+  const [showBannerModal, setShowBannerModal] = useState(false);
+  const [selectedBanner, setSelectedBanner] = useState('');
+  const cartRef = useRef(null);
+  const bannerScrollRef = useRef(null);
   const router = useRouter();
+
+  const banners = [
+    '/banner2.jpg',
+    '/banner1.jpg',
+    '/S__9256971.jpg',
+    '/S__36593668.jpg',
+  ];
+
+  // Banner infinite loop (user scroll only, no auto-scroll)
+  useEffect(() => {
+    const scrollContainer = bannerScrollRef.current;
+    if (!scrollContainer) return;
+
+    // Handle seamless loop when user scrolls
+    const handleScroll = () => {
+      if (!scrollContainer) return;
+      
+      const itemWidth = 332; // 320px width + 12px gap
+      const totalWidth = itemWidth * banners.length;
+      
+      // When scrolled past the first set, jump to second set
+      if (scrollContainer.scrollLeft <= 0) {
+        scrollContainer.scrollLeft = totalWidth;
+      }
+      // When scrolled past the second set, jump back to first set
+      else if (scrollContainer.scrollLeft >= totalWidth * 2) {
+        scrollContainer.scrollLeft = totalWidth;
+      }
+    };
+
+    scrollContainer.addEventListener('scroll', handleScroll);
+    
+    // Start in the middle position
+    const itemWidth = 332;
+    scrollContainer.scrollLeft = itemWidth * banners.length;
+
+    return () => {
+      scrollContainer?.removeEventListener('scroll', handleScroll);
+    };
+  }, [banners.length]);
 
   useEffect(() => {
     const stored = localStorage.getItem('cartItems');
@@ -143,10 +187,24 @@ export default function FoodsPage() {
       />
 
       {/* Banner */}
-      <div className={styles.foodBannerScroll}>
+      <div className={styles.foodBannerScroll} ref={bannerScrollRef}>
         <div className={styles.foodBannerTrack}>
-          <Image src="/banner2.jpg" alt="banner" width={320} height={160} className={styles.foodBannerImg} />
-          <Image src="/banner1.jpg" alt="banner" width={320} height={160} className={styles.foodBannerImg} />
+          {/* Duplicate set for seamless infinite scroll */}
+          {[...banners, ...banners, ...banners].map((banner, idx) => (
+            <Image 
+              key={idx}
+              src={banner} 
+              alt="banner" 
+              width={320} 
+              height={160} 
+              className={styles.foodBannerImg}
+              onClick={() => {
+                setSelectedBanner(banner);
+                setShowBannerModal(true);
+              }}
+              style={{ cursor: 'pointer' }}
+            />
+          ))}
         </div>
       </div>
 
@@ -155,23 +213,23 @@ export default function FoodsPage() {
         <div className={styles.tabLeft}>
           <h3 className={styles.sectionTitle}>อาหารคาว</h3>
         </div>
-        <CartIcon count={cartCount} onClick={() => setShowSheet(true)} />
+        <CartIcon ref={cartRef} count={cartCount} onClick={() => setShowSheet(true)} />
       </div>
-      <FoodGrid foods={filteredSavory} onAdd={addToCart} layout="horizontal" />
+      <FoodGrid foods={filteredSavory} onAdd={addToCart} layout="horizontal" cartRef={cartRef} />
 
       <div className={styles.tabs}>
         <div className={styles.tabLeft}>
           <h3 className={styles.sectionTitle}>อาหารหวาน</h3>
         </div>
       </div>
-      <FoodGrid foods={filteredSweets} onAdd={addToCart} layout="horizontal" />
+      <FoodGrid foods={filteredSweets} onAdd={addToCart} layout="horizontal" cartRef={cartRef} />
 
       <div className={styles.tabs}>
         <div className={styles.tabLeft}>
           <h3 className={styles.sectionTitle}>ของว่าง</h3>
         </div>
       </div>
-      <FoodGrid foods={filteredSnacks} onAdd={addToCart} layout="horizontal" />
+      <FoodGrid foods={filteredSnacks} onAdd={addToCart} layout="horizontal" cartRef={cartRef} />
       
           {showSheet && (
             <CartSheet
@@ -208,6 +266,24 @@ export default function FoodsPage() {
                 }}
             />
           )}
+
+      {/* Banner Modal */}
+      {showBannerModal && (
+        <div 
+          className={styles.bannerModal}
+          onClick={() => setShowBannerModal(false)}
+        >
+          <div className={styles.bannerModalContent}>
+            <Image 
+              src={selectedBanner} 
+              alt="banner" 
+              width={800} 
+              height={400} 
+              className={styles.bannerModalImg}
+            />
+          </div>
+        </div>
+      )}
 
       <BottomMenu />
     </div>

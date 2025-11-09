@@ -271,12 +271,15 @@ export default function MePage() {
         </div>
 
         <div className={styles.metrics}>
-          <div>
+          <div className={styles.metricLine}>
             BMI
             {bmi != null && !isNaN(bmi)
               ? `: ${Number(bmi).toFixed(1)}`
               : '...........................................'}
-            {bmr != null && !isNaN(bmr) ? ` | BMR: ${Number(bmr)}` : ''}
+          </div>
+          <div className={styles.metricLine}>
+            พลังที่ควรได้รับต่อวัน
+            {bmr != null && !isNaN(bmr) ? `: ${Number(bmr)}` : '...........................................'}
           </div>
         </div>
       </div>

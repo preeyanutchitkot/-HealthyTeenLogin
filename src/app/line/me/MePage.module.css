@@ -113,6 +113,11 @@
   text-align: center;
 }
 
+.metricLine {
+  margin: 6px 0;
+  line-height: 1.4;
+}
+
 /* กล่องสรุปแคล */
 .summaryWrap {
   position: relative; /* anchor ของกระต่าย */

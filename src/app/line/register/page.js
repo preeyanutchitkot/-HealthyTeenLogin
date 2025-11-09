@@ -251,7 +251,7 @@ export default function Register() {
           <div className={styles.bmiText}>
             BMI ของคุณ: {bmi || 'ยังไม่คำนวณ'}
             <br />
-            BMR ของคุณ: {bmr || 'ยังไม่คำนวณ'}
+            พลังที่ควรได้รับต่อวัน: {bmr || 'ยังไม่คำนวณ'}
           </div>
 
         <button type="submit" className={styles.btn} disabled={isLoading}>

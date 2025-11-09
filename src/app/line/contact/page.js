@@ -39,12 +39,12 @@ export default function ContactPage() {
               style={{ width: '22px', height: 'auto' }}
             />
           </span>
-          LINE @696kpmzu
+          LINE HEALTHY TEEN
         </a>
 
         <a
           className={styles.btn}
-          href="https://www.facebook.com/nursing.sut"
+          href="https://www.facebook.com/profile.php?id=61583365658632"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -57,8 +57,12 @@ export default function ContactPage() {
               style={{ width: '22px', height: 'auto' }}
             />
           </span>
-          Facebook Nursing SUT
+          Facebook HEALTHY TEEN
         </a>
+      </div>
+
+      <div className={styles.version}>
+        version 2.1
       </div>
     </div>
   );

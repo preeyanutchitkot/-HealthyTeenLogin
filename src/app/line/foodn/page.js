@@ -12,6 +12,7 @@ import FoodGrid from '../components/FoodGrid';
 import CartSheet from '../components/CartSheet';
 import FoodFooter from '../components/FoodFooter';
 import { saveCartToFirestore } from '../lib/saveCart';
+import { auth } from "../lib/firebase";
 import styles from './FoodsPage.module.css';
 
 const savoryFoods = [
@@ -63,45 +64,7 @@ export default function FoodsPage() {
   const bannerScrollRef = useRef(null);
   const router = useRouter();
 
-  const banners = [
-    '/banner2.jpg',
-    '/banner1.jpg',
-    '/S__9256971.jpg',
-    '/S__36593668.jpg',
-  ];
-
-  // Banner infinite loop (user scroll only, no auto-scroll)
-  useEffect(() => {
-    const scrollContainer = bannerScrollRef.current;
-    if (!scrollContainer) return;
-
-    // Handle seamless loop when user scrolls
-    const handleScroll = () => {
-      if (!scrollContainer) return;
-      
-      const itemWidth = 332; // 320px width + 12px gap
-      const totalWidth = itemWidth * banners.length;
-      
-      // When scrolled past the first set, jump to second set
-      if (scrollContainer.scrollLeft <= 0) {
-        scrollContainer.scrollLeft = totalWidth;
-      }
-      // When scrolled past the second set, jump back to first set
-      else if (scrollContainer.scrollLeft >= totalWidth * 2) {
-        scrollContainer.scrollLeft = totalWidth;
-      }
-    };
-
-    scrollContainer.addEventListener('scroll', handleScroll);
-    
-    // Start in the middle position
-    const itemWidth = 332;
-    scrollContainer.scrollLeft = itemWidth * banners.length;
-
-    return () => {
-      scrollContainer?.removeEventListener('scroll', handleScroll);
-    };
-  }, [banners.length]);
+  const banners = ['/banner2.jpg', '/banner1.jpg', '/S__9256971.jpg', '/S__36593668.jpg'];
 
   useEffect(() => {
     const stored = localStorage.getItem('cartItems');
@@ -149,7 +112,6 @@ export default function FoodsPage() {
     <div className={styles.page}>
       <Header title="บันทึกอาหาร" cartoonImage="/8.png" />
 
-      {/* Search */}
       <div className={styles.searchWrap}>
         <div className={styles.searchPill}>
           <Image src="/search.png" alt="ค้นหา" width={23} height={23} />
@@ -160,7 +122,7 @@ export default function FoodsPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
           <Link href="/line/food/cart">
-            <Image src="/character.png" alt="ตัวการ์ตูน" width={26} height={26} />
+            <Image src="/character.png" alt="character" width={26} height={26} />
           </Link>
         </div>
       </div>
@@ -187,29 +149,6 @@ export default function FoodsPage() {
         }}
       />
 
-      {/* Banner */}
-      <div className={styles.foodBannerScroll} ref={bannerScrollRef}>
-        <div className={styles.foodBannerTrack}>
-          {/* Duplicate set for seamless infinite scroll */}
-          {[...banners, ...banners, ...banners].map((banner, idx) => (
-            <Image 
-              key={idx}
-              src={banner} 
-              alt="banner" 
-              width={320} 
-              height={160} 
-              className={styles.foodBannerImg}
-              onClick={() => {
-                setSelectedBanner(banner);
-                setShowBannerModal(true);
-              }}
-              style={{ cursor: 'pointer' }}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* หมวดอาหาร */}
       <div className={styles.tabs}>
         <div className={styles.tabLeft}>
           <h3 className={styles.sectionTitle}>อาหารคาว</h3>
@@ -231,59 +170,58 @@ export default function FoodsPage() {
         </div>
       </div>
       <FoodGrid foods={filteredSnacks} onAdd={addToCart} layout="horizontal" cartRef={cartRef} />
-      
-          {showSheet && (
-            <CartSheet
-              cartItems={cartItems}
-              onClose={() => setShowSheet(false)}
-              onIncrease={(name, step = 1) => {
-                const updated = cartItems.map((it) =>
-                  it.name === name ? { ...it, qty: it.qty + step } : it
-                );
-                persist(updated);
-              }}
-              onDecrease={(name, step = 1) => {
-                const updated = cartItems
-                  .map((it) =>
-                    it.name === name ? { ...it, qty: it.qty - step } : it
-                  )
-                  .filter((it) => it.qty > 0);
-                persist(updated);
-              }}
-              onRemove={(name) => {
-                const updated = cartItems.filter((it) => it.name !== name);
-                persist(updated);
-              }}
-                onSave={async () => {
-                try {
-                    await saveCartToFirestore(cartItems);
-                    persist([]);
-                    setShowSheet(false);
-                    router.push('/line/food/cart');
-                } catch (err) {
-                    console.error(err);
-                    alert('บันทึกล้มเหลว');
-                }
-                }}
-            />
-          )}
 
-      {/* Banner Modal */}
-      {showBannerModal && (
-        <div 
-          className={styles.bannerModal}
-          onClick={() => setShowBannerModal(false)}
-        >
-          <div className={styles.bannerModalContent}>
-            <Image 
-              src={selectedBanner} 
-              alt="banner" 
-              width={800} 
-              height={400} 
-              className={styles.bannerModalImg}
-            />
-          </div>
-        </div>
+      {showSheet && (
+        <CartSheet
+          cartItems={cartItems}
+          onClose={() => setShowSheet(false)}
+          onIncrease={(name, step = 1) => {
+            const updated = cartItems.map((it) =>
+              it.name === name ? { ...it, qty: it.qty + step } : it
+            );
+            persist(updated);
+          }}
+          onDecrease={(name, step = 1) => {
+            const updated = cartItems
+              .map((it) =>
+                it.name === name ? { ...it, qty: it.qty - step } : it
+              )
+              .filter((it) => it.qty > 0);
+            persist(updated);
+          }}
+          onRemove={(name) => {
+            const updated = cartItems.filter((it) => it.name !== name);
+            persist(updated);
+          }}
+          onSave={async () => {
+            try {
+              if (!cartItems.length) return;
+
+              await saveCartToFirestore(cartItems);
+
+              if (process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL) {
+                await fetch(process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    uid: auth.currentUser?.uid ?? "unknown",
+                    source: "healthyteen-app",
+                    cart: cartItems,
+                    timestamp: new Date().toISOString(),
+                  }),
+                });
+              }
+
+              persist([]);
+              setShowSheet(false);
+              router.replace('/line/food/cart');
+
+            } catch (err) {
+              console.error(err);
+              alert(err?.message || "บันทึกล้มเหลว");
+            }
+          }}
+        />
       )}
 
       <FoodFooter />

@@ -66,6 +66,39 @@ export default function FoodsPage() {
 
   const banners = ['/banner2.jpg', '/banner1.jpg', '/S__9256971.jpg', '/S__36593668.jpg'];
 
+  // Banner infinite scroll setup
+  useEffect(() => {
+    const scrollContainer = bannerScrollRef.current;
+    if (!scrollContainer) return;
+
+    // Handle seamless loop when user scrolls
+    const handleScroll = () => {
+      if (!scrollContainer) return;
+      
+      const itemWidth = 332; // 320px width + 12px gap
+      const totalWidth = itemWidth * banners.length;
+      
+      // When scrolled past the first set, jump to second set
+      if (scrollContainer.scrollLeft <= 0) {
+        scrollContainer.scrollLeft = totalWidth;
+      }
+      // When scrolled past the second set, jump back to first set
+      else if (scrollContainer.scrollLeft >= totalWidth * 2) {
+        scrollContainer.scrollLeft = totalWidth;
+      }
+    };
+
+    scrollContainer.addEventListener('scroll', handleScroll);
+    
+    // Start in the middle position
+    const itemWidth = 332;
+    scrollContainer.scrollLeft = itemWidth * banners.length;
+
+    return () => {
+      scrollContainer?.removeEventListener('scroll', handleScroll);
+    };
+  }, [banners.length]);
+
   useEffect(() => {
     const stored = localStorage.getItem('cartItems');
     if (stored) setCartItems(JSON.parse(stored));
@@ -148,6 +181,45 @@ export default function FoodsPage() {
           ผักและผลไม้: '/line/food/fruit',
         }}
       />
+
+      {/* Banner */}
+      <div className={styles.foodBannerScroll} ref={bannerScrollRef}>
+        <div className={styles.foodBannerTrack}>
+          {[...banners, ...banners, ...banners].map((banner, idx) => (
+            <Image 
+              key={idx}
+              src={banner} 
+              alt="banner" 
+              width={320} 
+              height={160} 
+              className={styles.foodBannerImg}
+              onClick={() => {
+                setSelectedBanner(banner);
+                setShowBannerModal(true);
+              }}
+              style={{ cursor: 'pointer' }}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Banner Modal */}
+      {showBannerModal && (
+        <div 
+          className={styles.bannerModal}
+          onClick={() => setShowBannerModal(false)}
+        >
+          <div className={styles.bannerModalContent}>
+            <Image 
+              src={selectedBanner} 
+              alt="banner" 
+              width={800} 
+              height={400} 
+              className={styles.bannerModalImg}
+            />
+          </div>
+        </div>
+      )}
 
       <div className={styles.tabs}>
         <div className={styles.tabLeft}>

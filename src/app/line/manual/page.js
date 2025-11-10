@@ -1,20 +1,7 @@
 'use client';
 import Image from 'next/image';
 
-const manualImages = [
-  '/m1.png',
-  '/m2.png',
-  '/m3.png',
-  '/m4.png',
-  '/m5.png',
-  '/m6.png',
-  '/m7.png',
-  '/m8.png',
-  '/m9.png',
-  '/m10.png',
-  '/m11.png',
-  '/m12.png',
-];
+const manualImages = Array.from({ length: 15 }, (_, i) => `/m/${i + 1}.png`);
 
 export default function ManualPage() {
   return (

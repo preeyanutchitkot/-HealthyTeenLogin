@@ -1,48 +1,30 @@
-import {
-  writeBatch,
-  collection,
-  doc,
-  serverTimestamp,
-} from 'firebase/firestore';
-import { db, signInIfNeeded } from './firebase';
+import { writeBatch, collection, doc, serverTimestamp } from 'firebase/firestore';
+import { db, auth } from './firebase';
 
-function toYMDLocal(d = new Date()) {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
+function toYMD(d = new Date()) {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Bangkok' }).format(d);
 }
 
 export async function saveCartToFirestore(items) {
-  if (!Array.isArray(items) || items.length === 0) return;
+  const user = auth.currentUser;
+  if (!user) return; // ✅ user ต้อง login ก่อน
 
-  const user = await signInIfNeeded();
   const uid = user.uid;
-
-  const ymd = toYMDLocal(new Date());
+  const ymd = toYMD();
   const col = collection(db, 'food');
-
   const batch = writeBatch(db);
 
   items.forEach((it) => {
-    if (!it) return;
-
-    const itemName = String(it.name ?? '').trim();
-    const qty = Number(it.qty);
-    const calories = Number(it.calories);
-
-    if (!itemName) return;
-    if (!Number.isFinite(qty) || qty < 1) return;
-    if (!Number.isFinite(calories)) return;
+    if (!it || !it.name || !it.qty || !it.calories) return;
 
     const ref = doc(col);
     batch.set(ref, {
       uid,
       ymd,
       date: serverTimestamp(),
-      item: itemName,
-      qty,
-      calories,
+      item: it.name,
+      qty: Number(it.qty),
+      calories: Number(it.calories),
       imageUrl: typeof it.image === 'string' ? it.image : null,
     });
   });

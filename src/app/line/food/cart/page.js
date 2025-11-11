@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Header from '../../components/header';
-import { db, signInIfNeeded } from '../../lib/firebase';
+import { db, auth } from '../../lib/firebase';
 import {
   collection,
   query,
@@ -29,111 +29,86 @@ export default function AllFoodListPage() {
   };
 
   useEffect(() => {
-    let unsub = null;
+    let unsubAuth = null;
+    let unsubData = null;
 
-    (async () => {
-      setLoading(true);
-      try {
-        const user = await signInIfNeeded();
-        const uid = user?.uid;
-        if (!uid) throw new Error('No user');
+    setLoading(true);
 
-        const now = new Date();
-        const startOfDay = new Date(
-          now.getFullYear(),
-          now.getMonth(),
-          now.getDate(),
-          0,
-          0,
-          0
-        );
-        const endOfDay = new Date(
-          now.getFullYear(),
-          now.getMonth(),
-          now.getDate(),
-          23,
-          59,
-          59
-        );
-        const ymd = toYMD(now);
-
-        // สร้างคิวรี 2 แบบ
-        const qYmd = query(
-          collection(db, 'food'),
-          where('uid', '==', uid),
-          where('ymd', '==', ymd),
-          limit(2000)
-        );
-
-        const qDate = query(
-          collection(db, 'food'),
-          where('uid', '==', uid),
-          where('date', '>=', startOfDay),
-          where('date', '<=', endOfDay),
-          orderBy('date', 'desc'),
-          limit(2000)
-        );
-
-        // ตรวจว่ามีข้อมูลแบบ ymd ไหม ถ้ามีใช้ตัวนี้, ถ้าไม่มีก็ใช้แบบ date
-        let useYmd = false;
-        try {
-          const probe = await getDocs(qYmd);
-          useYmd = !probe.empty;
-        } catch {
-          useYmd = false;
-        }
-
-        const activeQuery = useYmd ? qYmd : qDate;
-
-        // ฟังแบบ realtime
-        unsub = onSnapshot(
-          activeQuery,
-          (snap) => {
-            const list = snap.docs.map((d) => {
-              const x = d.data();
-              return {
-                id: d.id,
-                item: x.item ?? x.name ?? x.menu ?? 'ไม่ระบุเมนู',
-                calories: Number(x.calories ?? 0),
-                qty: Number(x.qty ?? 1),
-                imageUrl: x.imageUrl ?? x.image ?? '/placeholder.png',
-                date: x.date?.toDate?.() ?? null,
-                ymd: x.ymd ?? null,
-                createdAt: x.createdAt?.toDate?.() ?? null,
-              };
-            });
-
-            // เรียงฝั่งไคลเอนต์ให้สวย (โดย date > createdAt > ymd)
-            list.sort((a, b) => {
-              const ta =
-                a.date?.getTime?.() ??
-                a.createdAt?.getTime?.() ??
-                (a.ymd ? new Date(a.ymd).getTime() : 0);
-              const tb =
-                b.date?.getTime?.() ??
-                b.createdAt?.getTime?.() ??
-                (b.ymd ? new Date(b.ymd).getTime() : 0);
-              return tb - ta; // ใหม่ไปเก่า
-            });
-
-            setFoods(list);
-            setLoading(false);
-          },
-          (err) => {
-            console.error('snapshot error:', err);
-            setFoods([]);
-            setLoading(false);
-          }
-        );
-      } catch (e) {
-        console.error('load foods error:', e);
+    unsubAuth = auth.onAuthStateChanged(async (user) => {
+      if (!user) {
         setFoods([]);
         setLoading(false);
+        return;
       }
-    })();
+
+      const uid = user.uid;
+      const now = new Date();
+      const ymd = toYMD(now);
+
+      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+      const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+
+      const qYmd = query(
+        collection(db, 'food'),
+        where('uid', '==', uid),
+        where('ymd', '==', ymd),
+        limit(2000)
+      );
+
+      const qDate = query(
+        collection(db, 'food'),
+        where('uid', '==', uid),
+        where('date', '>=', startOfDay),
+        where('date', '<=', endOfDay),
+        orderBy('date', 'desc'),
+        limit(2000)
+      );
+
+      let useYmd = false;
+      try {
+        const probe = await getDocs(qYmd);
+        useYmd = !probe.empty;
+      } catch {
+        useYmd = false;
+      }
+
+      const activeQuery = useYmd ? qYmd : qDate;
+
+      unsubData = onSnapshot(activeQuery, (snap) => {
+        const list = snap.docs.map((d) => {
+          const x = d.data();
+          return {
+            id: d.id,
+            item: x.item ?? x.name ?? x.menu ?? 'ไม่ระบุเมนู',
+            calories: Number(x.calories ?? x.cal ?? 0),
+            qty: Number(x.qty ?? 1),
+            imageUrl: x.imageUrl ?? x.image ?? '/placeholder.png',
+            date: x.date?.toDate?.() ?? null,
+            ymd: x.ymd ?? null,
+            createdAt: x.createdAt?.toDate?.() ?? null,
+          };
+        });
+
+        list.sort((a, b) => {
+          const ta =
+            a.date?.getTime?.() ??
+            a.createdAt?.getTime?.() ??
+            (a.ymd ? new Date(a.ymd).getTime() : 0);
+          const tb =
+            b.date?.getTime?.() ??
+            b.createdAt?.getTime?.() ??
+            (b.ymd ? new Date(b.ymd).getTime() : 0);
+          return tb - ta;
+        });
+
+        setFoods(list);
+        setLoading(false);
+      });
+    });
 
     return () => {
-      if (typeof unsub === 'function') unsub();
+      if (typeof unsubData === 'function') unsubData();
+      if (typeof unsubAuth === 'function') unsubAuth();
     };
   }, []);
 
@@ -143,7 +118,6 @@ export default function AllFoodListPage() {
     try {
       setDeletingId(id);
       await deleteDoc(doc(db, 'food', id));
-      // ไม่ต้อง setFoods เองก็ได้ onSnapshot จะอัปเดตให้
     } catch (e) {
       console.error('delete error:', e);
       alert('ลบไม่สำเร็จ');
@@ -154,32 +128,6 @@ export default function AllFoodListPage() {
 
   return (
     <div style={{ paddingBottom: 24 }}>
-      <style jsx global>{`
-        *,
-        *::before,
-        *::after {
-          box-sizing: border-box;
-        }
-        :root {
-          color-scheme: light;
-        }
-        html,
-        body,
-        #__next {
-          height: 100%;
-        }
-        html,
-        body {
-          margin: 0;
-          padding: 0;
-        }
-        body {
-          background: #ffffff;
-          padding-top: env(safe-area-inset-top);
-          padding-bottom: env(safe-area-inset-bottom);
-        }
-      `}</style>
-
       <Header title="เมนูของคุณ" cartoonImage="/8.png" />
 
       <div style={{ padding: 16, maxWidth: 560, margin: '0 auto' }}>
@@ -245,9 +193,7 @@ export default function AllFoodListPage() {
                 </div>
               </div>
 
-              <div
-                style={{ fontWeight: 700, minWidth: 24, textAlign: 'right' }}
-              >
+              <div style={{ fontWeight: 700, minWidth: 24, textAlign: 'right' }}>
                 {food.qty}
               </div>
 

@@ -11,7 +11,7 @@ import {
   getDoc,
   limit,
 } from 'firebase/firestore';
-import { db, signInIfNeeded } from '../lib/firebase';
+import { db, auth } from '../lib/firebase';
 
 export type WeekItem = { date: string; label: string; cal: number };
 
@@ -50,8 +50,10 @@ export function useSummaryData({
   defaultGoal = 2000,
   weekStartMonday = true,
   tz = 'Asia/Bangkok',
-  baseDate, 
-}: Opts) {
+  baseDate,
+  enabled = true,     // ✅ เพิ่มตรงนี้
+}: Opts & { enabled?: boolean }) {
+
   const [weekData, setWeekData] = useState<WeekItem[]>([]);
   const [todayCalories, setTodayCalories] = useState(0);
   const [goal, setGoal] = useState<number>(defaultGoal);
@@ -69,87 +71,81 @@ export function useSummaryData({
     return { ymdStart: start, ymdEnd: end, startYMD: start };
   }, [anchorYMD, weekStartMonday]);
 
-  useEffect(() => {
-    (async () => {
-      const user = await signInIfNeeded();
+useEffect(() => {
+  if (!enabled) return; // ✅ ยังไม่พร้อม → ยังไม่ fetch
+
+  (async () => {
+    try {
+      const user = auth.currentUser;
       const effectiveUid = uid || user?.uid;
+      if (!effectiveUid) return;
 
       /* 1) goal = BMR */
       let newGoal = defaultGoal;
       try {
-        if (effectiveUid) {
-          let snapUser = await getDoc(doc(db, 'users', effectiveUid));
-          if (!snapUser.exists()) {
-            const qU = query(
-              collection(db, 'users'),
-              where('uid', '==', effectiveUid),
-              limit(1)
-            );
-            const list = await getDocs(qU);
-            snapUser = list.docs[0] ?? snapUser;
-          }
-          if (snapUser?.exists()) {
-            const bmr = Number((snapUser.data() as any)?.bmr);
-            if (Number.isFinite(bmr) && bmr > 0) newGoal = Math.round(bmr);
-          }
+        let snapUser = await getDoc(doc(db, "users", effectiveUid));
+        if (!snapUser.exists()) {
+          const qU = query(
+            collection(db, "users"),
+            where("uid", "==", effectiveUid),
+            limit(1)
+          );
+          const list = await getDocs(qU);
+          snapUser = list.docs[0] ?? snapUser;
+        }
+        if (snapUser?.exists()) {
+          const bmr = Number((snapUser.data() as any)?.bmr);
+          if (Number.isFinite(bmr) && bmr > 0) newGoal = Math.round(bmr);
         }
       } catch (err) {
-        console.warn('⚠️ load goal failed', err);
+        console.warn("⚠️ load goal failed", err);
       }
       setGoal(newGoal);
 
-      const cons: any[] = [
-        where('ymd', '>=', ymdStart),
-        where('ymd', '<=', ymdEnd),
-        orderBy('ymd', 'asc'),
-      ];
-      if (effectiveUid) cons.unshift(where('uid', '==', effectiveUid));
+      /* 2) คำนวณสรุปแคลอรี่ */
+      const qFood = query(
+        collection(db, "food"),
+        where("uid", "==", effectiveUid),
+        where("ymd", ">=", ymdStart),
+        where("ymd", "<=", ymdEnd),
+        orderBy("ymd", "asc")
+      );
 
-      const qFood = query(collection(db, 'food'), ...cons);
       const snap = await getDocs(qFood);
 
       const byYmd: Record<string, number> = {};
       snap.forEach((docx) => {
         const d: any = docx.data();
-        const y =
-          d.ymd ||
-          (d.date?.toDate
-            ? getLocalYMD_TZ(d.date.toDate(), tz)
-            : typeof d.date === 'string'
-              ? d.date.slice(0, 10)
-              : '') ||
-          '';
-
+        const y = d.ymd;
         const qty = Number(d.qty ?? 1) || 1;
         const calEach = Number(d.calories ?? d.cal ?? 0) || 0;
         const total = calEach * qty;
-
-        if (y && Number.isFinite(total)) {
-          byYmd[y] = (byYmd[y] || 0) + total;
-        }
+        if (y) byYmd[y] = (byYmd[y] || 0) + total;
       });
 
-      let arr: WeekItem[] = Array.from({ length: 7 }).map((_, i) => {
+      const arr: WeekItem[] = Array.from({ length: 7 }).map((_, i) => {
         const ymd = addDaysYMD(startYMD, i);
-        const cal = byYmd[ymd] || 0;
         const label = TH_DAY_SUN_FIRST[dowFromYMD(ymd)];
-        return { date: ymd, label, cal };
+        return { date: ymd, label, cal: byYmd[ymd] || 0 };
       });
-     
 
       setWeekData(arr);
-      setTodayCalories(byYmd[anchorYMD] || 0); 
-    })().catch(console.error);
-  }, [
-    uid,
-    defaultGoal,
-    ymdStart,
-    ymdEnd,
-    startYMD,
-    tz,
-    anchorYMD,
-    weekStartMonday,
-  ]);
+      setTodayCalories(byYmd[anchorYMD] || 0);
+    } catch (err) {
+      console.error(err);
+    }
+  })();
+}, [
+  enabled,   // ✅ ทำงานใหม่เมื่อ ready
+  uid,
+  defaultGoal,
+  ymdStart,
+  ymdEnd,
+  startYMD,
+  anchorYMD,
+  weekStartMonday,
+]);
+
 
   /* ✅ progress (%) */
   const progress = Math.round(((todayCalories || 0) / (goal || 1)) * 100);

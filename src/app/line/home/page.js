@@ -34,15 +34,16 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const [bellSrc, setBellSrc] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('bellSrc') || null;
-    }
-    return null;
-  });
-  useEffect(() => {
-    if (bellSrc) localStorage.setItem('bellSrc', bellSrc);
-  }, [bellSrc]);
+    const [bellSrc, setBellSrc] = useState(null);
+    useEffect(() => {
+      const saved = localStorage.getItem("bellSrc");
+      if (saved) setBellSrc(saved);
+    }, []);
+
+    useEffect(() => {
+      if (bellSrc) localStorage.setItem("bellSrc", bellSrc);
+    }, [bellSrc]);
+
 
   const bmrRef = useRef(null);
   const sumRef = useRef(0);
@@ -72,7 +73,6 @@ export default function HomePage() {
       setLoading(false);
       return;
     }
-
     setLoading(true);
     const ymd = toYMD(new Date());
 
@@ -109,7 +109,7 @@ export default function HomePage() {
         setLoading(false);
       },
       (err) => {
-        console.error('food onSnapshot error:', err);
+       console.error('❌ Food onSnapshot error:', err);
         setLoading(false);
       }
     );
@@ -169,7 +169,8 @@ export default function HomePage() {
           </button>
         </div>
 
-        <CalorieSummary variant="floating" />
+        <CalorieSummary variant="floating" uid={uid} />
+
         <Image
           src="/bunny.png"
           alt="bunny"

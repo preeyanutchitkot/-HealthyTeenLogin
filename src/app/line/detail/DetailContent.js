@@ -18,7 +18,6 @@ import {
 } from 'firebase/firestore';
 import styles from './DetailPage.module.css';
 
-/* ====== TZ-safe date helpers ====== */
 const TZ_BKK = 'Asia/Bangkok';
 const getLocalYMD = (d = new Date(), tz = TZ_BKK) =>
   new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(d);
@@ -44,6 +43,7 @@ export default function DetailContent() {
 
   const [foodLoaded, setFoodLoaded] = useState(false);
   const [prevLevel, setPrevLevel] = useState('neutral');
+  const [isLevelReady, setIsLevelReady] = useState(false);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => setUid(user?.uid || null));
@@ -132,12 +132,12 @@ export default function DetailContent() {
       : 'red';
 
   useEffect(() => {
-    if (foodLoaded) {
-      setPrevLevel(computedLevel);
+    if (foodLoaded && !isLevelReady) {
+      setIsLevelReady(true);
     }
-  }, [computedLevel, foodLoaded]);
+  }, [foodLoaded, isLevelReady]);
 
-  const level = foodLoaded ? computedLevel : prevLevel;
+  const level = isLevelReady ? computedLevel : prevLevel;
 
   return (
     <div className={styles.page}>

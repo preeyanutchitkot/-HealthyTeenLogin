@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
-import { auth, db, signInIfNeeded } from '../lib/firebase';
+import { auth, db } from '../lib/firebase';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 
 const getLocalYMD_TZ = (d, tz = 'Asia/Bangkok') =>
@@ -48,50 +48,55 @@ export default function CalorieSummary({
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState(null);
 
-  useEffect(() => {
-    (async () => {
-      setLoading(true);
-      setErr(null);
-      try {
-        const user = await signInIfNeeded();
-        const userId = uid || user?.uid;
-        if (!userId) throw new Error('ยังไม่ได้ล็อกอิน');
-
-        const qDay = query(
-          collection(db, 'food'),
-          where('uid', '==', userId),
-          where('ymd', '==', anchorYMD)
-        );
-        const daySnap = await getDocs(qDay);
-        const daySum = daySnap.docs.reduce((s, doc) => {
-          const d = doc.data();
-          const calEach = Number(d.calories ?? d.cal ?? 0) || 0;
-          const qty = Number(d.qty ?? 1) || 1;
-          return s + calEach * qty;
-        }, 0);
-        setDailyCalorie(daySum);
-
-        const qWeek = query(
-          collection(db, 'food'),
-          where('uid', '==', userId),
-          where('ymd', '>=', ymdStart),
-          where('ymd', '<=', ymdEnd)
-        );
-        const weekSnap = await getDocs(qWeek);
-        const weekSum = weekSnap.docs.reduce((s, doc) => {
-          const d = doc.data();
-          const calEach = Number(d.calories ?? d.cal ?? 0) || 0;
-          const qty = Number(d.qty ?? 1) || 1;
-          return s + calEach * qty;
-        }, 0);
-        setWeeklyCalorie(weekSum);
-      } catch (e) {
-        setErr(e?.message || 'เกิดข้อผิดพลาดในการดึงข้อมูล');
-      } finally {
-        setLoading(false);
+useEffect(() => {
+  (async () => {
+    setLoading(true);
+    setErr(null);
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        throw new Error("ยังไม่ได้ล็อกอิน");
       }
-    })();
-  }, [uid, anchorYMD, ymdStart, ymdEnd]);
+      const userId = uid || user.uid;
+
+      // ดึงแคลอรี่วันนี้
+      const qDay = query(
+        collection(db, "food"),
+        where("uid", "==", userId),
+        where("ymd", "==", anchorYMD)
+      );
+      const daySnap = await getDocs(qDay);
+      const daySum = daySnap.docs.reduce((s, doc) => {
+        const d = doc.data();
+        const calEach = Number(d.calories ?? d.cal ?? 0) || 0;
+        const qty = Number(d.qty ?? 1) || 1;
+        return s + calEach * qty;
+      }, 0);
+      setDailyCalorie(daySum);
+
+      // ดึงแคลอรี่สัปดาห์
+      const qWeek = query(
+        collection(db, "food"),
+        where("uid", "==", userId),
+        where("ymd", ">=", ymdStart),
+        where("ymd", "<=", ymdEnd)
+      );
+      const weekSnap = await getDocs(qWeek);
+      const weekSum = weekSnap.docs.reduce((s, doc) => {
+        const d = doc.data();
+        const calEach = Number(d.calories ?? d.cal ?? 0) || 0;
+        const qty = Number(d.qty ?? 1) || 1;
+        return s + calEach * qty;
+      }, 0);
+      setWeeklyCalorie(weekSum);
+
+    } catch (e) {
+      setErr(e?.message || "เกิดข้อผิดพลาดในการดึงข้อมูล");
+    } finally {
+      setLoading(false);
+    }
+  })();
+}, [uid, anchorYMD, ymdStart, ymdEnd]);
 
   return (
     <div

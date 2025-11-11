@@ -18,18 +18,22 @@
   color: #fff;
   text-align: center;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  transition: background 0.5s ease; /* เพิ่ม transition ให้การเปลี่ยนแปลงสีช้า */
 }
+
 .tbTitle {
   font-weight: 900;
   font-size: 18px;
   margin-bottom: 6px;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.12);
 }
+
 .tbValue {
   font-weight: 900;
   font-size: 42px;
   line-height: 1;
 }
+
 .tbUnit {
   font-size: 16px;
   font-weight: 800;
@@ -38,28 +42,31 @@
 
 /* สีตามระดับ */
 .lv-green {
-  background: #43a047;
+  background: #43a047; /* สีเขียว */
 }
+
 .lv-yellow {
-  background: #f9a825;
+  background: #f9a825; /* สีเหลือง */
 }
+
 .lv-red {
-  background: #d32f2f;
+  background: #d32f2f; /* สีแดง */
 }
 
 .lv-neutral {
-  background: #e8f5e9;
+  background: #e8f5e9; /* สีเบื้องต้นเมื่อข้อมูลยังไม่พร้อม */
 }
 
 .todayBadge {
-  transition: background 0.25s ease;
+  transition: background 0.5s ease; /* เพิ่ม transition */
 }
 
-/* ===== ตารางแบบเดียวกับ HomePage ===== */
+/* ===== ตารางเมนู ===== */
 .menuToday {
   margin-top: 4px;
   padding: 0 0;
 }
+
 .menuTable {
   background: #fff;
   border-radius: 12px;
@@ -68,7 +75,6 @@
   margin-top: 8px;
 }
 
-/* วันที่เล็กมุมซ้ายบน */
 .tableDate {
   font-weight: 800;
   color: #2b2b2b;
@@ -84,14 +90,17 @@
   color: #333;
   border-bottom: 1px solid #ddd;
 }
+
 .menuHeaderImg {
   width: 80px;
   text-align: center;
 }
+
 .menuHeaderName {
   flex: 1;
   text-align: center;
 }
+
 .menuHeaderCal {
   width: 80px;
   text-align: center;
@@ -104,6 +113,7 @@
   border-top: 1px solid #eee;
   background: #fff;
 }
+
 .menuRow:last-child {
   border-bottom: none;
 }
@@ -114,6 +124,7 @@
   justify-content: center;
   align-items: center;
 }
+
 .menuThumb {
   border-radius: 8px;
   object-fit: cover;
@@ -128,6 +139,7 @@
   align-items: center;
   text-align: center;
 }
+
 .menuColCal {
   width: 80px;
   font-size: 14px;

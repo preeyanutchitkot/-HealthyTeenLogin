@@ -62,7 +62,7 @@ export default function ContactPage() {
       </div>
 
       <div className={styles.version}>
-        version 2.2
+        version 2.3
       </div>
     </div>
   );

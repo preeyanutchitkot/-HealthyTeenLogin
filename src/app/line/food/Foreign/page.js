@@ -26,7 +26,7 @@ const ForeignFoods = [
     image: '/foods/spaghetti-carbonara.png',
   },
   { name: 'เบอร์ริโต', calories: 290, image: '/foods/burrito.png' },
-  { name: 'ซูชิ (5 คำ)', calories: 200, image: '/foods/sushi.png' },
+  { name: 'ซูชิ (1 คำ)', calories: 40, image: '/foods/sushi.png' },
   {
     name: 'สเต็กเนื้อ (100 กรัม)',
     calories: 25,

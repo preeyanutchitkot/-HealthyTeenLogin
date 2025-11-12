@@ -7,7 +7,7 @@ function toYMD(d = new Date()) {
 
 export async function saveCartToFirestore(items) {
   const user = auth.currentUser;
-  if (!user) return; // ✅ user ต้อง login ก่อน
+  if (!user) return;
 
   const uid = user.uid;
   const ymd = toYMD();
@@ -15,7 +15,7 @@ export async function saveCartToFirestore(items) {
   const batch = writeBatch(db);
 
   items.forEach((it) => {
-    if (!it || !it.name || !it.qty || !it.calories) return;
+    if (!it || !it.name || !it.qty || it.calories === undefined || it.calories === null) return;
 
     const ref = doc(col);
     batch.set(ref, {

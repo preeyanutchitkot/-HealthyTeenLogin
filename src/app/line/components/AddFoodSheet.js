@@ -50,12 +50,12 @@ export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
       const detailRaw = data.detail ?? '';
       const sourceRaw = data.source ?? '';
 
-      const newCalories = parseInt(String(caloriesRaw).replace(/[^\d]/g, ''), 10) || '';
+      const newCalories = parseInt(String(caloriesRaw).replace(/[^\d]/g, ''), 10);
 
       // ✅ แสดงผลบน UI
       setApiResults((prev) => {
         const next = [...prev];
-        next[index] = newCalories ? `${newCalories} kcal` : 'ไม่พบข้อมูล';
+        next[index] = newCalories !== undefined && newCalories !== null ? `${newCalories} kcal` : 'ไม่พบข้อมูล';
         return next;
       });
 
@@ -98,8 +98,8 @@ export default function AddFoodSheet({ onAddCustom, onSave, onClose }) {
   const handleSave = () => {
     foodInputs.forEach((food) => {
       const name = food.name.trim();
-      const cal = Number(food.calories) || 0;
-      if (name && cal > 0) {
+      const cal = Number(food.calories);
+      if (name && cal !== undefined && cal !== null && cal >= 0) {
         const image = pickImageByName(name);
         onAddCustom({
           id: Date.now() + Math.random(),

@@ -49,8 +49,50 @@ const snackFoods = [
   { name: "ข้าวโพดปิ้ง", calories: 100, image: "/foods/khao-phot-ping.png" },
   { name: "กล้วยทอด", calories: 250, image: "/foods/kluai-thot.png" },
   { name: "มันทอด", calories: 150, image: "/foods/man-thot.png" },
-  { name: "ถั่วทอด", calories: 200, image: "/foods/thua-thot.png" },
-  { name: "เกี๊ยวทอด", calories: 190, image: "/foods/kiao-thot.png" },
+];
+
+const veganFoods = [
+  { name: "เต้าหู้ทอด", calories: 100, image: "/foods/fried-tofu.png" },
+  { name: "ผัดหมี่เจ", calories: 250, image: "/foods/vegetarian-fried-noodle.png" },
+  { name: "ข้าวผัดเจ", calories: 300, image: "/foods/vegetarian-fried-rice.png" },
+  { name: "แกงเขียวหวานเจ", calories: 180, image: "/foods/vegetarian-green-curry.png" },
+  { name: "ซาลาเปาไส้เผือก", calories: 180, image: "/foods/taro-steamed-bun.png" },
+  { name: "ปอเปี๊ยะสดเจ", calories: 120, image: "/foods/vegetarian-fresh-spring-roll.png" },
+  { name: "ต้มจับฉ่ายเจ", calories: 90, image: "/foods/vegetarian-mixed-vegetable-soup.png" },
+  { name: "เห็ดทอดเจ", calories: 150, image: "/foods/vegetarian-fried-mushroom.png" },
+];
+
+const foreignFoods = [
+  { name: "พิซซ่า (1 ชิ้น)", calories: 280, image: "/foods/pizza.png" },
+  { name: "สปาเกตตี้คาโบนารา", calories: 400, image: "/foods/spaghetti-carbonara.png" },
+  { name: "เบอร์ริโต", calories: 290, image: "/foods/burrito.png" },
+  { name: "ซูชิ (1 คำ)", calories: 40, image: "/foods/sushi.png" },
+  { name: "สเต็กเนื้อ (100 กรัม)", calories: 25, image: "/foods/beef-steak.png" },
+  { name: "นาโชส์ (1 ถุงเล็ก)", calories: 150, image: "/foods/nachos.png" },
+  { name: "ไก่ย่างบาร์บีคิว (1 ชิ้น)", calories: 250, image: "/foods/bbq-chicken.png" },
+  { name: "ข้าวผัดญี่ปุ่น", calories: 280, image: "/foods/japanese-fried-rice.png" },
+];
+
+const drinkFoods = [
+  { name: "น้ำเปล่า", calories: 0, image: "/foods/water.png" },
+  { name: "น้ำส้มคั้น", calories: 100, image: "/foods/orange-juice.png" },
+  { name: "โค้ก", calories: 150, image: "/foods/coke.png" },
+  { name: "อเมริกาโน่", calories: 10, image: "/foods/americano.png" },
+  { name: "น้ำมะนาว", calories: 90, image: "/foods/lemonade.png" },
+  { name: "น้ำแตงโมปั่น", calories: 250, image: "/foods/watermelon-smoothie.png" },
+  { name: "นมสดเย็น", calories: 370, image: "/foods/cold-milk.png" },
+  { name: "ชานมไข่มุก", calories: 450, image: "/foods/bubble-tea.png" },
+];
+
+const fruitVeggies = [
+  { name: "กล้วย (1 ผล)", calories: 105, image: "/foods/banana.png" },
+  { name: "แตงโม (1 ชิ้น)", calories: 30, image: "/foods/watermelon.png" },
+  { name: "แอปเปิ้ล (1 ลูก)", calories: 90, image: "/foods/apple.png" },
+  { name: "มะม่วงสุก (1 ผล)", calories: 135, image: "/foods/mango.png" },
+  { name: "สับปะรด (1 ชิ้น)", calories: 45, image: "/foods/pineapple.png" },
+  { name: "ลำไย (1 ลูก)", calories: 46, image: "/foods/longan.png" },
+  { name: "เงาะ (1 ลูก)", calories: 85, image: "/foods/rambutan.png" },
+  { name: "ลูกพลับ (1 ผล)", calories: 89, image: "/foods/persimmon.png" },
 ];
 
 export default function FoodsPage() {
@@ -58,6 +100,7 @@ export default function FoodsPage() {
   const [cartCount, setCartCount] = useState(0);
   const [cartItems, setCartItems] = useState([]);
   const [showSheet, setShowSheet] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [showBannerModal, setShowBannerModal] = useState(false);
   const [selectedBanner, setSelectedBanner] = useState('');
   const cartRef = useRef(null);
@@ -123,6 +166,22 @@ export default function FoodsPage() {
   );
   const filteredSnacks = useMemo(
     () => snackFoods.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())),
+    [searchQuery]
+  );
+  const filteredVegan = useMemo(
+    () => veganFoods.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())),
+    [searchQuery]
+  );
+  const filteredForeign = useMemo(
+    () => foreignFoods.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())),
+    [searchQuery]
+  );
+  const filteredDrinks = useMemo(
+    () => drinkFoods.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())),
+    [searchQuery]
+  );
+  const filteredFruitVeggies = useMemo(
+    () => fruitVeggies.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())),
     [searchQuery]
   );
   
@@ -243,6 +302,34 @@ export default function FoodsPage() {
       </div>
       <FoodGrid foods={filteredSnacks} onAdd={addToCart} layout="horizontal" cartRef={cartRef} />
 
+      <div className={styles.tabs}>
+        <div className={styles.tabLeft}>
+          <h3 className={styles.sectionTitle}>อาหารเจ</h3>
+        </div>
+      </div>
+      <FoodGrid foods={filteredVegan} onAdd={addToCart} layout="horizontal" cartRef={cartRef} />
+
+      <div className={styles.tabs}>
+        <div className={styles.tabLeft}>
+          <h3 className={styles.sectionTitle}>อาหารต่างประเทศ</h3>
+        </div>
+      </div>
+      <FoodGrid foods={filteredForeign} onAdd={addToCart} layout="horizontal" cartRef={cartRef} />
+
+      <div className={styles.tabs}>
+        <div className={styles.tabLeft}>
+          <h3 className={styles.sectionTitle}>เครื่องดื่ม</h3>
+        </div>
+      </div>
+      <FoodGrid foods={filteredDrinks} onAdd={addToCart} layout="horizontal" cartRef={cartRef} />
+
+      <div className={styles.tabs}>
+        <div className={styles.tabLeft}>
+          <h3 className={styles.sectionTitle}>ผักและผลไม้</h3>
+        </div>
+      </div>
+      <FoodGrid foods={filteredFruitVeggies} onAdd={addToCart} layout="horizontal" cartRef={cartRef} />
+
       {showSheet && (
         <CartSheet
           cartItems={cartItems}
@@ -268,31 +355,36 @@ export default function FoodsPage() {
           onSave={async () => {
             try {
               if (!cartItems.length) return;
+              setIsSaving(true);
 
+              // 1) บันทึกลง Firestore
               await saveCartToFirestore(cartItems);
 
+              // 2) ส่งข้อมูลให้ n8n
               if (process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL) {
                 await fetch(process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL, {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({
-                    uid: auth.currentUser?.uid ?? "unknown",
-                    source: "healthyteen-app",
-                    cart: cartItems,
-                    timestamp: new Date().toISOString(),
+                    uid: auth.currentUser?.uid,
+                    source: "healthyteen-app"
                   }),
                 });
               }
 
+              // 3) ล้างตะกร้า + redirect
               persist([]);
               setShowSheet(false);
               router.replace('/line/food/cart');
 
             } catch (err) {
               console.error(err);
-              alert(err?.message || "บันทึกล้มเหลว");
+              alert(err?.message || 'บันทึกล้มเหลว');
+            } finally {
+              setIsSaving(false);
             }
           }}
+          isSaving={isSaving}
         />
       )}
 

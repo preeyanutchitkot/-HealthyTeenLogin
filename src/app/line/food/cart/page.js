@@ -92,11 +92,11 @@ export default function AllFoodListPage() {
         list.sort((a, b) => {
           const ta =
             a.date?.getTime?.() ??
-            a.createdAt?.getTime?.() ??
+            a.createdAt?.getTime?.() ?? 
             (a.ymd ? new Date(a.ymd).getTime() : 0);
           const tb =
-            b.date?.getTime?.() ??
-            b.createdAt?.getTime?.() ??
+            b.date?.getTime?.() ?? 
+            b.createdAt?.getTime?.() ?? 
             (b.ymd ? new Date(b.ymd).getTime() : 0);
           return tb - ta;
         });
@@ -127,10 +127,10 @@ export default function AllFoodListPage() {
   };
 
   return (
-    <div style={{ paddingBottom: 24 }}>
+    <div style={{ paddingBottom: 24, backgroundColor: '#fff' }}> {/* เพิ่ม background-color ตรงนี้ */}
       <Header title="เมนูของคุณ" cartoonImage="/8.png" />
 
-      <div style={{ padding: 16, maxWidth: 560, margin: '0 auto' }}>
+      <div style={{ padding: 16, maxWidth: 560, margin: '0 auto', backgroundColor: '#fff' }}> {/* เพิ่ม background-color ตรงนี้ */}
         {loading && (
           <div style={{ padding: 8, textAlign: 'center', color: '#888' }}>
             กำลังโหลดเมนู...
@@ -146,6 +146,7 @@ export default function AllFoodListPage() {
               alignItems: 'center',
               justifyContent: 'center',
               color: '#888',
+              backgroundColor: '#fff',
             }}
           >
             <Image src="/bear.png" alt="เมนูของคุณ" width={190} height={240} />
@@ -160,12 +161,14 @@ export default function AllFoodListPage() {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                background: '#F3FAF4',
+                background: '#f0f8ee',
                 borderRadius: 12,
-                padding: 10,
+                padding: 12,
                 marginBottom: 10,
                 boxShadow: '0 1px 4px rgba(0,0,0,.08)',
                 gap: 12,
+                minHeight: 80,
+                height: 80,
               }}
             >
               <Image

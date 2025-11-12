@@ -18,6 +18,8 @@ export default function LineLayout({ children }) {
     '/line/lookvideo',
     '/line/manual',
     '/line/request-otp',
+    '/line/verify-otp',
+    '/line/reset-password',
   ];
 
   const isPublic = publicPaths.some((p) => pathname.startsWith(p));

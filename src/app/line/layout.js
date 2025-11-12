@@ -17,6 +17,7 @@ export default function LineLayout({ children }) {
     '/line/contact',
     '/line/lookvideo',
     '/line/manual',
+    '/line/request-otp',
   ];
 
   const isPublic = publicPaths.some((p) => pathname.startsWith(p));

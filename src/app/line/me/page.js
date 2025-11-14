@@ -33,20 +33,19 @@ const toYMD = (d) => {
   const day = String(d.getDate()).padStart(2, '0');
   return `${y}-${m}-${day}`;
 };
-
 const bellSrcByPercent = (percent) => {
-  if (percent == null) return '/b1.png';
-  if (percent >= 100) return '/b3.png';
-  if (percent >= 80) return '/b2.png';
-  return '/b1.png';
+  if (percent == null || isNaN(percent)) return '/b_green.png';
+
+  if (percent >= 100) return '/b_red.png';
+  if (percent >= 80) return '/b_yellow.png';
+
+  return '/b_green.png';
 };
 
 export default function MePage() {
-  // ✅ ป้องกัน Hydration mismatch
+  // ป้องกัน hydration mismatch
   const [hydrated, setHydrated] = useState(false);
-  useEffect(() => {
-    setHydrated(true);
-  }, []);
+  useEffect(() => setHydrated(true), []);
 
   const fmtTh = (date) =>
     new Date(date).toLocaleDateString('th-TH', {
@@ -65,17 +64,31 @@ export default function MePage() {
   const [openDates, setOpenDates] = useState({});
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const [bellSrc, setBellSrc] = useState('/b1.png'); // ✅ ทำ default ให้เหมือน SSR
+  const [bellSrc, setBellSrc] = useState('/b_green.png'); // default สีเขียว
   const bmrRef = useRef(null);
   const sumTodayRef = useRef(0);
 
   const recomputeBell = () => {
-    const b = bmrRef.current;
-    const s = sumTodayRef.current;
-    let percent = null;
-    if (b && b > 0) percent = Math.round((s / b) * 100);
-    const next = bellSrcByPercent(percent);
-    setBellSrc(next);
+    const b = Number(bmrRef.current);
+    const s = Number(sumTodayRef.current);
+
+    // ❗ ป้องกันไม่ให้ Bell แดงตอนข้อมูลยังโหลดไม่เสร็จ
+    if (!b || isNaN(b) || b <= 0) {
+      console.log("Skip bell: BMR ยังไม่พร้อม");
+      return;   // <<==== หยุด ไม่เปลี่ยนสีระฆัง
+    }
+
+    const percent = Math.round((s / b) * 100);
+
+    console.log("DEBUG percent =", percent, "sum =", s, "bmr =", b);
+
+    // ถ้า percent ผิด (NaN / Infinity) → ให้เป็นเขียว
+    if (isNaN(percent) || percent < 0) {
+      setBellSrc('/b_green.png');
+      return;
+    }
+
+    setBellSrc(bellSrcByPercent(percent));
   };
 
   useEffect(() => {
@@ -85,6 +98,7 @@ export default function MePage() {
     return () => unsub();
   }, []);
 
+  // โหลดค่า BMR และแคลวันนี้แบบ realtime
   useEffect(() => {
     if (!uid) return;
 
@@ -109,9 +123,8 @@ export default function MePage() {
       let sumCal = 0;
       snapToday.forEach((docSnap) => {
         const x = docSnap.data();
-        const cal = Number(x.calories || 0);
-        const qty = Number(x.qty || 1);
-        sumCal += cal * qty;
+        // calories ใน Firestore เป็นค่ารวมแล้ว ไม่ต้องคูณ qty
+        sumCal += Number(x.calories || 0);
       });
       sumTodayRef.current = sumCal;
       recomputeBell();
@@ -123,11 +136,13 @@ export default function MePage() {
     };
   }, [uid]);
 
+  // โหลดประวัติย้อนหลัง
   useEffect(() => {
     if (!uid) return;
+
     const ymdToTh = (ymd) => {
-      const [y, m, d] = ymd.split('-').map(Number);
-      return fmtTh(new Date(y, m - 1, d));
+      const [y, m, d] = ymd.split('-');
+      return fmtTh(new Date(Number(y), Number(m) - 1, Number(d)));
     };
 
     (async () => {
@@ -172,9 +187,9 @@ export default function MePage() {
       <div className={styles.header}>
         <div className={styles.headerTop}>
           <Link href="/line/home" aria-label="ย้อนกลับ" className={styles.back} />
+
           <div className={styles.headerIcons}>
             <Link href="/line/notification" aria-label="การแจ้งเตือน" className={styles.notifWrap}>
-              {/** ✅ ป้องกัน Hydration mismatch ตรงนี้ */}
               {hydrated ? (
                 <Image
                   src={bellSrc}
@@ -224,7 +239,7 @@ export default function MePage() {
                 <span className={`${styles.chev} ${open ? styles.rot : ''}`}>▾</span>
               </button>
 
-              <div className={styles.dayBody} style={{ maxHeight: open ? '560px' : '0px' }}>
+              <div className={styles.dayBody}>
                 {d.items?.length > 0 ? (
                   <div className={styles.menuTable}>
                     {d.items.map((item, idx) => (

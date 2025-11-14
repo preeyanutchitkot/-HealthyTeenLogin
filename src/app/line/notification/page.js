@@ -50,13 +50,13 @@ export default function NotificationPage() {
         );
 
         const snap = await getDocs(qFood);
+
         const sum = snap.docs.reduce((s, docu) => {
           const d = docu.data();
-          return s + Number(d.calories || 0) * Number(d.qty || 1);
+          return s + Number(d.calories || 0);
         }, 0);
 
         setCalorie(sum);
-
         // ✅ คำนวณระดับแจ้งเตือน
         let lv = 'normal';
         let ic = <img src="/enough.png" alt="enough" style={{ width: 80 }} />;

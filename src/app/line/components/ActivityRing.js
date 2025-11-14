@@ -95,7 +95,7 @@ export default function ActivityRing({
         let totalToday = 0;
         todayDocs.forEach((d) => {
           const x = d.data();
-          totalToday += (Number(x.calories ?? x.cal) || 0) * (Number(x.qty) || 1);
+          totalToday += Number(x.calories ?? x.cal ?? 0) || 0;
         });
         if (!active) return;
         setTodayCal(totalToday);
@@ -125,18 +125,16 @@ export default function ActivityRing({
           totalYest > 0 ? ((totalToday - totalYest) / totalYest) * 100 : 0;
         if (active) setDiff(diffPct);
 
-        // ✅ ติดตามแบบ realtime
         unsubFood = onSnapshot(qToday, (snap) => {
           let total = 0;
           snap.forEach((d) => {
             const x = d.data();
-            total += (Number(x.calories ?? x.cal) || 0) * (Number(x.qty) || 1);
+            total += Number(x.calories ?? x.cal ?? 0) || 0;      // ✅
           });
           setTodayCal(total);
           setPercent(Math.round((total / bmr) * 100));
         });
 
-        // ✅ ชื่อตามการเลือกวัน
         if (ymd === todayYMD) setTitle('สรุปแคลอรี่วันนี้');
         else {
           const th = new Intl.DateTimeFormat('th-TH-u-ca-buddhist', {

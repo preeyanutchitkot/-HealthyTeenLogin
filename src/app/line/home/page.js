@@ -22,10 +22,10 @@ const toYMD = (d) => {
 };
 
 const bellSrcByPercent = (percent) => {
-  if (percent == null) return '/b1.png'; // ไม่มีข้อมูล => เขียว
-  if (percent >= 100) return '/b3.png'; // แดง
-  if (percent >= 80) return '/b2.png'; // เหลือง
-  return '/b1.png'; // เขียว
+  if (percent == null) return '/b_green.png'; // ไม่มีข้อมูล => เขียว
+  if (percent >= 100) return '/b_red.png'; // แดง
+  if (percent >= 80) return '/b_yellow.png'; // เหลือง
+  return '/b_green.png'; // เขียว
 };
 
 export default function HomePage() {
@@ -94,13 +94,13 @@ export default function HomePage() {
         let sumCal = 0;
         const rows = snap.docs.map((d) => {
           const x = d.data();
+          // calories ใน Firestore เป็นค่ารวมแล้ว ไม่ต้องคูณ qty
           const cal = Number(x.calories || 0);
-          const qty = Number(x.qty || 1);
-          sumCal += cal * qty;
+          sumCal += cal;
           return {
             name: x.name || x.item || '',
             img: x.imageUrl || '/placeholder.png',
-            calText: qty > 1 ? `${cal}x${qty}` : `${cal}`,
+            calText: `${cal}`,
           };
         });
         setItems(rows);

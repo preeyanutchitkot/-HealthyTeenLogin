@@ -4,7 +4,7 @@ import { auth, db } from '../lib/firebase';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 
 const getLocalYMD_TZ = (d, tz = 'Asia/Bangkok') =>
-  new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(d); // YYYY-MM-DD
+  new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(d);
 
 const ymdToUTCDate = (ymd) => new Date(`${ymd.slice(0, 10)}T00:00:00Z`);
 const addDaysYMD = (ymd, days) => {
@@ -24,10 +24,7 @@ export default function CalorieSummary({
   variant = 'floating',
   uid,
   tz = 'Asia/Bangkok',
-
-  // ✅ แก้ตรงนี้: ให้เริ่มสัปดาห์ = วันอาทิตย์
   weekStartMonday = false,
-
   baseYMD,
 }) {
   const anchorYMD = useMemo(
@@ -36,7 +33,7 @@ export default function CalorieSummary({
   );
 
   const { ymdStart, ymdEnd } = useMemo(() => {
-    const dow = ymdToUTCDate(anchorYMD).getUTCDay(); // 0=อาทิตย์...6=เสาร์
+    const dow = ymdToUTCDate(anchorYMD).getUTCDay();
     const offset = weekStartMonday ? (dow + 6) % 7 : dow;
     const start = addDaysYMD(anchorYMD, -offset);
     const end = addDaysYMD(start, 6);
@@ -48,60 +45,54 @@ export default function CalorieSummary({
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState(null);
 
-useEffect(() => {
-  (async () => {
-    setLoading(true);
-    setErr(null);
-    try {
-      const user = auth.currentUser;
-      if (!user) {
-        throw new Error("ยังไม่ได้ล็อกอิน");
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      setErr(null);
+      try {
+        const user = auth.currentUser;
+        if (!user) throw new Error("ยังไม่ได้ล็อกอิน");
+        const userId = uid || user.uid;
+
+        // 🔹 ดึงแคลอรี่รายวัน (ไม่คูณ qty แล้ว)
+        const qDay = query(
+          collection(db, "food"),
+          where("uid", "==", userId),
+          where("ymd", "==", anchorYMD)
+        );
+        const daySnap = await getDocs(qDay);
+        const daySum = daySnap.docs.reduce((s, doc) => {
+          const d = doc.data();
+          const calEach = Number(d.calories ?? d.cal ?? 0) || 0;
+          return s + calEach;   // ✅ ใช้ตรง ๆ
+        }, 0);
+        setDailyCalorie(daySum);
+
+        // 🔹 ดึงแคลอรี่รายสัปดาห์ (ไม่คูณ qty)
+        const qWeek = query(
+          collection(db, "food"),
+          where("uid", "==", userId),
+          where("ymd", ">=", ymdStart),
+          where("ymd", "<=", ymdEnd)
+        );
+        const weekSnap = await getDocs(qWeek);
+        const weekSum = weekSnap.docs.reduce((s, doc) => {
+          const d = doc.data();
+          const calEach = Number(d.calories ?? d.cal ?? 0) || 0;
+          return s + calEach;   // ✅ เช่นกัน
+        }, 0);
+        setWeeklyCalorie(weekSum);
+
+      } catch (e) {
+        setErr(e?.message || "เกิดข้อผิดพลาดในการดึงข้อมูล");
+      } finally {
+        setLoading(false);
       }
-      const userId = uid || user.uid;
-
-      // ดึงแคลอรี่วันนี้
-      const qDay = query(
-        collection(db, "food"),
-        where("uid", "==", userId),
-        where("ymd", "==", anchorYMD)
-      );
-      const daySnap = await getDocs(qDay);
-      const daySum = daySnap.docs.reduce((s, doc) => {
-        const d = doc.data();
-        const calEach = Number(d.calories ?? d.cal ?? 0) || 0;
-        const qty = Number(d.qty ?? 1) || 1;
-        return s + calEach * qty;
-      }, 0);
-      setDailyCalorie(daySum);
-
-      // ดึงแคลอรี่สัปดาห์
-      const qWeek = query(
-        collection(db, "food"),
-        where("uid", "==", userId),
-        where("ymd", ">=", ymdStart),
-        where("ymd", "<=", ymdEnd)
-      );
-      const weekSnap = await getDocs(qWeek);
-      const weekSum = weekSnap.docs.reduce((s, doc) => {
-        const d = doc.data();
-        const calEach = Number(d.calories ?? d.cal ?? 0) || 0;
-        const qty = Number(d.qty ?? 1) || 1;
-        return s + calEach * qty;
-      }, 0);
-      setWeeklyCalorie(weekSum);
-
-    } catch (e) {
-      setErr(e?.message || "เกิดข้อผิดพลาดในการดึงข้อมูล");
-    } finally {
-      setLoading(false);
-    }
-  })();
-}, [uid, anchorYMD, ymdStart, ymdEnd]);
+    })();
+  }, [uid, anchorYMD, ymdStart, ymdEnd]);
 
   return (
-    <div
-      className={`summary-container ${variant === 'inline' ? 'inline' : 'floating'}`}
-    >
+    <div className={`summary-container ${variant === 'inline' ? 'inline' : 'floating'}`}>
       <p className="summary-title">สรุปแคลอรี่</p>
 
       {loading ? (
@@ -115,7 +106,9 @@ useEffect(() => {
             <p className="summary-value">{dailyCalorie.toLocaleString()}</p>
             <p className="summary-unit">แคลอรี่</p>
           </div>
+
           <span className="divider" aria-hidden="true" />
+
           <div className="summary-item">
             <p className="summary-date">รายสัปดาห์</p>
             <p className="summary-value">{weeklyCalorie.toLocaleString()}</p>

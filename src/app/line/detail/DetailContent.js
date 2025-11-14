@@ -87,18 +87,24 @@ export default function DetailContent() {
       qFood,
       (snap) => {
         let sum = 0;
+
         const list = snap.docs.map((d) => {
           const x = d.data();
           const qty = Number(x.qty ?? 1) || 1;
-          const calEach = Number(x.calories ?? x.cal ?? 0) || 0;
-          const calTotal = calEach * qty;
-          sum += calTotal;
+
+          // total calories ที่เซฟใน DB แล้ว เช่น 75
+          const calTotal = Number(x.calories ?? x.cal ?? 0) || 0;
+
+          sum += calTotal; // รวม 75
 
           return {
             id: d.id,
             name: x.name || x.item || '-',
             img: x.imageUrl || '/placeholder.png',
-            calText: qty > 1 ? `${calEach}x${qty}` : `${calEach}`,
+
+            // ❗ แสดงแคลอรี่แบบรวมจริง ไม่คูณ ไม่หาร
+            calText: `${calTotal}`,
+
             cal: calTotal,
           };
         });
@@ -113,6 +119,7 @@ export default function DetailContent() {
         setLoading(false);
       }
     );
+
 
     return () => unsubFood();
   }, [uid, pickedYMD]);

@@ -14,7 +14,6 @@ import {
 } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 
-/* ===== สีตามช่วง % ===== */
 const GREEN = '#2e7d32';
 const YELLOW = '#f9a825';
 const RED = '#d32f2f';
@@ -79,14 +78,16 @@ export default function TodayCalCard({
         );
 
         unsubFood = onSnapshot(qFood, (qs) => {
-          let total = 0;
+          let total = 0;  // 👈 ต้องมีบรรทัดนี้
+
           qs.forEach((d) => {
             const x = d.data();
-            total += (Number(x.calories ?? x.cal) || 0) * (Number(x.qty) || 1);
+            total += Number(x.calories ?? x.cal ?? 0) || 0;  // 👈 ไม่คูณ qty
           });
 
           const pct = Math.round((total / bmr) * 100);
           if (!active) return;
+
           setSumCal(total);
           setPercent(capAt100 ? Math.min(100, pct) : pct);
           setLoading(false);

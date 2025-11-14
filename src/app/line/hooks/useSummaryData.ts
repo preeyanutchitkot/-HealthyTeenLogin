@@ -117,9 +117,7 @@ useEffect(() => {
       snap.forEach((docx) => {
         const d: any = docx.data();
         const y = d.ymd;
-        const qty = Number(d.qty ?? 1) || 1;
-        const calEach = Number(d.calories ?? d.cal ?? 0) || 0;
-        const total = calEach * qty;
+        const total = Number(d.calories ?? d.cal ?? 0) || 0;
         if (y) byYmd[y] = (byYmd[y] || 0) + total;
       });
 

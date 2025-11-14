@@ -167,17 +167,21 @@
   transform: rotate(180deg);
 }
 .dayBody {
-  overflow: hidden;
-  transition:
-    max-height 0.25s ease,
-    opacity 0.2s ease;
-  opacity: 1;
+  max-height: 300px; /* ปรับได้ตามต้องการ */
+  overflow-y: auto;   /* ให้เลื่อน */
+  overflow-x: hidden; /* กันหน้าจอเลื่อนด้านข้าง */
   padding: 0 12px 12px;
+  transition: max-height 0.25s ease;
+}
+
+.dayCard.open .dayBody {
+  max-height: 300px;  /* ความสูงตอนเปิด */
 }
 .dayCard:not(.open) .dayBody {
-  opacity: 0;
-  padding: 0 12px;
+  max-height: 0;
+  padding-bottom: 0;
 }
+
 
 /* ข้อความว่าง */
 .empty {

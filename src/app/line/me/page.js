@@ -136,8 +136,7 @@ export default function MePage() {
     };
   }, [uid]);
 
-  // โหลดประวัติย้อนหลัง
-  useEffect(() => {
+    useEffect(() => {
     if (!uid) return;
 
     const ymdToTh = (ymd) => {
@@ -150,16 +149,18 @@ export default function MePage() {
       const snap = await getDocs(qy);
 
       const byDate = {};
+
       snap.forEach((docSnap) => {
         const d = docSnap.data();
-        const dateStr = d?.ymd ? ymdToTh(d.ymd) : today;
+        const ymd = d?.ymd;
+        if (!ymd) return;
 
-        if (!byDate[dateStr]) byDate[dateStr] = [];
+        if (!byDate[ymd]) byDate[ymd] = [];
 
         const itemName =
           d.item ?? d.name ?? d.menu ?? d.title ?? 'ไม่ระบุเมนู';
 
-        byDate[dateStr].push({
+        byDate[ymd].push({
           name: itemName,
           cal:
             d.calories != null && d.qty != null
@@ -169,15 +170,18 @@ export default function MePage() {
         });
       });
 
-      const logs = Object.keys(byDate).map((date) => ({
-        date,
-        items: byDate[date],
-      }));
+      const logs = Object.keys(byDate)
+        .sort((a, b) => new Date(b) - new Date(a))
+        .map((ymd) => ({
+          date: ymdToTh(ymd),
+          items: byDate[ymd],
+        }));
 
       setDailyLogs(logs);
       setOpenDates({ [logs[0]?.date]: true });
     })();
   }, [uid]);
+
 
   const toggleDate = (date) =>
     setOpenDates((prev) => ({ ...prev, [date]: !prev[date] }));

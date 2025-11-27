@@ -55,7 +55,7 @@ export default function LookvideoPage() {
       `}</style>
 
       <div className="header-container">
-        <Header title="วิดีโอสุขภาพ" cartoonImage="/9.png" />
+        <Header title="วิดีโอสุขภาพ" cartoonImage="/8.png" />
       </div>
 
       <div className="content">

@@ -61,7 +61,7 @@ export default function SummaryPage() {
   return (
     <div className="summary-page">
       <div className="header-container">
-        <Header title="สรุปแคลอรี่" cartoonImage="/9.png" />
+        <Header title="สรุปแคลอรี่" cartoonImage="/8.png" />
       </div>
 
       <main className="summary-main">

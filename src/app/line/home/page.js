@@ -191,7 +191,7 @@ export default function HomePage() {
           {
             label: 'แนะนำอาหาร',
             href: OA_URL,
-            img: '/ploy3.png',
+            img: '/p2.png',
             external: true,
           },
           {
@@ -203,7 +203,7 @@ export default function HomePage() {
           {
             label: 'วิดีโอสุขภาพ',
             href: '/line/lookvideo',
-            img: '/p4.png',
+            img: '/9.png',
             external: false,
           },
         ].map((item) =>

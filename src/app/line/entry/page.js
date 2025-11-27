@@ -13,23 +13,25 @@ export default function EntryPage() {
     setHydrated(true);
   }, []);
 
-  useEffect(() => {
-    if (!hydrated) return;
+useEffect(() => {
+  if (!hydrated) return;
 
     const unsub = onAuthStateChanged(auth, (user) => {
-      const last = Number(localStorage.getItem("lastLoginAt") || 0);
-      const now = Date.now();
-      const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
+    const last = Number(localStorage.getItem("lastLoginAt") || 0);
+    const now = Date.now();
 
-      if (user && now - last < SEVEN_DAYS) {
-        router.replace("/line/home");
-      } else {
-        router.replace("/line/login");
-      }
-    });
+    const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
 
-    return () => unsub();
-  }, [hydrated, router]);
+    if (user && now - last < THIRTY_DAYS) {
+      router.replace("/line/home");
+    } else {
+      router.replace("/line/login");
+    }
+  });
+
+  return () => unsub();
+}, [hydrated, router]);
+
 
   return (
     <div style={{

@@ -5,7 +5,7 @@ import Header from '../components/header';
 export default function ContactPage() {
   return (
     <div className="header-container">
-      <Header title="ติดต่อเรา" cartoonImage="/9.png" />
+      <Header title="ติดต่อเรา" cartoonImage="/8.png" />
 
       <div className={styles.content}>
         หากคุณต้องการความช่วยเหลือ ติดต่อเราได้ที่

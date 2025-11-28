@@ -36,7 +36,7 @@ export default function SummaryPage() {
     weekStartMonday: false,
     tz: 'Asia/Bangkok',
     baseDate: selectedDate.toDate(),
-    enabled: uidReady, // ✅ สำคัญ
+    enabled: uidReady,
   });
 
   const weekTotal = (weekData || []).reduce(
@@ -65,7 +65,6 @@ export default function SummaryPage() {
       </div>
 
       <main className="summary-main">
-        {/* ถ้ายังไม่พร้อม → แสดง skeleton แทน */}
         {!uidReady ? (
           <div style={{ textAlign: 'center', padding: 40 }}>กำลังโหลด…</div>
         ) : (

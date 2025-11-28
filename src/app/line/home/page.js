@@ -132,7 +132,7 @@ export default function HomePage() {
           background-color: #f3faee;
         }
       `}</style>
-
+      
       {/* Header */}
       <div className={styles.header}>
         <div className={styles.profile}>

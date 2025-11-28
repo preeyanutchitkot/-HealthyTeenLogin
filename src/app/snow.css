@@ -1,14 +1,47 @@
 .snowflake {
   position: fixed;
-  top: -10px;
-  color: white;
+  top: -30px;
   pointer-events: none;
-  animation-name: fall;
+  z-index: 9999;
   animation-timing-function: linear;
+  animation-fill-mode: forwards;
 }
 
-@keyframes fall {
-  to {
-    transform: translateY(100vh);
+.snowflake-img {
+  width: 25px;
+  height: 25px;
+  object-fit: contain;
+  opacity: 0.9;
+}
+
+.snowflake.left {
+  animation-name: fallLeft;
+}
+
+.snowflake.right {
+  animation-name: fallRight;
+}
+
+@keyframes fallLeft {
+  0% {
+    transform: translate(0, -10px);
+  }
+  50% {
+    transform: translate(-30px, 50vh);
+  }
+  100% {
+    transform: translate(30px, 100vh);
+  }
+}
+
+@keyframes fallRight {
+  0% {
+    transform: translate(0, -10px);
+  }
+  50% {
+    transform: translate(30px, 50vh);
+  }
+  100% {
+    transform: translate(-30px, 100vh);
   }
 }

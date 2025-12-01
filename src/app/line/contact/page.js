@@ -25,7 +25,7 @@ export default function ContactPage() {
       <div className={styles.social}>
         <a
           className={styles.btn}
-          href="https://line.me/R/ti/p/@696kpmzu"
+          href="https://line.me/R/ti/p/@570ajysg"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -39,7 +39,7 @@ export default function ContactPage() {
               style={{ width: '22px', height: 'auto' }}
             />
           </span>
-          LINE HEALTHY TEEN
+          ติดต่อแจ้งปัญหา
         </a>
 
         <a
@@ -62,7 +62,7 @@ export default function ContactPage() {
       </div>
 
       <div className={styles.version}>
-        version 2.6
+        version 2.7
       </div>
     </div>
   );
